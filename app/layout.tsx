@@ -1,9 +1,9 @@
 import './globals.css';
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
-import { cn } from "@/lib/utils"
+import { cn } from '@/lib/utils';
 import { SiteHeader } from '@/components/common/site-header';
-import { ThemeProvider } from "@/components/common/theme-provider"
+import { ThemeProvider } from '@/components/common/theme-provider';
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
@@ -17,13 +17,19 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className="lite">
-      <body className={inter.className}>  <ThemeProvider
-        attribute="class"
-        defaultTheme="system"
-        enableSystem
-        disableTransitionOnChange
-      ><SiteHeader />{children}</ThemeProvider></body>
+    <html lang='en' className='lite'>
+      <body className={inter.className}>
+        {' '}
+        <ThemeProvider
+          attribute='class'
+          defaultTheme='system'
+          enableSystem
+          disableTransitionOnChange
+        >
+          <SiteHeader />
+          {children}
+        </ThemeProvider>
+      </body>
     </html>
   );
 }
