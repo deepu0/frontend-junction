@@ -7,8 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "format": "prettier --check --ignore-path .gitignore package-lock.json .next .",
-    "format:fix": "prettier --write --ignore-path package-lock.json .gitignore .next ."
+    "format": "prettier --check --ignore-path .gitignore .",
+    "format:fix": "prettier --write --ignore-path  .gitignore ."
   },
   "dependencies": {
     "@radix-ui/react-dropdown-menu": "^2.0.6",

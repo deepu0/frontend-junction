@@ -22,7 +22,7 @@ const CardComponent: React.FC<CardProps> = ({
 
   return (
     <div
-      className={`max-w-md rounded-lg overflow-hidden shadow-md border ${theme === 'light' ? 'border-gray-200' : 'border-gray-700'} ${theme === 'light' ? 'bg-white' : 'bg-gray-800'} text-${theme === 'light' ? 'gray-700' : 'white'} transition duration-500 ease-in-out transform hover:scale-105`}
+      className={`max-w-md rounded-lg overflow-hidden shadow-md border ${theme === 'light' ? 'border-gray-200' : 'border-gray-700'} ${theme === 'light' ? 'bg-white-500' : 'bg-gray-800'} text-${theme === 'light' ? 'gray-700' : 'white'} transition duration-500 ease-in-out transform hover:scale-105`}
     >
       <img
         className='w-full h-25 object-cover'
