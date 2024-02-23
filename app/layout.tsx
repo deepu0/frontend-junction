@@ -45,13 +45,13 @@ export default function RootLayout({
         <meta property='og:image' content='/logo.png' />
         <meta property='og:url' content='https://www.yourwebsite.com' />
       </Head>
-      {process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS && (
+      {process.env.NEXT_GOOGLE_ANALYTICS && (
         <Script
           async
-          src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS}`}
+          src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_GOOGLE_ANALYTICS}`}
         />
       )}
-      {process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS && (
+      {process.env.NEXT_GOOGLE_ANALYTICS && (
         <Script
           id='google-analytics'
           dangerouslySetInnerHTML={{
@@ -59,7 +59,7 @@ export default function RootLayout({
             window.dataLayer = window.dataLayer || [];
             function gtag(){dataLayer.push(arguments);}
             gtag('js', new Date());
-            gtag('config', '${process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS}');
+            gtag('config', '${process.env.NEXT_GOOGLE_ANALYTICS}');
         `,
           }}
         />
