@@ -53,11 +53,11 @@ const roles: Role[] = [
 ];
 
 type FilterProps = {
-  searchText: string;
+  searchText?: string;
   companies?: Company[];
   roles?: Role[];
   onFilterChange: (filter: {
-    searchText: string;
+    searchText?: string;
     company?: string;
     role?: string;
   }) => void;

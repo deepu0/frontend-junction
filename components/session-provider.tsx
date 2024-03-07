@@ -13,7 +13,7 @@ export const useAuth = () => {
   return useContext(AuthContext)!;
 };
 
-export const AuthProvider: React.FC = ({ children }: any) => {
+export const AuthProvider = ({ children }: any) => {
   const [user, setUser] = useState<any | null>(null); // Update the type according to your user data structure
 
   const supabase = createBrowserClient<any>(
