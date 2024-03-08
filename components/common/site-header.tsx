@@ -21,7 +21,7 @@ export function SiteHeader() {
         </h1>
         <div className='flex flex-1 items-center  space-x-2 justify-end'>
           <nav className='flex items-center gap-2'>
-            <ModeToggle />
+            {/* <ModeToggle /> */}
             {user ? <Profile /> : <Login />}
           </nav>
         </div>

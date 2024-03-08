@@ -11,11 +11,15 @@ export default function Login() {
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
   );
 
+  const isProduction = process.env.NODE_ENV === 'production';
+
   const handleLogin = async () => {
     await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        redirectTo: `${location.origin}/auth/callback?next=${pathname}`,
+        redirectTo: isProduction
+          ? `https://frontend-junction.vercel.app/auth/callback?next=${pathname}`
+          : `${location.origin}/auth/callback?next=${pathname}`,
       },
     });
   };
