@@ -12,7 +12,6 @@ export default async function useGetExperiences() {
       )
       .order('created_at', { ascending: false })
       .eq('verification_status', 'approved');
-    console.log(data.length);
     if (error) throw error;
     return transformData(data) || [];
   } catch (err) {

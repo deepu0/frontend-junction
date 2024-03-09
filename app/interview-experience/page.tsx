@@ -1,6 +1,7 @@
 import InterviewExperiences from '@/components/experiences';
 import useGetExperiences from '@/hooks/useGetExperiences';
 
+export const dynamic = 'force-dynamic';
 export default async function Interview() {
   const data = await useGetExperiences();
 
