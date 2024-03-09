@@ -1,16 +1,18 @@
 import React from 'react';
 import { supabase } from '@/lib/supabase';
 
+export const revalidate = 60;
+
 export default async function useGetExperiences() {
   try {
     const { data, error } = await supabase
       .from('experiences')
       .select(
-        'id, title, summary, role, status, location, original_link,verification_status,detail_experience'
+        'id, title, summary, role, status, location, original_link,verification_status,detail_experience,user_id'
       )
-      .order('created_at', { ascending: false });
-    //.eq('verification_status', 'approved');
-
+      .order('created_at', { ascending: false })
+      .eq('verification_status', 'approved');
+    console.log(data.length);
     if (error) throw error;
     return transformData(data) || [];
   } catch (err) {

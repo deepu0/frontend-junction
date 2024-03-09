@@ -69,8 +69,14 @@ const CardComponent: React.FC<CardProps> = ({
       </div>
       {link && (
         <div className={`px-6 py-4   items-end`}>
-          <Link href={link} passHref={true} legacyBehavior={true}>
+          <Link
+            href={link}
+            passHref={true}
+            legacyBehavior={true}
+            target='_blank'
+          >
             <a
+              target='_blank'
               className={`bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full block text-center ${theme === 'light' ? 'hover:bg-blue-600' : 'hover:bg-blue-800'}`}
             >
               Read More
