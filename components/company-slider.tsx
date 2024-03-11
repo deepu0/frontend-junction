@@ -1,53 +1,41 @@
+'use client';
 import React from 'react';
 import { useTheme } from 'next-themes';
+import { motion } from 'framer-motion';
 
 interface CompanySliderProps {
-  companies: { logo: string; name: string }[];
+  companies: { logoUrl: string }[];
 }
 
 const CompanySlider: React.FC<CompanySliderProps> = ({ companies }) => {
-  const { theme } = useTheme();
-
   return (
-    <div className={`relative overflow-hidden `}>
-      <div className='flex animation-container'>
-        {[...companies, ...companies.slice(0, 4)].map((company, index) => (
-          <div key={index} className='px-4'>
-            <div className='animate-slidein'>
-              <img
-                src={company.logo}
-                alt={company.name}
-                className='mx-auto'
-                style={{ maxWidth: '100%', maxHeight: '100px' }}
+    <section className='bg-gray-900 py-20 w-screen'>
+      <div className='mx-auto px-4'>
+        <motion.h2
+          className='text-2xl md:text-3xl font-bold text-center mb-12 text-white'
+          initial={{ opacity: 0, y: -50 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.8 }}
+        >
+          Featured Companies
+        </motion.h2>
+        <div className='overflow-hidden w-screen'>
+          <div className='flex animate-slide'>
+            {companies.map((logo, index) => (
+              <motion.img
+                key={index}
+                src={logo.logoUrl}
+                alt={`Company Logo ${index + 1}`}
+                className='h-12 md:h-16 mx-4'
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.9 }}
               />
-              <p
-                className={`text-center mt-2 ${theme === 'light' ? 'text-gray-700' : 'text-gray-300'}`}
-              >
-                {company.name}
-              </p>
-            </div>
+            ))}
           </div>
-        ))}
+        </div>
       </div>
-      <style jsx>{`
-        @keyframes slidein {
-          0% {
-            transform: translateX(-100%);
-          }
-          100% {
-            transform: translateX(0);
-          }
-        }
-
-        .animate-slidein {
-          animation: slidein 10s linear infinite;
-        }
-
-        .animation-container {
-          display: flex;
-        }
-      `}</style>
-    </div>
+    </section>
   );
 };
 

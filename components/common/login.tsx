@@ -3,24 +3,16 @@ import { Button } from '@/components/ui/button';
 import { createBrowserClient } from '@supabase/ssr';
 import { usePathname } from 'next/navigation';
 import React from 'react';
+import handleLogin from '@/lib/handleLogin';
 
 export default function Login() {
   const pathname = usePathname();
-  const supabase = createBrowserClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-  );
+  const redirectTo = `/auth/callback?next=${pathname}`;
 
-  const isProduction = process.env.NODE_ENV === 'production';
-
-  const handleLogin = async () => {
-    await supabase.auth.signInWithOAuth({
+  const onClickLogin = async () => {
+    await handleLogin({
       provider: 'google',
-      options: {
-        redirectTo: isProduction
-          ? `https://frontend-junction.vercel.app/auth/callback?next=${pathname}`
-          : `${location.origin}/auth/callback?next=${pathname}`,
-      },
+      redirectTo,
     });
   };
 
@@ -28,7 +20,7 @@ export default function Login() {
     <Button
       className='flex items-center gap-2 bg-red-800 hover:bg-red-500'
       variant='outline'
-      onClick={handleLogin}
+      onClick={onClickLogin}
     >
       Sign in with{' '}
       <img
