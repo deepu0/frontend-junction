@@ -14,6 +14,8 @@ import { motion } from 'framer-motion';
 import handleLogin from '@/lib/handleLogin';
 import { usePathname } from 'next/navigation';
 import { useAuth } from './session-provider';
+import { useRouter } from 'next/navigation';
+
 interface Company {
   id: number;
   companyName: string;
@@ -25,12 +27,17 @@ interface IHomeProps {
 
 const LandingPage: React.FC<IHomeProps> = (props: IHomeProps) => {
   const { theme } = useTheme();
+  const router = useRouter();
   const { user = '' } = useAuth();
 
   const pathname = usePathname();
   const redirectTo = `/auth/callback?next=${pathname}/add-experience`;
 
   const onClickLogin = async () => {
+    if (user) {
+      router.push('./add-experience');
+      return;
+    }
     await handleLogin({
       provider: 'google',
       redirectTo,
@@ -67,14 +74,14 @@ const LandingPage: React.FC<IHomeProps> = (props: IHomeProps) => {
           frontend interview experiences from across the web, all in one place.
         </p>
         <div className='flex justify-center my-4 flex-row md:flex-row md:space-y-0 space-x-0  mt-10 gap-2'>
-          {!user && (
+          {
             <button
               onClick={onClickLogin}
               className='w-40 h-10 rounded-xl bg-black border dark:border-white border-transparent text-white text-sm mt-0 hover:scale-105'
             >
               Add Interview
             </button>
-          )}
+          }
           <button className='w-40 h-10 rounded-xl bg-white text-black border border-black  text-sm mt-0 hover:scale-105'>
             <Link href='/interview-experience'>Explore Experiences</Link>
           </button>
