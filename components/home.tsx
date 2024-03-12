@@ -28,7 +28,7 @@ const LandingPage: React.FC<IHomeProps> = (props: IHomeProps) => {
   const { user = '' } = useAuth();
 
   const pathname = usePathname();
-  const redirectTo = `/auth/callback?next=${pathname}`;
+  const redirectTo = `/auth/callback?next=${pathname}/add-experience`;
 
   const onClickLogin = async () => {
     await handleLogin({
@@ -72,7 +72,7 @@ const LandingPage: React.FC<IHomeProps> = (props: IHomeProps) => {
               onClick={onClickLogin}
               className='w-40 h-10 rounded-xl bg-black border dark:border-white border-transparent text-white text-sm mt-0 hover:scale-105'
             >
-              Join now
+              Add Interview
             </button>
           )}
           <button className='w-40 h-10 rounded-xl bg-white text-black border border-black  text-sm mt-0 hover:scale-105'>
