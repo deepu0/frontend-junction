@@ -1,4 +1,4 @@
-import { QuestionsActionsType, QuestionsStateType } from '@/reducers';
+import { QuestionsActionsType, QuestionsStateType } from '@/form/reducers';
 import { Dispatch, SetStateAction } from 'react';
 import { ObjectType } from './index';
 
