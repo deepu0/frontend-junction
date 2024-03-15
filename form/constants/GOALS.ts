@@ -7,9 +7,10 @@ export const FOUNDER_GOALS: ObjectType = {
 };
 
 export const NON_FOUNDER_GOALS: ObjectType = {
-  A: 'Get hired',
-  B: 'Get promoted',
-  C: 'Connect with like-minded people',
-  D: 'Structured approach to growth',
-  E: 'Build a growth team',
+  A: 'Frontend',
+  B: 'Frontend Interview',
+  C: 'UI Engineer',
+  D: 'Interview',
+  E: 'UI Engineer Interview Experience',
+  F: 'Frontend Interview Questions',
 };

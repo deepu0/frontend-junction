@@ -9,7 +9,6 @@ import { Question } from '../index';
 export function MainContent() {
   const { questionNum, setShowIndustriesList } = useSharedStates();
   const { prev, now } = questionNum;
-
   useHandleKeypress();
   useHandleScroll();
 
@@ -88,13 +87,22 @@ export function MainContent() {
             inViewSlide={prev === 6 ? 'down' : 'up'}
           />
         )}
-
-        {prev === 5 && [now - 1, now, now + 1].includes(6) && (
+        {[5, 7].includes(prev ?? 0) && [now - 1, now, now + 1].includes(6) && (
           <Question
-            type='email'
+            type='description'
             outView={[now - 1, now + 1].includes(6)}
             outViewSlide={now - 1 === 6 ? 'up' : 'down'}
             inView={now === 6}
+            inViewSlide={prev === 7 ? 'down' : 'up'}
+          />
+        )}
+
+        {prev === 6 && [now - 1, now, now + 1].includes(7) && (
+          <Question
+            type='email'
+            outView={[now - 1, now + 1].includes(7)}
+            outViewSlide={now - 1 === 7 ? 'up' : 'down'}
+            inView={now === 7}
             inViewSlide={'up'}
           />
         )}

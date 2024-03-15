@@ -8,3 +8,6 @@ type QuestionBoxParaProps = {
 export function QuestionBoxPara({ children }: QuestionBoxParaProps) {
   return <p className={styles['question-box__para']}>{children}</p>;
 }
+export function InterviewBoxPara({ children }: QuestionBoxParaProps) {
+  return <p className={styles['interview-box__para']}>{children}</p>;
+}

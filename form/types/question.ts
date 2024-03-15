@@ -13,6 +13,7 @@ export type QuestionProps = {
     | 'industry'
     | 'role'
     | 'goal'
+    | 'description'
     | 'email';
 };
 

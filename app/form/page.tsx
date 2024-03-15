@@ -15,10 +15,10 @@ export default function Home() {
 
   return (
     <>
-      <header className={styles.header}>
-        <ProgressBar width={percent} />
-      </header>
       <main className={styles.box}>
+        {/* //To do */}
+        {/* <ProgressBar width={percent} /> */}
+
         <div className={`${classNames(styles.main, questrialFont.className)}`}>
           <QuestionsProvider>
             <SharedStatesProvider>

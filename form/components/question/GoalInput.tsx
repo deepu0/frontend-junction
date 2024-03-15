@@ -46,13 +46,12 @@ export function GoalInput() {
     }
   }
 
-  const chooseNum = 2 - goals.length;
+  const chooseNum = 3 - goals.length;
 
   return (
     <>
       <QuestionNumHeading questionNum={5}>
-        {firstName}, what&apos;s your professional goal for the next 12 months?
-        *
+        Tags related to your Frontend experience *
       </QuestionNumHeading>
 
       {chooseNum === 2 && (
@@ -60,6 +59,9 @@ export function GoalInput() {
       )}
       {chooseNum === 1 && (
         <span className={styles['choose-num']}>Choose 1 more</span>
+      )}
+      {chooseNum === 3 && (
+        <span className={styles['choose-num']}>Choose 3 more</span>
       )}
 
       <DropdownSelect
@@ -105,7 +107,7 @@ export function GoalInput() {
 
       {errorMsg && <Error message={errorMsg} />}
 
-      {goals.length === 2 && errorMsg === '' && (
+      {goals.length === 3 && errorMsg === '' && (
         <BtnContainer
           className={classNames(styles['btn-container'], styles['ok'])}
           showPressEnter={false}

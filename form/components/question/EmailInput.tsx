@@ -32,19 +32,19 @@ export function EmailInput() {
 
   return (
     <>
-      <QuestionNumHeading questionNum={6}>
-        Email you&apos;d like to register with? *
+      <QuestionNumHeading questionNum={7}>
+        🔗 Please provide a link to your LinkedIn profile.? *
       </QuestionNumHeading>
 
-      <QuestionBoxPara>
+      {/* <QuestionBoxPara>
         We will keep all our communications with you through this email. Do
         check your span inbox if you can&apos;t find our application received
         email.
-      </QuestionBoxPara>
+      </QuestionBoxPara> */}
 
       <QuestionInputText
         type='email'
-        placeholder='name@example.com'
+        placeholder='https://www.linkedin.com/in/username'
         value={email}
         onChange={handleInputChange}
       />
@@ -57,7 +57,7 @@ export function EmailInput() {
           showPressEnter={true}
           onClick={handleOkClick}
         >
-          OK{' '}
+          Submit{' '}
           <Image
             src='/check-small.svg'
             alt='check small'

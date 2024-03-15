@@ -4,6 +4,7 @@ export const questionsInitialState = {
   industry: '',
   role: '',
   goals: [],
+  description: '',
   email: '',
 };
 
@@ -13,5 +14,7 @@ export type QuestionsStateType = {
   industry: string;
   role: string;
   goals: string[];
+  description: string;
   email: string;
+  QuestionsStateType: string;
 };

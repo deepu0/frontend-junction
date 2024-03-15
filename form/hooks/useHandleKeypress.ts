@@ -1,5 +1,9 @@
 import { useQuestions, useSharedStates } from '@/form/contexts';
-import { isNotValidEmail, isTaskSpecificEmail } from '@/form/utils';
+import {
+  isNotValidEmail,
+  isTaskSpecificEmail,
+  isValidLinkedInUrl,
+} from '@/form/utils';
 import { useEffect } from 'react';
 
 export function useHandleKeypress() {
@@ -8,7 +12,8 @@ export function useHandleKeypress() {
 
   const { now } = questionNum;
   const { state } = useQuestions();
-  const { firstName, lastName, industry, role, goals, email } = state;
+  const { firstName, lastName, industry, role, goals, email, description } =
+    state;
 
   useEffect(() => {
     function handleKeypress(event: KeyboardEvent) {
@@ -51,29 +56,39 @@ export function useHandleKeypress() {
             goals: 'Please select more choices',
           }));
           return;
-        } else if (now + 1 === 7 && email === '') {
+        } else if (now + 1 === 7 && description === '') {
           setErrorMsg((prevValue) => ({
             ...prevValue,
             email: 'Please fill this in',
           }));
           return;
-        } else if (now + 1 === 7 && email && isNotValidEmail(email)) {
+        } else if (now + 1 === 8 && email === '') {
           setErrorMsg((prevValue) => ({
             ...prevValue,
-            email: "Hmm... that email doesn't look right",
+            email: 'Please fill this in',
           }));
           return;
-        } else if (
-          now + 1 === 7 &&
-          email &&
-          !isNotValidEmail(email) &&
-          isTaskSpecificEmail(email)
-        ) {
+        } else if (now + 1 === 8 && email && !isValidLinkedInUrl(email)) {
           setErrorMsg((prevValue) => ({
             ...prevValue,
-            email: 'Hmm... task specific emails are not allowed',
+            email: "Hmm... that link doesn't look right",
           }));
           return;
+        }
+        // } else if (
+        //   now + 1 === 8 &&
+        //   email &&
+        //   !isNotValidEmail(email) &&
+        //   isTaskSpecificEmail(email)
+        // ) {
+        //   setErrorMsg((prevValue) => ({
+        //     ...prevValue,
+        //     email: 'Hmm... task specific emails are not allowed',
+        //   }));
+        //   return;
+        // }
+        if (now == 7) {
+          alert(JSON.stringify(state));
         }
 
         handleQuestionNumUpdate();
@@ -87,5 +102,5 @@ export function useHandleKeypress() {
     };
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [firstName, industry, lastName, now, role, goals, email]);
+  }, [firstName, industry, lastName, now, role, goals, email, description]);
 }

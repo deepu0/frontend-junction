@@ -32,7 +32,7 @@ export function LastNameInput() {
   return (
     <>
       <QuestionNumHeading questionNum={2}>
-        and your last name, {firstName}? *
+        Where was the {firstName}`s job location 🌍 ? *
       </QuestionNumHeading>
 
       <QuestionInputText

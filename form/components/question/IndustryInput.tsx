@@ -8,7 +8,7 @@ import {
 import classNames from 'classnames';
 import styles from './Question.module.css';
 import Image from 'next/image';
-import { useSharedStates } from '@/form/contexts';
+import { useSharedStates, useQuestions } from '@/form/contexts';
 
 export function IndustryInput() {
   const {
@@ -19,16 +19,20 @@ export function IndustryInput() {
     handleOkClick,
   } = useSharedStates();
   const errorMsg = error.industry ?? '';
+  const { state, dispatch } = useQuestions();
+
+  const { firstName, lastName } = state;
 
   return (
     <>
       <QuestionNumHeading questionNum={3}>
-        What industry is your company in? *
+        {/* 🔍 What was the status of the interview result? * */}
+        What job title were you chasing at
       </QuestionNumHeading>
 
-      <QuestionBoxPara>
+      {/* <QuestionBoxPara>
         We will personalize your learning experience accordingly
-      </QuestionBoxPara>
+      </QuestionBoxPara> */}
 
       <QuestionInputIndustries
         showIndustriesList={showIndustriesList}

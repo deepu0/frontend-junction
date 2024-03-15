@@ -2,6 +2,8 @@
   animation: grow-right 0.5s ease-out 1 forwards;
   background-color: rgba(0, 119, 255, 0.3);
   height: 4px;
+  position: relative;
+  top: 50px;
 }
 
 @keyframes grow-right {
@@ -17,7 +19,7 @@
 }
 
 .progress-bar {
-  background-color: var(--primary-color);
+  background-color: red;
   height: 100%;
   transition: width 0.5s;
 }

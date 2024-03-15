@@ -8,6 +8,7 @@ import {
   SET_ROLE,
   SET_GOALS,
   SET_EMAIL,
+  SET_DESCRIPTION,
 } from '../index';
 
 export function questionsReducerFunc(
@@ -17,6 +18,8 @@ export function questionsReducerFunc(
   switch (action.type) {
     case SET_FIRST_NAME:
       return { ...state, firstName: action.payload };
+    case SET_DESCRIPTION:
+      return { ...state, description: action.payload };
 
     case SET_LAST_NAME:
       return { ...state, lastName: action.payload };
