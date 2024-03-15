@@ -57,7 +57,7 @@ export function EmailInput() {
           showPressEnter={true}
           onClick={handleOkClick}
         >
-          Submit{' '}
+          Ok{' '}
           <Image
             src='/check-small.svg'
             alt='check small'

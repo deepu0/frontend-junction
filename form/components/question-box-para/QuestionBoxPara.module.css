@@ -1,13 +1,13 @@
 .question-box__para {
   color: var(--para-text-color);
-  font-size: 2rem;
+  font-size: 1.5rem;
   font-weight: unset;
   line-height: 1.4em;
   margin-top: 12px;
 }
 .interview-box__para {
   color: var(--para-text-color);
-  font-size: 1rem;
+  font-size: 0.9rem;
   font-weight: unset;
   line-height: 1.4em;
   margin-top: 12px;

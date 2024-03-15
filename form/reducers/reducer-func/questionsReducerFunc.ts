@@ -9,7 +9,10 @@ import {
   SET_GOALS,
   SET_EMAIL,
   SET_DESCRIPTION,
+  SET_IDENTITY,
+  RESET_STATE,
 } from '../index';
+import { questionsInitialState } from '../states/questionsInitialState';
 
 export function questionsReducerFunc(
   state: QuestionsStateType,
@@ -41,6 +44,10 @@ export function questionsReducerFunc(
 
     case SET_EMAIL:
       return { ...state, email: action.payload };
+    case SET_IDENTITY:
+      return { ...state, identity: action.payload };
+    case RESET_STATE:
+      return questionsInitialState;
 
     default:
       return state;

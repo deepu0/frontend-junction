@@ -5,3 +5,8 @@ export const ROLES: ObjectType = {
   B: 'Ghosted 👻',
   C: 'Rejected ❌',
 };
+
+export const IDENTITY: ObjectType = {
+  A: 'Reveal my identity',
+  B: 'Anonymous 👻',
+};

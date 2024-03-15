@@ -5,11 +5,15 @@ import { useSharedStates } from '@/form/contexts';
 import { useHandleKeypress, useHandleScroll } from '@/form/hooks';
 import { useEffect } from 'react';
 import { Question } from '../index';
+import { useAuth } from '@/components/session-provider';
+import Success from '@/components/common/confetti';
 
 export function MainContent() {
   const { questionNum, setShowIndustriesList } = useSharedStates();
   const { prev, now } = questionNum;
-  useHandleKeypress();
+
+  const { user } = useAuth();
+  const { isLoading, isFailure, isSuccess } = useHandleKeypress();
   useHandleScroll();
   const [isMounted, setIsMounted] = useState(false);
 
@@ -32,6 +36,14 @@ export function MainContent() {
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isMounted]);
+
+  console.log(now, isLoading, isFailure, isSuccess);
+  if (isLoading) {
+    return <p>Submitting your data...</p>;
+  }
+  if (isSuccess) {
+    return <Success />;
+  }
 
   return (
     <section>
@@ -103,13 +115,22 @@ export function MainContent() {
             inViewSlide={prev === 7 ? 'down' : 'up'}
           />
         )}
-
-        {prev === 6 && [now - 1, now, now + 1].includes(7) && (
+        {[6, 8].includes(prev ?? 0) && [now - 1, now, now + 1].includes(7) && (
           <Question
             type='email'
             outView={[now - 1, now + 1].includes(7)}
             outViewSlide={now - 1 === 7 ? 'up' : 'down'}
             inView={now === 7}
+            inViewSlide={prev === 8 ? 'down' : 'up'}
+          />
+        )}
+
+        {prev === 7 && [now - 1, now, now + 1].includes(8) && (
+          <Question
+            type='identity'
+            outView={[now - 1, now + 1].includes(8)}
+            outViewSlide={now - 1 === 8 ? 'up' : 'down'}
+            inView={now === 8}
             inViewSlide={'up'}
           />
         )}

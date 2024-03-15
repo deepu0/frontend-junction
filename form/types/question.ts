@@ -14,7 +14,8 @@ export type QuestionProps = {
     | 'role'
     | 'goal'
     | 'description'
-    | 'email';
+    | 'email'
+    | 'identity';
 };
 
 export type IndustriesProps = {

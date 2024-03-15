@@ -74,6 +74,7 @@ const mobileToolbar = [
   { list: 'bullet' },
   { list: 'ordered' },
   { header: [1, 2, 3, 4, 5, false] },
+  ['link'],
 ];
 
 const formats = [

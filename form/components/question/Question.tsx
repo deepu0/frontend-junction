@@ -9,6 +9,7 @@ import {
   LastNameInput,
   RoleInput,
   InterviewInput,
+  IdentityInput,
 } from './index';
 import styles from './Question.module.css';
 
@@ -40,6 +41,7 @@ export function Question({
       {type === 'goal' && <GoalInput />}
       {type === 'email' && <EmailInput />}
       {type === 'description' && <InterviewInput />}
+      {type === 'identity' && <IdentityInput />}
     </div>
   );
 }

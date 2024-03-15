@@ -7,6 +7,8 @@ export const SET_DESCRIPTION = 'SET_DESCRIPTION';
 export const SET_GOALS = 'SET_GOALS';
 export const REMOVE_GOAL = 'REMOVE_GOAL';
 export const SET_EMAIL = 'SET_EMAIL';
+export const SET_IDENTITY = 'SET_IDENTITY';
+export const RESET_STATE = 'RESET_STATE';
 
 export type QuestionsActionsType =
   | { type: 'SET_FIRST_NAME'; payload: string }
@@ -22,4 +24,6 @@ export type QuestionsActionsType =
   | { type: 'SET_GOALS'; payload: string }
   | { type: 'REMOVE_GOAL'; payload: string }
   | { type: 'SET_DESCRIPTION'; payload: string }
-  | { type: 'SET_EMAIL'; payload: string };
+  | { type: 'SET_EMAIL'; payload: string }
+  | { type: 'SET_IDENTITY'; payload: string }
+  | { type: 'RESET_STATE'; payload: string };

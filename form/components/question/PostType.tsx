@@ -10,15 +10,15 @@ import classNames from 'classnames';
 import styles from './Question.module.css';
 import Image from 'next/image';
 import { useQuestions, useSharedStates } from '@/form/contexts';
-import { ROLES } from '@/form/constants';
-import { SET_ROLE } from '@/form/reducers';
+import { IDENTITY } from '@/form/constants';
+import { SET_ROLE, SET_IDENTITY } from '@/form/reducers';
 
-export function RoleInput() {
+export function IdentityInput() {
   const { errorMsg: error, setErrorMsg, handleOkClick } = useSharedStates();
   const { state, dispatch } = useQuestions();
 
   const errorMsg = error.role ?? '';
-  const { role } = state;
+  const { identity } = state;
 
   function handleDropdownOptionClick(_role: string) {
     setErrorMsg &&
@@ -27,39 +27,39 @@ export function RoleInput() {
         return prevValue;
       });
 
-    if (_role === role) {
-      dispatch({ type: SET_ROLE, payload: '' });
+    if (_role === identity) {
+      dispatch({ type: SET_IDENTITY, payload: '' });
     } else {
-      dispatch({ type: SET_ROLE, payload: _role });
+      dispatch({ type: SET_IDENTITY, payload: _role });
       setTimeout(() => handleOkClick(), 600);
     }
   }
 
   return (
     <>
-      <QuestionNumHeading questionNum={4}>
-        What was the status of the interview result ?*
+      <QuestionNumHeading questionNum={8}>
+        🎭 Would you like to reveal your identity or remain anonymous?*
       </QuestionNumHeading>
 
       {/* <QuestionBoxPara>
-        We want to understand how you spend your time right now.
-      </QuestionBoxPara> */}
+          We want to understand how you spend your time right now.
+        </QuestionBoxPara> */}
 
       <DropdownSelect className={styles['role-dropdown']}>
         <div>
-          {Object.keys(ROLES).map((roleKey) => {
-            const _role = ROLES[roleKey];
+          {Object.keys(IDENTITY).map((roleKey) => {
+            const _role = IDENTITY[roleKey];
 
             return (
               <DropdownSelectOption
                 key={roleKey}
                 className={styles['role-option']}
                 onClick={() => handleDropdownOptionClick(_role)}
-                isSelected={_role === role}
+                isSelected={_role === identity}
               >
                 <span
                   className={classNames({
-                    [styles['selected']]: _role === role,
+                    [styles['selected']]: _role === identity,
                   })}
                 >
                   {roleKey}
@@ -73,13 +73,13 @@ export function RoleInput() {
 
       {errorMsg && <Error message={errorMsg} />}
 
-      {role && errorMsg === '' && (
+      {identity && errorMsg === '' && (
         <BtnContainer
           className={classNames(styles['btn-container'], styles['ok'])}
           showPressEnter={false}
           onClick={handleOkClick}
         >
-          OK{' '}
+          Submit{' '}
           <Image
             src='/check-small.svg'
             alt='check small'

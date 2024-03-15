@@ -28,8 +28,16 @@ export function QuestionsProvider({ children }: QuestionsProviderType) {
   const percent = useMemo(
     function () {
       let answeredQues = 0;
-      const { firstName, lastName, industry, role, description, goals, email } =
-        state;
+      const {
+        firstName,
+        lastName,
+        industry,
+        role,
+        description,
+        goals,
+        email,
+        identity,
+      } = state;
 
       if (firstName) answeredQues += 1;
       if (lastName) answeredQues += 1;
@@ -39,6 +47,7 @@ export function QuestionsProvider({ children }: QuestionsProviderType) {
 
       if (goals.length !== 0) answeredQues += 1;
       if (email) answeredQues += 1;
+      if (identity) answeredQues += 1;
 
       return (answeredQues * 100) / TOTAL_QUESTIONS;
     },

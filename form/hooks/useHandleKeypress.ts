@@ -4,6 +4,7 @@ import {
   isTaskSpecificEmail,
   isValidLinkedInUrl,
 } from '@/form/utils';
+import useCustomSubmit from './useSubmit';
 import { useEffect } from 'react';
 
 export function useHandleKeypress() {
@@ -11,9 +12,18 @@ export function useHandleKeypress() {
     useSharedStates();
 
   const { now } = questionNum;
+  const { onSubmit, isLoading, isFailure, isSuccess } = useCustomSubmit(now);
   const { state } = useQuestions();
-  const { firstName, lastName, industry, role, goals, email, description } =
-    state;
+  const {
+    firstName,
+    lastName,
+    industry,
+    role,
+    goals,
+    email,
+    description,
+    identity,
+  } = state;
 
   useEffect(() => {
     function handleKeypress(event: KeyboardEvent) {
@@ -74,6 +84,12 @@ export function useHandleKeypress() {
             email: "Hmm... that link doesn't look right",
           }));
           return;
+        } else if (now + 1 === 9 && identity === '') {
+          setErrorMsg((prevValue) => ({
+            ...prevValue,
+            role: 'Oops! Please make a selection',
+          }));
+          return;
         }
         // } else if (
         //   now + 1 === 8 &&
@@ -87,11 +103,11 @@ export function useHandleKeypress() {
         //   }));
         //   return;
         // }
-        if (now == 7) {
-          alert(JSON.stringify(state));
-        }
 
         handleQuestionNumUpdate();
+        if (now === 8) {
+          onSubmit();
+        }
       }
     }
 
@@ -102,5 +118,21 @@ export function useHandleKeypress() {
     };
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [firstName, industry, lastName, now, role, goals, email, description]);
+  }, [
+    firstName,
+    industry,
+    lastName,
+    now,
+    role,
+    goals,
+    email,
+    description,
+    identity,
+  ]);
+
+  return {
+    isLoading,
+    isFailure,
+    isSuccess,
+  };
 }
