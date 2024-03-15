@@ -6,10 +6,16 @@ import {
   useEffect,
   useRef,
 } from 'react';
-import TextEditor from '@/components/common/text-editor';
+import dynamic from 'next/dynamic';
+//import TextEditor from '@/components/common/text-editor';
 import styles from './QuestionInputText.module.css';
 import classNames from 'classnames';
-
+const TextEditor = dynamic(
+  () => {
+    return import('@/components/common/text-editor');
+  },
+  { ssr: false }
+);
 type QuestionInputTextProps = {
   readonly placeholder?: string;
   readonly className?: string;

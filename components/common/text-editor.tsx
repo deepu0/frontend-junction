@@ -7,7 +7,7 @@ import ReactQuill, { Quill } from 'react-quill';
 //import { UploadToS3 } from 'utils/UploadFile';
 
 import { isMobile } from 'mobile-device-detect';
-import 'quill-emoji/dist/quill-emoji.css';
+//import 'quill-emoji/dist/quill-emoji.css';
 
 var BaseImageFormat = Quill.import('formats/image');
 var BaseEmbedFormat = Quill.import('formats/video');
@@ -15,7 +15,7 @@ const ImageFormatAttributesList = ['alt', 'height', 'width', 'style'];
 const EmbedFormatAttributesList = ['alt', 'height', 'width', 'style'];
 
 // class ImageFormat extends BaseImageFormat {
-//   static formats(domNode) {
+//   static formats(domNode: any) {
 //     return ImageFormatAttributesList.reduce(function (formats, attribute) {
 //       if (domNode.hasAttribute(attribute)) {
 //         formats[attribute] = domNode.getAttribute(attribute);
@@ -23,7 +23,7 @@ const EmbedFormatAttributesList = ['alt', 'height', 'width', 'style'];
 //       return formats;
 //     }, {});
 //   }
-//   format(name, value) {
+//   format(name: any, value: any) {
 //     if (ImageFormatAttributesList.indexOf(name) > -1) {
 //       if (value) {
 //         this.domNode.setAttribute(name, value);
@@ -36,7 +36,7 @@ const EmbedFormatAttributesList = ['alt', 'height', 'width', 'style'];
 //   }
 // }
 // class EmbedFormat extends BaseImageFormat {
-//   static formats(domNode) {
+//   static formats(domNode: any) {
 //     return EmbedFormatAttributesList.reduce(function (formats, attribute) {
 //       if (domNode.hasAttribute(attribute)) {
 //         formats[attribute] = domNode.getAttribute(attribute);
@@ -44,7 +44,7 @@ const EmbedFormatAttributesList = ['alt', 'height', 'width', 'style'];
 //       return formats;
 //     }, {});
 //   }
-//   format(name, value) {
+//   format(name: any, value: any) {
 //     if (EmbedFormatAttributesList.indexOf(name) > -1) {
 //       if (value) {
 //         this.domNode.setAttribute(name, value);
@@ -91,7 +91,7 @@ const formats = [
   'direction',
   'align',
   'link',
-  'emoji',
+  //'emoji',
   'height',
   'width',
   'class',
@@ -103,8 +103,8 @@ const tabToolbar = [
   [{ list: 'bullet' }, { list: 'ordered' }, { align: [] }],
   // [{ size: ["Select Size", "12px", "14px", "16px", "18px"] }],
   [{ header: [1, 2, 3, 4, 5, false] }],
-  ['link', 'image', 'video'],
-  ['emoji'],
+  ['link'],
+  //['emoji'],
 ];
 
 type Props = {
@@ -116,9 +116,9 @@ type Props = {
 };
 const modules = {
   toolbar: tabToolbar,
-  'emoji-toolbar': true,
-  'emoji-textarea': false,
-  'emoji-shortname': true,
+  // 'emoji-toolbar': true,
+  // 'emoji-textarea': false,
+  // 'emoji-shortname': true,
   blotFormatter: {},
   //   imageUploader: {
   //     upload: async (file: any) => {
@@ -139,9 +139,9 @@ const modules = {
 
 const mobileModules = {
   toolbar: mobileToolbar,
-  'emoji-toolbar': true,
-  'emoji-textarea': false,
-  'emoji-shortname': true,
+  // 'emoji-toolbar': true,
+  // 'emoji-textarea': false,
+  // 'emoji-shortname': true,
   blotFormatter: {},
   //   imageUploader: {
   //     upload: async (file: any) => {

@@ -1,6 +1,6 @@
 'use client';
 import '@/styles/globals.css';
-
+import { useState } from 'react';
 import { useSharedStates } from '@/form/contexts';
 import { useHandleKeypress, useHandleScroll } from '@/form/hooks';
 import { useEffect } from 'react';
@@ -11,20 +11,27 @@ export function MainContent() {
   const { prev, now } = questionNum;
   useHandleKeypress();
   useHandleScroll();
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   useEffect(() => {
     function handleClick() {
       setShowIndustriesList(false);
     }
-
-    document.addEventListener('click', handleClick);
+    if (typeof window !== 'undefined') {
+      // browser code
+      document.addEventListener('click', handleClick);
+    }
 
     return function () {
       document.removeEventListener('click', handleClick);
     };
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [isMounted]);
 
   return (
     <section>
