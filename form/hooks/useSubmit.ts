@@ -33,7 +33,6 @@ const useCustomSubmit = (now: number) => {
         verification_status:
           user.role === 'superadmin' ? 'approved' : 'pending',
       };
-      alert(JSON.stringify(experienceData));
       const { data, error: insertError } = await supabase
         .from('experiences')
         .insert({ ...experienceData });

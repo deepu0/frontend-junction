@@ -34,7 +34,7 @@ html::-webkit-scrollbar {
 
 body {
   background-color: var(--body-background-color);
-  /* font-size: 1.6rem; */
+  font-size: 1.6rem;
 }
 
 a {
@@ -44,6 +44,6 @@ a {
 
 @media screen and (max-width: 599px) {
   html {
-    /* font-size: 52%; */
+    font-size: 52%;
   }
 }
