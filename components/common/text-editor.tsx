@@ -177,7 +177,6 @@ const TextEditor: React.FC<Props> = (props: Props) => {
   useEffect(() => {
     onChangeHandler(editorText);
   }, [editorText]);
-  console.log(showAllOptions, isMobile);
 
   return (
     <ReactQuill

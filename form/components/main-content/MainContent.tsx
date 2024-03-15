@@ -37,7 +37,6 @@ export function MainContent() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isMounted]);
 
-  console.log(now, isLoading, isFailure, isSuccess);
   if (isLoading) {
     return <p>Submitting your data...</p>;
   }
