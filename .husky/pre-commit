@@ -1,0 +1,15 @@
+. "$(dirname "$0")/_/husky.sh"
+
+echo 'Styling,testing and building the project before commiting.\n'
+
+npm run check-types || (
+    echo 'Failed Type checking.'
+    false;
+)
+
+npm run format || (
+    echo 'Prettier Failed Type checking.'
+    false;
+)
+
+echo 'All good commiting your changes'
