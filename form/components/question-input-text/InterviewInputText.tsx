@@ -14,7 +14,7 @@ type QuestionInputTextProps = {
   readonly placeholder?: string;
   readonly className?: string;
   readonly value?: string;
-  readonly onChange?: ChangeEventHandler<HTMLTextAreaElement>; // Change to HTMLTextAreaElement
+  readonly onChange?: any; // Change to HTMLTextAreaElement
 };
 
 const InterviewInputText = forwardRef(

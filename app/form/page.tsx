@@ -2,13 +2,18 @@
 import '@/styles/globals.css';
 import styles from '@/styles/Home.module.css';
 import { questrialFont } from '@/form/utils';
-import { MainContent, ProgressBar } from '@/form/components';
+//import { MainContent } from '@/form/components';
 import classNames from 'classnames';
+import dynamic from 'next/dynamic';
 import {
   SharedStatesProvider,
   useQuestions,
   QuestionsProvider,
 } from '@/form/contexts';
+const DynamicComponentWithNoSSR = dynamic(
+  (): any => import('@/form/components'),
+  { ssr: false }
+);
 
 export default function Home() {
   const { percent } = useQuestions();
@@ -22,7 +27,7 @@ export default function Home() {
         <div className={`${classNames(styles.main, questrialFont.className)}`}>
           <QuestionsProvider>
             <SharedStatesProvider>
-              <MainContent />
+              <DynamicComponentWithNoSSR />
             </SharedStatesProvider>
           </QuestionsProvider>
         </div>

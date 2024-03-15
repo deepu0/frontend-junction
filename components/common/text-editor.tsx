@@ -1,5 +1,5 @@
 import BlotFormatter from 'quill-blot-formatter';
-import * as Emoji from 'quill-emoji';
+//import * as Emoji from 'quill-emoji';
 //import ImageUploader from 'quill-image-uploader';
 import 'quill/dist/quill.snow.css';
 import React, { useEffect, useState } from 'react';
@@ -14,48 +14,48 @@ var BaseEmbedFormat = Quill.import('formats/video');
 const ImageFormatAttributesList = ['alt', 'height', 'width', 'style'];
 const EmbedFormatAttributesList = ['alt', 'height', 'width', 'style'];
 
-class ImageFormat extends BaseImageFormat {
-  static formats(domNode) {
-    return ImageFormatAttributesList.reduce(function (formats, attribute) {
-      if (domNode.hasAttribute(attribute)) {
-        formats[attribute] = domNode.getAttribute(attribute);
-      }
-      return formats;
-    }, {});
-  }
-  format(name, value) {
-    if (ImageFormatAttributesList.indexOf(name) > -1) {
-      if (value) {
-        this.domNode.setAttribute(name, value);
-      } else {
-        this.domNode.removeAttribute(name);
-      }
-    } else {
-      super.format(name, value);
-    }
-  }
-}
-class EmbedFormat extends BaseImageFormat {
-  static formats(domNode) {
-    return EmbedFormatAttributesList.reduce(function (formats, attribute) {
-      if (domNode.hasAttribute(attribute)) {
-        formats[attribute] = domNode.getAttribute(attribute);
-      }
-      return formats;
-    }, {});
-  }
-  format(name, value) {
-    if (EmbedFormatAttributesList.indexOf(name) > -1) {
-      if (value) {
-        this.domNode.setAttribute(name, value);
-      } else {
-        this.domNode.removeAttribute(name);
-      }
-    } else {
-      super.format(name, value);
-    }
-  }
-}
+// class ImageFormat extends BaseImageFormat {
+//   static formats(domNode) {
+//     return ImageFormatAttributesList.reduce(function (formats, attribute) {
+//       if (domNode.hasAttribute(attribute)) {
+//         formats[attribute] = domNode.getAttribute(attribute);
+//       }
+//       return formats;
+//     }, {});
+//   }
+//   format(name, value) {
+//     if (ImageFormatAttributesList.indexOf(name) > -1) {
+//       if (value) {
+//         this.domNode.setAttribute(name, value);
+//       } else {
+//         this.domNode.removeAttribute(name);
+//       }
+//     } else {
+//       super.format(name, value);
+//     }
+//   }
+// }
+// class EmbedFormat extends BaseImageFormat {
+//   static formats(domNode) {
+//     return EmbedFormatAttributesList.reduce(function (formats, attribute) {
+//       if (domNode.hasAttribute(attribute)) {
+//         formats[attribute] = domNode.getAttribute(attribute);
+//       }
+//       return formats;
+//     }, {});
+//   }
+//   format(name, value) {
+//     if (EmbedFormatAttributesList.indexOf(name) > -1) {
+//       if (value) {
+//         this.domNode.setAttribute(name, value);
+//       } else {
+//         this.domNode.removeAttribute(name);
+//       }
+//     } else {
+//       super.format(name, value);
+//     }
+//   }
+// }
 
 let Size = Quill.import('attributors/style/size');
 Size.whitelist = ['12px', '14px', '16px', '18px'];
@@ -64,7 +64,7 @@ Quill.register(Size, true);
 //Quill.register(ImageFormat, true);
 //Quill.register(EmbedFormat, true);
 //Quill.register('modules/imageUploader', ImageUploader);
-Quill.register('modules/emoji', Emoji);
+//Quill.register('modules/emoji', Emoji);
 Quill.register('modules/blotFormatter', BlotFormatter);
 
 const mobileToolbar = [

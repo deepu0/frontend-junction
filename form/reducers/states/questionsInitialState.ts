@@ -16,5 +16,5 @@ export type QuestionsStateType = {
   goals: string[];
   description: string;
   email: string;
-  QuestionsStateType: string;
+  QuestionsStateType?: string;
 };

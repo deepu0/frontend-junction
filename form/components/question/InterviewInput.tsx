@@ -19,9 +19,7 @@ export function InterviewInput() {
   const errorMsg = error.description ?? '';
   const { description } = state;
 
-  const handleInputChange: ChangeEventHandler<HTMLInputElement> = (
-    event: any
-  ) => {
+  const handleInputChange = (event: any) => {
     errorMsg &&
       setErrorMsg &&
       setErrorMsg((prevValue) => {
