@@ -20,7 +20,7 @@ const CompanySlider: React.FC<CompanySliderProps> = ({ companies }) => {
         >
           Featured Companies
         </motion.h2>
-        <div className='overflow-hidden w-screen'>
+        <div className='overflow-hidden w-full '>
           <div className='flex animate-slide'>
             {companies.map((logo, index) => (
               <motion.img

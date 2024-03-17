@@ -88,6 +88,18 @@
   animation: slide 30s linear infinite;
 }
 
+.loader {
+  border-top-color: orange;
+  border-left-color: #ffffff;
+  animation: spin 1.5s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 .custom-quill-editor {
   width: fit-content;
   min-width: 100%;

@@ -60,6 +60,9 @@ export async function middleware(request: NextRequest) {
 
   const { data } = await supabase.auth.getSession();
   if (data.session) {
+    if (pathname === '/add-experience') {
+      return response;
+    }
     if (
       // protect this page only admin can access this /dashboard/members
       data.session.user.user_metadata.role !== 'admin'
@@ -72,5 +75,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/dashboard/:path*'],
+  matcher: ['/dashboard/:path*', '/add-experience'],
 };

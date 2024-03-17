@@ -8,5 +8,6 @@
   .question-box__heading {
     line-height: 1.35em;
     margin-top: -15px;
+    font-size: 1.5rem;
   }
 }

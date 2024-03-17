@@ -2,7 +2,7 @@ import LandingPage from '@/components/home';
 import useGetCompanies from '@/hooks/useGetCompanies';
 import type { Metadata } from 'next';
 
-const metaData: Metadata = {
+export const metadata: Metadata = {
   title: 'Front-end Junction: Insider Front-end Interview Insights',
   description:
     'Gain insider knowledge and prepare better for your front-end developer job interviews. Browse through real candidate experiences from top companies. Get tips, advice, and valuable insights.',

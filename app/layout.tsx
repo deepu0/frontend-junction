@@ -8,6 +8,7 @@ import { ThemeProvider } from '@/components/common/theme-provider';
 import Script from 'next/script';
 import { AuthProvider } from '@/components/session-provider';
 import { Toaster } from '@/components/ui/toaster';
+import { LoadingProvider } from '@/components/common/loader';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -50,12 +51,12 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <Toaster />
-          <AuthProvider>
-            <>
+          <LoadingProvider>
+            <AuthProvider>
               <SiteHeader />
               {children}
-            </>
-          </AuthProvider>
+            </AuthProvider>
+          </LoadingProvider>
         </ThemeProvider>
       </body>
     </html>

@@ -7,7 +7,8 @@ export function Intro() {
   return (
     <>
       <QuestionBoxHeading>
-        Share Your Interview Journey with Frontend Junction! 💡
+        Share Your Interview Journey with{' '}
+        <b className='text-orange-500'>Frontend Junction!</b> 💡
       </QuestionBoxHeading>
       <QuestionBoxPara>
         <br />

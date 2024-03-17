@@ -1,7 +1,7 @@
 'use client';
 import { createContext, useContext, useEffect, useState } from 'react';
 import { createBrowserClient } from '@supabase/ssr';
-
+import { useLoading } from './common/loader';
 interface AuthContextType {
   user: any; // Update the type according to your user data structure
   setUser: (user: any | null) => void;
@@ -14,6 +14,7 @@ export const useAuth = () => {
 };
 
 export const AuthProvider = ({ children }: any) => {
+  const { setLoading } = useLoading();
   const [user, setUser] = useState<any | null>(null); // Update the type according to your user data structure
 
   const supabase = createBrowserClient<any>(
@@ -26,8 +27,11 @@ export const AuthProvider = ({ children }: any) => {
   }, []);
 
   const readSession = async () => {
+    setLoading(true);
     const { data: userSession, error } = await supabase.auth.getSession();
+
     if (error || !userSession) {
+      setLoading(false);
       return;
     }
 
@@ -39,6 +43,7 @@ export const AuthProvider = ({ children }: any) => {
         .single();
       setUser(data);
     }
+    setLoading(false);
   };
 
   return (

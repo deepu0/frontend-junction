@@ -11,8 +11,10 @@ import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { createBrowserClient } from '@supabase/ssr';
 import { useAuth } from '../session-provider';
+import { useRouter } from 'next/navigation';
 
 export default function Profile() {
+  const router = useRouter();
   const path = usePathname();
   const supabase = createBrowserClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -23,10 +25,9 @@ export default function Profile() {
   const handleLogout = async () => {
     await supabase.auth.signOut();
     setUser(null);
+    router.push('/');
   };
-  const handleNavigate = () => {
-    ('/add-experience');
-  };
+
   const isAdmin = user?.role === 'admin';
   const isSub = user?.stripe_customer_id;
 
@@ -65,14 +66,15 @@ export default function Profile() {
 						</Button>
 					</Link>
 				)} */}
-
-        <Button
-          variant='ghost'
-          className='w-full flex justify-between items-center'
-          onClick={handleLogout}
-        >
-          Log out
-        </Button>
+        <form action='/auth/signout' method='post'>
+          <Button
+            variant='ghost'
+            className='w-full flex justify-between items-center'
+            //onClick={handleLogout}
+          >
+            Log out
+          </Button>
+        </form>
       </PopoverContent>
     </Popover>
   );
