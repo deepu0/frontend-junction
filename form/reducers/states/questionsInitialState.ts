@@ -7,6 +7,7 @@ export const questionsInitialState = {
   description: '',
   email: '',
   identity: '',
+  interviewDate: '',
 };
 
 export type QuestionsStateType = {
@@ -18,5 +19,6 @@ export type QuestionsStateType = {
   description: string;
   email: string;
   identity: string;
+  interviewDate: string;
   QuestionsStateType?: string;
 };

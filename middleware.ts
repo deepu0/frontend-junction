@@ -64,7 +64,7 @@ export async function middleware(request: NextRequest) {
       return response;
     }
     if (
-      // protect this page only admin can access this /dashboard/members
+      //in protect this page only admin can access this /dashboard/members
       data.session.user.user_metadata.role !== 'admin'
     ) {
       return NextResponse.redirect(new URL('/', request.url));

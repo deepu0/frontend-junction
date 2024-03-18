@@ -13,7 +13,7 @@ import {
 const Success = () => {
   const router = useRouter();
   const [showModal, setShowModal] = useState(true);
-  const message = 'Thank you for contributing to the community!';
+  const message = 'Thank you for contributing to the community!🫡 ';
 
   // Close modal and redirect after 40 seconds
   setTimeout(() => {
@@ -24,8 +24,13 @@ const Success = () => {
   return (
     <>
       <Confetti width={window.innerWidth} height={window.innerHeight} />
-      <h1>{message}</h1>
-      <p> Your submission will be reviewed and will be live soon.</p>
+      <h1 className='text-orange-500 text-center'>
+        <b>{message}</b>
+      </h1>
+      <p className='text-center'>
+        {' '}
+        Your submission will be reviewed and will be live soon.
+      </p>
     </>
   );
 };

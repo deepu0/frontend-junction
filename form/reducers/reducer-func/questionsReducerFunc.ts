@@ -11,6 +11,7 @@ import {
   SET_DESCRIPTION,
   SET_IDENTITY,
   RESET_STATE,
+  SET_INTERVIEW_DATE,
 } from '../index';
 import { questionsInitialState } from '../states/questionsInitialState';
 
@@ -48,6 +49,8 @@ export function questionsReducerFunc(
       return { ...state, identity: action.payload };
     case RESET_STATE:
       return questionsInitialState;
+    case SET_INTERVIEW_DATE:
+      return { ...state, interviewDate: action.payload };
 
     default:
       return state;

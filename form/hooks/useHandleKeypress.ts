@@ -2,7 +2,7 @@ import { useQuestions, useSharedStates } from '@/form/contexts';
 import {
   isNotValidEmail,
   isTaskSpecificEmail,
-  isValidLinkedInUrl,
+  isNotValidLinkedInUrl,
 } from '@/form/utils';
 import useCustomSubmit from './useSubmit';
 import { useEffect } from 'react';
@@ -27,6 +27,7 @@ export function useHandleKeypress() {
     email,
     description,
     identity,
+    interviewDate,
   } = state;
 
   const validationRules: ValidationRule[] = [
@@ -73,12 +74,17 @@ export function useHandleKeypress() {
     {
       questionType: 'email',
       errorMessage: "Hmm... that link doesn't look right",
-      checkCondition: () => !isValidLinkedInUrl(state.email),
+      checkCondition: () => isNotValidLinkedInUrl(state.email),
     },
     {
       questionType: 'identity',
       errorMessage: 'Oops! Please make a selection',
       checkCondition: () => state.identity === '',
+    },
+    {
+      questionType: 'interviewDate',
+      errorMessage: 'Oops! Please select a valid date',
+      checkCondition: () => state.interviewDate === '',
     },
   ];
 
@@ -98,70 +104,9 @@ export function useHandleKeypress() {
           }));
           return;
         }
-        // if (now + 1 === 2 && firstName === '') {
-        //   setErrorMsg((prevValue) => ({
-        //     ...prevValue,
-        //     firstName: 'Please fill this in',
-        //   }));
-        //   return;
-        // } else if (now + 1 === 3 && lastName === '') {
-        //   setErrorMsg((prevValue) => ({
-        //     ...prevValue,
-        //     lastName: 'Please fill this in',
-        //   }));
-        //   return;
-        // } else if (now + 1 === 4 && industry === '') {
-        //   setErrorMsg((prevValue) => ({
-        //     ...prevValue,
-        //     industry: 'Oops! Please make a selection',
-        //   }));
-        //   return;
-        // } else if (now + 1 === 5 && role === '') {
-        //   setErrorMsg((prevValue) => ({
-        //     ...prevValue,
-        //     role: 'Oops! Please make a selection',
-        //   }));
-        //   return;
-        // } else if (now + 1 === 6 && goals.length === 0) {
-        //   setErrorMsg((prevValue) => ({
-        //     ...prevValue,
-        //     goals: 'Oops! Please make a selection',
-        //   }));
-        //   return;
-        // } else if (now + 1 === 6 && goals.length === 1) {
-        //   setErrorMsg((prevValue) => ({
-        //     ...prevValue,
-        //     goals: 'Please select more choices',
-        //   }));
-        //   return;
-        // } else if (now + 1 === 7 && description === '') {
-        //   setErrorMsg((prevValue) => ({
-        //     ...prevValue,
-        //     email: 'Please fill this in',
-        //   }));
-        //   return;
-        // } else if (now + 1 === 8 && email === '') {
-        //   setErrorMsg((prevValue) => ({
-        //     ...prevValue,
-        //     email: 'Please fill this in',
-        //   }));
-        //   return;
-        // } else if (now + 1 === 8 && email && !isValidLinkedInUrl(email)) {
-        //   setErrorMsg((prevValue) => ({
-        //     ...prevValue,
-        //     email: "Hmm... that link doesn't look right",
-        //   }));
-        //   return;
-        // } else if (now + 1 === 9 && identity === '') {
-        //   setErrorMsg((prevValue) => ({
-        //     ...prevValue,
-        //     role: 'Oops! Please make a selection',
-        //   }));
-        //   return;
-        // }
 
         handleQuestionNumUpdate();
-        if (now === 7) {
+        if (now === 8) {
           onSubmit();
         }
       }
@@ -180,10 +125,10 @@ export function useHandleKeypress() {
     lastName,
     now,
     role,
-    goals,
     email,
     description,
     identity,
+    interviewDate,
   ]);
 
   return {
@@ -210,7 +155,10 @@ function getCurrentQuestionType(now: number): string {
     case 6:
       return 'email';
     case 7:
+      return 'interviewDate';
+    case 8:
       return 'identity';
+
     default:
       return '';
   }

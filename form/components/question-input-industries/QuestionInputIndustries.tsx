@@ -61,13 +61,13 @@ export function QuestionInputIndustries({
     if (
       localIndustry &&
       filterIndustries.length === 0 &&
-      industry !== localIndustry
+      !industries.includes(localIndustry)
     ) {
-      setErrorMsg &&
-        setErrorMsg((prevValue) => ({
-          ...prevValue,
-          industry: 'No suggestions found',
-        }));
+      // setErrorMsg &&
+      //   setErrorMsg((prevValue) => ({
+      //     ...prevValue,
+      //     industry: 'No suggestions found',
+      //   }));
     } else {
       setErrorMsg &&
         setErrorMsg((prevValue) => {
@@ -75,7 +75,7 @@ export function QuestionInputIndustries({
           return prevValue;
         });
     }
-  }, [filterIndustries.length, industry, localIndustry, setErrorMsg]);
+  }, [filterIndustries.length, industries, localIndustry, setErrorMsg]);
 
   function handleDropdownClick(event: MouseEvent) {
     event.stopPropagation();
@@ -84,7 +84,7 @@ export function QuestionInputIndustries({
 
   function handleInputChange(event: ChangeEvent) {
     const typedValue = (event.target as HTMLInputElement).value;
-    dispatch({ type: SET_INDUSTRY, payload: '' });
+    dispatch({ type: SET_INDUSTRY, payload: typedValue });
 
     if (typedValue) {
       setShowIndustriesList(true);
@@ -108,24 +108,6 @@ export function QuestionInputIndustries({
     setShowIndustriesList(false);
     dispatch({ type: SET_INDUSTRY, payload: '' });
     inputTextRef.current?.focus();
-  }
-
-  function handleDropdownOptionClick(_industry: string) {
-    setLocalIndustry(_industry);
-    setOptionClicked(true);
-
-    setTimeout(function () {
-      setErrorMsg &&
-        setErrorMsg((prevValue) => {
-          delete prevValue.industry;
-          return prevValue;
-        });
-
-      setOptionClicked(false);
-      dispatch({ type: SET_INDUSTRY, payload: _industry });
-      setShowIndustriesList(false);
-      setTimeout(() => handleOkClick(), 600);
-    }, 500);
   }
 
   return (
@@ -160,17 +142,15 @@ export function QuestionInputIndustries({
           [styles['show']]: showIndustriesList && filterIndustries.length,
         })}
       >
-        {filterIndustries.map(function (_industry) {
-          return (
-            <DropdownSelectOption
-              key={_industry}
-              onClick={() => handleDropdownOptionClick(_industry)}
-              isSelected={localIndustry === _industry && optionClicked}
-            >
-              {_industry}
-            </DropdownSelectOption>
-          );
-        })}
+        {filterIndustries.map((_industry) => (
+          <DropdownSelectOption
+            key={_industry}
+            onClick={() => setLocalIndustry(_industry)}
+            isSelected={localIndustry === _industry && optionClicked}
+          >
+            {_industry}
+          </DropdownSelectOption>
+        ))}
       </DropdownSelect>
     </div>
   );

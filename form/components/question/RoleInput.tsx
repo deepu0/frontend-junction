@@ -38,7 +38,8 @@ export function RoleInput() {
   return (
     <>
       <QuestionNumHeading questionNum={4}>
-        What was the status of the interview result ?*
+        What was the <b className='text-orange-500'>status</b> of the interview
+        result ?*
       </QuestionNumHeading>
 
       {/* <QuestionBoxPara>

@@ -43,7 +43,8 @@ export function InterviewInput() {
   return (
     <>
       <QuestionNumHeading questionNum={6}>
-        🏢 Describe your interview experience?*
+        🏢 Describe your <b className='text-orange-500'>interview experience</b>
+        ?*
       </QuestionNumHeading>
       {/* <InterviewBoxPara>
         Format:

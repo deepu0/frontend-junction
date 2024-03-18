@@ -9,9 +9,10 @@ export function isNotValidEmail(emailId: string) {
   return true;
 }
 
-export function isValidLinkedInUrl(url: string) {
+export function isNotValidLinkedInUrl(url: string) {
+  if (!url) return true;
   // Regular expression to match LinkedIn profile URLs with any username
   const linkedinRegex =
     /^https:\/\/(www\.)?linkedin\.com\/in\/[a-zA-Z0-9_-]+\/?$/;
-  return linkedinRegex.test(url);
+  return !linkedinRegex.test(url);
 }

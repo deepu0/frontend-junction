@@ -38,7 +38,8 @@ export function IdentityInput() {
   return (
     <>
       <QuestionNumHeading questionNum={8}>
-        🎭 Would you like to reveal your identity or remain anonymous?*
+        🎭 Would you like to <b className='text-orange-500'>reveal</b> your
+        identity or remain anonymous in the posts?*
       </QuestionNumHeading>
 
       {/* <QuestionBoxPara>

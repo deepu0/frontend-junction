@@ -5,14 +5,12 @@ import { useSharedStates } from '@/form/contexts';
 import { useHandleKeypress, useHandleScroll } from '@/form/hooks';
 import { useEffect } from 'react';
 import { Question } from '../index';
-import { useAuth } from '@/components/session-provider';
 import Success from '@/components/common/confetti';
 
 export function MainContent() {
   const { questionNum, setShowIndustriesList } = useSharedStates();
   const { prev, now } = questionNum;
 
-  const { user } = useAuth();
   const { isLoading, isFailure, isSuccess } = useHandleKeypress();
   //useHandleScroll();
   const [isMounted, setIsMounted] = useState(false);
@@ -53,7 +51,8 @@ export function MainContent() {
     //{ index: 5, type: 'goal' },
     { index: 5, type: 'description' },
     { index: 6, type: 'email' },
-    { index: 7, type: 'identity' },
+    { index: 7, type: 'interviewDate' },
+    { index: 8, type: 'identity' },
   ];
 
   return (

@@ -32,7 +32,8 @@ export function LastNameInput() {
   return (
     <>
       <QuestionNumHeading questionNum={2}>
-        Where was the {firstName}`s job location 🌍 ? *
+        Where was the {firstName}`s job{' '}
+        <b className='text-orange-500'>location</b> 🌍 ? *
       </QuestionNumHeading>
 
       <QuestionInputText

@@ -7,3 +7,4 @@ export { LastNameInput } from './LastNameInput';
 export { RoleInput } from './RoleInput';
 export { InterviewInput } from './InterviewInput';
 export { IdentityInput } from './PostType';
+export { DateInput } from './DateInput';

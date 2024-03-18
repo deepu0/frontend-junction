@@ -1,52 +1,43 @@
-import { useQuestions, useSharedStates } from '@/form/contexts';
-import classNames from 'classnames';
 import {
   BtnContainer,
   Error,
-  QuestionBoxPara,
   QuestionInputText,
   QuestionNumHeading,
 } from '../index';
-import Image from 'next/image';
+import classNames from 'classnames';
 import styles from './Question.module.css';
+import Image from 'next/image';
 import { ChangeEventHandler } from 'react';
-import { SET_EMAIL } from '@/form/reducers';
+import { SET_INTERVIEW_DATE } from '@/form/reducers';
+import { useQuestions, useSharedStates } from '@/form/contexts';
+import DateSelector from '../date-selector/DateSelect';
 
-export function EmailInput() {
+export function DateInput() {
   const { errorMsg: error, setErrorMsg, handleOkClick } = useSharedStates();
   const { state, dispatch } = useQuestions();
 
-  const errorMsg = error.email ?? '';
-  const { email } = state;
+  const errorMsg = error.interviewDate ?? '';
+  const { interviewDate } = state;
 
   const handleInputChange: ChangeEventHandler<HTMLInputElement> = (event) => {
     errorMsg &&
       setErrorMsg &&
       setErrorMsg((prevValue) => {
-        delete prevValue.email;
+        delete prevValue.interviewDate;
         return prevValue;
       });
-
-    dispatch({ type: SET_EMAIL, payload: event.target.value });
+    dispatch({ type: SET_INTERVIEW_DATE, payload: event.target.value });
   };
 
   return (
     <>
-      <QuestionNumHeading questionNum={7}>
-        🔗 Please provide a link to your{' '}
-        <b className='text-orange-500'>Linkedin</b> profile.? *
+      <QuestionNumHeading questionNum={1}>
+        🏢 Interview Date?*
       </QuestionNumHeading>
 
-      {/* <QuestionBoxPara>
-        We will keep all our communications with you through this email. Do
-        check your span inbox if you can&apos;t find our application received
-        email.
-      </QuestionBoxPara> */}
-
-      <QuestionInputText
-        type='email'
-        placeholder='https://www.linkedin.com/in/username'
-        value={email}
+      <DateSelector
+        placeholder='Type your answer here...'
+        value={interviewDate}
         onChange={handleInputChange}
       />
 
@@ -58,7 +49,7 @@ export function EmailInput() {
           showPressEnter={true}
           onClick={handleOkClick}
         >
-          Ok{' '}
+          OK{' '}
           <Image
             src='/check-small.svg'
             alt='check small'

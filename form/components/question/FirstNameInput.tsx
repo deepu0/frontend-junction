@@ -32,7 +32,8 @@ export function FirstNameInput() {
   return (
     <>
       <QuestionNumHeading questionNum={1}>
-        🏢 What is the name of the company you interviewed with?*
+        🏢 What is the name of the <b className='text-orange-500'>company</b>{' '}
+        you interviewed with?*
       </QuestionNumHeading>
 
       <QuestionInputText

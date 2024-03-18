@@ -27,7 +27,8 @@ export function IndustryInput() {
     <>
       <QuestionNumHeading questionNum={3}>
         {/* 🔍 What was the status of the interview result? * */}
-        What job title were you chasing at
+        What <b className='text-orange-500'>job title</b> were you chasing at{' '}
+        {firstName}
       </QuestionNumHeading>
 
       {/* <QuestionBoxPara>

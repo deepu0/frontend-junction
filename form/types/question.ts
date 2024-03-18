@@ -15,6 +15,7 @@ export type QuestionProps = {
     | 'goal'
     | 'description'
     | 'email'
+    | 'interviewDate'
     | 'identity';
 };
 
