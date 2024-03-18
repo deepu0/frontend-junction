@@ -45,6 +45,12 @@
     flex-direction: column;
     gap: 17.5px;
   }
+  .btn-container > button {
+    font-size: 1rem;
+  }
+  .btn-container > button > img {
+    bottom: 8px !important;
+  }
 
   .btn-container > span {
     font-size: 1rem;
