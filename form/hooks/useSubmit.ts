@@ -26,8 +26,9 @@ const useCustomSubmit = (now: number) => {
         description: state.description || '',
         company_name: state?.firstName || '',
         linkedin_url: state?.email || '',
-        tags: state.goals || [],
+        tags: state.goals || ['frontend', `${state.firstName}`],
         is_original: true,
+        interview_date: state?.interviewDate,
         user_id: user.id || '',
         visibility: state.identity === 'Reveal my identity' ? true : false,
         verification_status:

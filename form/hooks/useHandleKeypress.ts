@@ -33,13 +33,33 @@ export function useHandleKeypress() {
   const validationRules: ValidationRule[] = [
     {
       questionType: 'firstName',
-      errorMessage: 'Please fill this in',
-      checkCondition: () => state.firstName === '',
+      errorMessage:
+        state.firstName === ''
+          ? 'Please fill this in'
+          : state.firstName.length < 3
+            ? 'Company name must be at least 3 characters long'
+            : state.firstName.length > 50
+              ? 'Company name cannot exceed 20 characters'
+              : '',
+      checkCondition: () =>
+        state.firstName === '' ||
+        state.firstName.length < 3 ||
+        state.firstName.length > 20,
     },
     {
       questionType: 'lastName',
-      errorMessage: 'Please fill this in',
-      checkCondition: () => state.lastName === '',
+      errorMessage:
+        state.lastName === ''
+          ? 'Please fill this in'
+          : state.lastName.length < 3
+            ? 'Location must be at least 3 characters long'
+            : state.lastName.length > 30
+              ? 'Location cannot exceed 50 characters'
+              : '',
+      checkCondition: () =>
+        state.lastName === '' ||
+        state.lastName.length < 3 ||
+        state.lastName.length > 30,
     },
     {
       questionType: 'industry',
@@ -63,8 +83,18 @@ export function useHandleKeypress() {
     },
     {
       questionType: 'description',
-      errorMessage: 'Please fill this in',
-      checkCondition: () => state.description === '',
+      errorMessage:
+        state.description === ''
+          ? 'Please fill this in'
+          : state.description.length < 500
+            ? 'Oops! Your interview experience seems too short. Share more details! 📝🔍'
+            : state.description.length > 2000
+              ? 'Your interview experience is too long! Keep it concise and focused. 🚫📄'
+              : '',
+      checkCondition: () =>
+        state.description === '' ||
+        state.description.length < 500 ||
+        state.description.length > 2000,
     },
     {
       questionType: 'email',
