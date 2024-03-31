@@ -18,7 +18,9 @@ export const metadata: Metadata = {
       'Gain insider knowledge and prepare better for your front-end developer job interviews. Browse through real candidate experiences from top companies. Get tips, advice, and valuable insights.',
     siteName: 'Front-end Junction',
     images: [
-      { url: new URL('/og-image.jpg', 'https://frontend-junction.com') },
+      {
+        url: new URL('/opengraph-image.jpeg', 'https://frontend-junction.com'),
+      },
     ],
   },
 
