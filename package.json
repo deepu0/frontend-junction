@@ -1,6 +1,6 @@
 {
-  "name": "nextjs",
-  "version": "0.1.0",
+  "name": "frontend-junction",
+  "version": "1.1.0",
   "private": true,
   "scripts": {
     "dev": "next dev",
@@ -39,7 +39,9 @@
     "eslint": "8.49.0",
     "eslint-config-next": "13.5.1",
     "framer-motion": "^11.0.5",
+    "gray-matter": "^4.0.3",
     "lucide-react": "^0.331.0",
+    "markdown-to-jsx": "^7.4.7",
     "mobile-device-detect": "^0.4.3",
     "next": "13.5.1",
     "next-themes": "^0.2.1",
@@ -63,6 +65,7 @@
     "zod": "^3.22.4"
   },
   "devDependencies": {
+    "@tailwindcss/typography": "^0.5.13",
     "eslint-config-prettier": "^9.1.0",
     "husky": "^9.0.11",
     "prettier": "^3.2.5"
