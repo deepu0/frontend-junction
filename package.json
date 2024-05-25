@@ -1,5 +1,5 @@
 {
-  "name": "frontend-junction",
+  "name": "frontend-fjunction",
   "version": "1.1.0",
   "private": true,
   "scripts": {
@@ -43,7 +43,7 @@
     "lucide-react": "^0.331.0",
     "markdown-to-jsx": "^7.4.7",
     "mobile-device-detect": "^0.4.3",
-    "next": "13.5.1",
+    "next": "14.1.2",
     "next-themes": "^0.2.1",
     "npx": "^10.2.2",
     "postcss": "8.4.30",
@@ -62,12 +62,17 @@
     "typescript": "5.2.2",
     "utf-8-validate": "^6.0.3",
     "ws": "^8.16.0",
-    "zod": "^3.22.4"
+    "zod": "^3.22.4",
+    "github-slugger": "^2.0.0"
   },
   "devDependencies": {
     "@tailwindcss/typography": "^0.5.13",
     "eslint-config-prettier": "^9.1.0",
     "husky": "^9.0.11",
-    "prettier": "^3.2.5"
+    "prettier": "^3.2.5",
+    "velite": "0.1.0-beta.11",
+    "rehype-autolink-headings": "^7.1.0",
+    "rehype-pretty-code": "^0.13.0",
+    "rehype-slug": "^6.0.0"
   }
 }

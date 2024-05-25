@@ -23,7 +23,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang='en' className='lite'>
+    <html lang='en' className='lite dark'>
       {process.env.NEXT_GOOGLE_ANALYTICS && (
         <Script
           async
@@ -47,7 +47,7 @@ export default function RootLayout({
         <ThemeProvider
           attribute='class'
           defaultTheme='dark'
-          enableSystem
+          //enableSystem
           disableTransitionOnChange
         >
           <Toaster />
