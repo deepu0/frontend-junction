@@ -65,6 +65,11 @@
     --ring: 216 12.2% 83.9%;
   }
 }
+@media (prefers-color-scheme: light) {
+  html {
+    color-scheme: dark;
+  }
+}
 
 @layer base {
   * {
