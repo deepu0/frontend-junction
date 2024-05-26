@@ -15,7 +15,7 @@ export function ModeToggle() {
       />
       <Moon
         className='absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100 cursor-pointer m-2'
-        onClick={() => setTheme('light')}
+        onClick={() => setTheme('dark')}
       />
     </>
   );
