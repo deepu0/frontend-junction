@@ -12,14 +12,17 @@ export const metadata: Metadata = {
   robots: 'index, follow',
   openGraph: {
     type: 'website',
-    url: new URL('https://frontend-junction.com'),
+    url: new URL('https://www.frontend-junction.com/'),
     title: 'Front-end Junction: Insider Front-end Interview Insights',
     description:
       'Gain insider knowledge and prepare better for your front-end developer job interviews. Browse through real candidate experiences from top companies. Get tips, advice, and valuable insights.',
     siteName: 'Front-end Junction',
     images: [
       {
-        url: new URL('/opengraph-image.jpeg', 'https://frontend-junction.com'),
+        url: new URL(
+          '/opengraph-image.jpeg',
+          'https://www.frontend-junction.com'
+        ),
       },
     ],
   },

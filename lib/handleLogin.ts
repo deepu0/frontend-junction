@@ -18,7 +18,7 @@ const handleLogin = async ({ provider, redirectTo }: HandleLoginParams) => {
       provider,
       options: {
         redirectTo: isProduction
-          ? `https://frontend-junction.com${redirectTo}`
+          ? `https://www.frontend-junction.com${redirectTo}`
           : `${location.origin}${redirectTo}`,
       },
     });

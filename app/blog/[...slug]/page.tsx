@@ -42,7 +42,10 @@ export async function generateMetadata({
       url: post.slug,
       images: [
         {
-          url: `/api/og?${ogSearchParams.toString()}`,
+          url: new URL(
+            `/api/og?${ogSearchParams.toString()}`,
+            'https://www.frontend-junction.com'
+          ),
           width: 1200,
           height: 630,
           alt: post.title,
