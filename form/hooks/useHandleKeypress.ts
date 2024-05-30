@@ -88,13 +88,13 @@ export function useHandleKeypress() {
           ? 'Please fill this in'
           : state.description.length < 500
             ? 'Oops! Your interview experience seems too short. Share more details! 📝🔍'
-            : state.description.length > 2000
+            : state.description.length > 8000
               ? 'Your interview experience is too long! Keep it concise and focused. 🚫📄'
               : '',
       checkCondition: () =>
         state.description === '' ||
         state.description.length < 500 ||
-        state.description.length > 2000,
+        state.description.length > 8000,
     },
     {
       questionType: 'email',
