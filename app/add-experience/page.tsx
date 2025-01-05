@@ -15,6 +15,7 @@ import {
 } from '@/form/contexts';
 import { useAuth } from '@/components/session-provider';
 import { useRouter } from 'next/navigation';
+import InterviewExperienceForm from '@/components/add-new-experience';
 
 export default function Home() {
   const router = useRouter();
@@ -31,13 +32,14 @@ export default function Home() {
         {/* //To do */}
         {/* <ProgressBar width={percent} /> */}
 
-        <div className={`${classNames(styles.main, questrialFont.className)}`}>
+        {/* <div className={`${classNames(styles.main, questrialFont.className)}`}>
           <QuestionsProvider>
             <SharedStatesProvider>
               <MainContent />
             </SharedStatesProvider>
           </QuestionsProvider>
-        </div>
+        </div> */}
+        <InterviewExperienceForm />
       </main>
     </Suspense>
   );
