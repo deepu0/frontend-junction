@@ -140,6 +140,10 @@ const InterviewExperienceForm: React.FC = () => {
       setIsLoading(true); // Set loading to true when the request starts
 
       try {
+        if (!user) {
+          throw new Error('You must be logged in to submit an experience');
+        }
+
         const experienceData = {
           title: formData.title,
           company: formData.company,

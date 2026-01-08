@@ -15,6 +15,10 @@ const useCustomSubmit = (now: number) => {
   async function onSubmit() {
     try {
       setIsLoading(true);
+      if (!user) {
+        throw new Error('User not found');
+      }
+
       const experienceData = {
         title: `Frontend Interview Experience at ${state.firstName}`,
         original_link: '',
