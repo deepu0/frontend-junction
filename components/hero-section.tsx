@@ -5,6 +5,7 @@ import { FaSearch } from 'react-icons/fa';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
+import Image from 'next/image';
 
 export default function HeroSection() {
   const router = useRouter();
@@ -19,10 +20,13 @@ export default function HeroSection() {
 
   return (
     <section className='relative pt-32 pb-20 lg:pt-48 lg:pb-32 overflow-hidden'>
-      {/* Background Decorations */}
+      {/* Background Decorations with Floating Logos */}
       <div className='absolute top-0 left-1/2 -translate-x-1/2 w-full h-full max-w-7xl mx-auto pointer-events-none'>
         <div className='absolute top-20 left-10 w-72 h-72 bg-purple-500/20 rounded-full blur-[120px]' />
-        <div className='absolute bottom-20 right-10 w-72 h-72 bg-blue-500/20 rounded-full blur-[120px]' />
+        <div className='relative top-20 right-10 w-72 h-72 bg-blue-500/20 rounded-full blur-[120px]' />
+
+        {/* Floating Company Logos */}
+        <FloatingLogos />
       </div>
 
       <div className='container px-4 mx-auto relative z-10 text-center'>
@@ -92,5 +96,94 @@ export default function HeroSection() {
         </motion.div>
       </div>
     </section>
+  );
+}
+
+// Train Animation Component - Frontend Junction Theme 🚂
+function FloatingLogos() {
+  const logos = [
+    { name: 'Google', path: '/companies/Google.png' },
+    { name: 'Meta', path: '/companies/Meta.png' },
+    { name: 'Microsoft', path: '/companies/Microsoft.png' },
+    { name: 'Amazon', path: '/companies/amazon.png' },
+    { name: 'Apple', path: '/companies/Apple.png' },
+    { name: 'Flipkart', path: '/companies/Flipkart.png' },
+    { name: 'Adobe', path: '/companies/Adobe.png' },
+    { name: 'Uber', path: '/companies/Uber.png' },
+    { name: 'Swiggy', path: '/companies/Swiggy.png' },
+    { name: 'Zomato', path: '/companies/Zomato.png' },
+    { name: 'Razorpay', path: '/companies/Razorpay.png' },
+    { name: 'PhonePe', path: '/companies/PhonePe.png' },
+  ];
+
+  // Double for seamless loop
+  const allLogos = [...logos, ...logos];
+
+  return (
+    <div className='absolute top-16 md:top-20 left-0 right-0 overflow-hidden pointer-events-none z-20'>
+      {/* Track */}
+      <div className='absolute bottom-2 left-0 right-0 h-0.5 bg-muted-foreground/20' />
+
+      {/* Train - GPU accelerated infinite scroll */}
+      <div className='train-container flex items-end'>
+        {/* Engine */}
+        <div className='flex-shrink-0 mr-1'>
+          <div className='w-10 h-8 md:w-14 md:h-10 bg-gradient-to-b from-primary to-primary/80 rounded-t-md rounded-r-lg flex items-center justify-center'>
+            <span className='text-[8px] md:text-xs font-bold text-white/90'>
+              🚂
+            </span>
+          </div>
+          <div className='flex gap-0.5 justify-center'>
+            <div className='w-2 h-2 md:w-3 md:h-3 bg-muted-foreground/60 rounded-full' />
+            <div className='w-2 h-2 md:w-3 md:h-3 bg-muted-foreground/60 rounded-full' />
+          </div>
+        </div>
+
+        {/* Carriages */}
+        {allLogos.map((logo, index) => (
+          <div key={index} className='flex-shrink-0 flex items-end mx-0.5'>
+            <div className='w-1 h-0.5 bg-muted-foreground/40 mb-2' />
+            <div className='relative'>
+              <div className='w-8 h-6 md:w-12 md:h-8 bg-card/80 backdrop-blur-sm border border-border/40 rounded flex items-center justify-center'>
+                <div className='relative w-5 h-5 md:w-7 md:h-7'>
+                  <Image
+                    src={logo.path}
+                    alt={logo.name}
+                    fill
+                    className='object-contain'
+                    unoptimized
+                  />
+                </div>
+              </div>
+              <div className='flex gap-0.5 justify-center -mt-0.5'>
+                <div className='w-1.5 h-1.5 md:w-2 md:h-2 bg-muted-foreground/50 rounded-full' />
+                <div className='w-1.5 h-1.5 md:w-2 md:h-2 bg-muted-foreground/50 rounded-full' />
+              </div>
+            </div>
+            <div className='w-1 h-0.5 bg-muted-foreground/40 mb-2' />
+          </div>
+        ))}
+      </div>
+
+      <style jsx global>{`
+        .train-container {
+          will-change: transform;
+          animation: train-move 20s linear infinite;
+        }
+        @keyframes train-move {
+          0% {
+            transform: translate3d(0, 0, 0);
+          }
+          100% {
+            transform: translate3d(-50%, 0, 0);
+          }
+        }
+        @media (max-width: 768px) {
+          .train-container {
+            animation: train-move 15s linear infinite;
+          }
+        }
+      `}</style>
+    </div>
   );
 }
