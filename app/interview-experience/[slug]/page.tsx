@@ -5,6 +5,7 @@ import { FaExternalLinkAlt, FaCalendar, FaUser } from 'react-icons/fa';
 import { Metadata } from 'next';
 import ReactMarkdown from 'react-markdown';
 
+export const dynamic = 'force-dynamic';
 export const revalidate = 60; // ISR
 
 interface Props {

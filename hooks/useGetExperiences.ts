@@ -39,9 +39,11 @@ export default async function useGetExperiences() {
     ];
 
     // Global Sort: Newest First
-    return allExperiences.sort(
-      (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
-    );
+    return allExperiences.sort((a, b) => {
+      const dateA = a.date ? new Date(a.date).getTime() : 0;
+      const dateB = b.date ? new Date(b.date).getTime() : 0;
+      return dateB - dateA;
+    });
   } catch (err) {
     console.log(err);
     return [];

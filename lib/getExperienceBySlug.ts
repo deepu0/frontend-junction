@@ -6,11 +6,17 @@ export async function getExperienceBySlug(identifierEncoded: string) {
   console.log(`[getExperienceBySlug] Lookup: "${identifier}"`);
 
   // Use Admin Client to bypass RLS for content fetching
-  // Initialized inside function to ensure env vars are ready
-  const supabaseAdmin = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
-  );
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+  if (!url || !key) {
+    console.warn(
+      `[getExperienceBySlug] Missing Supabase credentials, skipping lookup.`
+    );
+    return null;
+  }
+
+  const supabaseAdmin = createClient(url, key);
 
   // 1. Check if it's an ID (Legacy/Direct lookup)
   if (
