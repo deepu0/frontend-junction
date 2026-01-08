@@ -9,6 +9,7 @@ import Script from 'next/script';
 import { AuthProvider } from '@/components/session-provider';
 import { Toaster } from '@/components/ui/toaster';
 import { LoadingProvider } from '@/components/common/loader';
+import { Analytics } from '@vercel/analytics/next';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -58,6 +59,7 @@ export default function RootLayout({
             </AuthProvider>
           </LoadingProvider>
         </ThemeProvider>
+        <Analytics />
       </body>
     </html>
   );
