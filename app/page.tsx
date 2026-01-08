@@ -1,5 +1,6 @@
 import LandingPage from '@/components/home';
 import useGetCompanies from '@/hooks/useGetCompanies';
+import useGetExperiences from '@/hooks/useGetExperiences';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
@@ -40,10 +41,14 @@ export const metadata: Metadata = {
 };
 
 export default async function Home() {
-  const data = await useGetCompanies();
+  const [companies, experiences] = await Promise.all([
+    useGetCompanies(),
+    useGetExperiences(),
+  ]);
+
   return (
     <main className='flex min-h-screen flex-col items-center justify-between p-4 mt-3'>
-      <LandingPage companies={data} />
+      <LandingPage companies={companies} experiences={experiences} />
     </main>
   );
 }

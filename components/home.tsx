@@ -20,20 +20,17 @@ interface Company {
 }
 interface IHomeProps {
   companies: Company[];
+  experiences: any[];
 }
 
 const LandingPage: React.FC<IHomeProps> = (props: IHomeProps) => {
+  const { experiences = [] } = props;
+
   return (
     <Suspense fallback={<Loading />}>
       <div className='flex flex-col min-h-screen w-full overflow-x-hidden'>
         {/* NEW HERO - now includes floating logos */}
         <HeroSection />
-
-        {/* TRUST SIGNALS - Now integrated in hero 
-        <div className='mb-20'>
-          <CompanySlider companies={props.companies} />
-        </div>
-        */}
 
         {/* STATS */}
         <StatsSection />
@@ -114,26 +111,28 @@ const LandingPage: React.FC<IHomeProps> = (props: IHomeProps) => {
               }}
               className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6'
             >
-              {interviewData.slice(0, 6).map((interview, index) => (
-                <motion.div
-                  key={interview.id}
-                  variants={{
-                    hidden: { opacity: 0, y: 30, scale: 0.95 },
-                    visible: {
-                      opacity: 1,
-                      y: 0,
-                      scale: 1,
-                      transition: {
-                        type: 'spring',
-                        stiffness: 100,
-                        damping: 15,
+              {(experiences.length > 0 ? experiences : interviewData)
+                .slice(0, 6)
+                .map((interview, index) => (
+                  <motion.div
+                    key={interview.id}
+                    variants={{
+                      hidden: { opacity: 0, y: 30, scale: 0.95 },
+                      visible: {
+                        opacity: 1,
+                        y: 0,
+                        scale: 1,
+                        transition: {
+                          type: 'spring',
+                          stiffness: 100,
+                          damping: 15,
+                        },
                       },
-                    },
-                  }}
-                >
-                  <CardComponent {...interview} />
-                </motion.div>
-              ))}
+                    }}
+                  >
+                    <CardComponent {...interview} />
+                  </motion.div>
+                ))}
             </motion.div>
 
             {/* Mobile CTA */}

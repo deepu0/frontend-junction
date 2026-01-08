@@ -1,5 +1,6 @@
 'use client';
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
+import { useSearchParams } from 'next/navigation';
 import CardComponent from './common/card';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FaSearch, FaFilter, FaSortAmountDown } from 'react-icons/fa';
@@ -11,11 +12,22 @@ interface IExperienceProps {
 const FAMOUS_COMPANIES = ['Google', 'Amazon', 'Meta', 'Netflix', 'Microsoft'];
 
 const InterviewExperiences = ({ interviewData = [] }: IExperienceProps) => {
-  const [searchQuery, setSearchQuery] = useState('');
+  const searchParams = useSearchParams();
+  const initialSearch = searchParams.get('search') || '';
+
+  const [searchQuery, setSearchQuery] = useState(initialSearch);
   const [activeFilter, setActiveFilter] = useState<'all' | 'community' | 'web'>(
     'all'
   );
   const [selectedCompanies, setSelectedCompanies] = useState<string[]>([]);
+
+  // Update searchQuery when URL parameter changes
+  useEffect(() => {
+    const search = searchParams.get('search');
+    if (search !== null) {
+      setSearchQuery(search);
+    }
+  }, [searchParams]);
 
   // Extract unique companies for dropdown
   const allCompanies = useMemo(() => {
