@@ -12,6 +12,7 @@ import {
   OrganizationSchema,
   WebsiteSchema,
 } from '@/components/structured-data';
+import { Analytics } from '@vercel/analytics/next';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -140,6 +141,7 @@ export default function RootLayout({
             </AuthProvider>
           </LoadingProvider>
         </ThemeProvider>
+        <Analytics />
       </body>
     </html>
   );
