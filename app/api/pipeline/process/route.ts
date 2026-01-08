@@ -1,15 +1,21 @@
+export const dynamic = 'force-dynamic';
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 
-// Initialize Clients
-// Note: We use the SERVICE ROLE KEY to bypass RLS for reading/writing all data
-const supabaseAdmin = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY || ''
-);
+// Initialize Clients Lazily or with Checks
+const getSupabaseAdmin = () => {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!url || !key) return null;
+  return createClient(url, key);
+};
 
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '');
+const getGenAI = () => {
+  const key = process.env.GEMINI_API_KEY;
+  if (!key) return null;
+  return new GoogleGenerativeAI(key);
+};
 
 async function fetchMediumContent(url: string) {
   try {
@@ -50,6 +56,16 @@ export async function GET(request: Request) {
   }
 
   try {
+    const supabaseAdmin = getSupabaseAdmin();
+    const genAI = getGenAI();
+
+    if (!supabaseAdmin || !genAI) {
+      return NextResponse.json(
+        { error: 'Environment variables not fully configured' },
+        { status: 500 }
+      );
+    }
+
     const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
     const results = { scraped: 0, user: 0, legacy: 0, errors: [] as string[] };
     const BATCH_SIZE = 200;
