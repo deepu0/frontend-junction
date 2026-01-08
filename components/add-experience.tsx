@@ -5,7 +5,6 @@ import { useAuth } from './session-provider';
 import { Form } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Select } from '@/components/ui/select';
-import { supabase } from '@/lib/supabase';
 import { useToast } from '@/components/ui/use-toast';
 
 const initialData = {
@@ -60,44 +59,56 @@ const AddExperiencePage: React.FC = () => {
 
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    setIsLoading(true); // Set loading to true when the request starts
+    setIsLoading(true);
 
     try {
-      const formData = new FormData(event.currentTarget);
-      formData.set('id', user.id);
-      formData.set('user_role', user.role);
+      if (!user) {
+        toast({
+          title: 'Not Authenticated',
+          description: 'Please sign in to share your experience.',
+          variant: 'destructive',
+        });
+        return;
+      }
 
-      const experienceData = {
-        title: formData.get('title'),
-        original_link: formData.get('blogLink') || '',
-        role: formData.get('role'),
-        summary: formData.get('description') || '',
-        status: formData.get('outcome') || 'ghosted',
-        detail_experience: formData.get('description') || '',
-        company_name: formData.get('company') || '',
-        user_id: formData.get('id') || '',
-        verification_status:
-          formData.get('user_role') === 'superadmin' ? 'approved' : 'pending',
-      };
+      const response = await fetch('/api/experiences', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          title: formData.title,
+          companyName: formData.company,
+          role: formData.role,
+          outcome: formData.outcome,
+          experience: formData.description,
+          difficulty: formData.difficulty,
+          original_link: formData.blogLink,
+          tags: [], // Can add tag input later
+        }),
+      });
 
-      const { data, error: insertError } = await supabase
-        .from('experiences')
-        .insert({ ...experienceData });
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.error || 'Failed to submit');
+      }
+
       toast({
         title: '✨ Thanks for sharing!',
         description:
           'Your contribution will inspire others on their job search journey.',
       });
       setFormData(initialData);
-    } catch (error) {
-      // Handle error if necessary
+    } catch (error: any) {
       console.error(error);
       toast({
         title: 'Oops! Something went wrong',
-        description: '',
+        description: error.message || 'Please try again later.',
+        variant: 'destructive',
       });
     } finally {
-      setIsLoading(false); // Set loading to false when the request completes
+      setIsLoading(false);
     }
   }
 

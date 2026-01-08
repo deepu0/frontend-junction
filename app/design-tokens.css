@@ -1,0 +1,76 @@
+@layer base {
+  :root {
+    /* Base HSL values */
+    --background: 222 47% 11%; /* Deep Space Blue */
+    --foreground: 210 40% 98%; /* Soft White */
+
+    --card: 217 33% 17%; /* Lighter Blue-Grey */
+    --card-foreground: 210 40% 98%;
+
+    --popover: 222 47% 11%;
+    --popover-foreground: 210 40% 98%;
+
+    --primary: 262 83% 58%; /* Vibrant Purple (Primary Action) */
+    --primary-foreground: 210 40% 98%;
+
+    --secondary: 199 89% 48%; /* Cyan/Blue (Secondary/Accent) */
+    --secondary-foreground: 222 47.4% 11.2%;
+
+    --muted: 217 33% 17%;
+    --muted-foreground: 215 20.2% 65.1%;
+
+    --accent: 199 89% 48%;
+    --accent-foreground: 222 47.4% 11.2%;
+
+    --destructive: 0 63% 31%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 217 33% 17%;
+    --input: 217 33% 17%;
+    --ring: 262 83% 58%;
+
+    --radius: 0.75rem;
+
+    /* Custom Gradients */
+    --gradient-primary: linear-gradient(
+      135deg,
+      hsl(262 83% 58%),
+      hsl(199 89% 48%)
+    );
+    --gradient-glow: radial-gradient(
+      circle at center,
+      hsla(262, 83%, 58%, 0.15),
+      transparent 70%
+    );
+  }
+
+  .dark {
+    --background: 222 47% 11%;
+    --foreground: 210 40% 98%;
+
+    --card: 217 33% 17%;
+    --card-foreground: 210 40% 98%;
+
+    --popover: 222 47% 11%;
+    --popover-foreground: 210 40% 98%;
+
+    --primary: 262 83% 58%;
+    --primary-foreground: 210 40% 98%;
+
+    --secondary: 199 89% 48%;
+    --secondary-foreground: 222 47.4% 11.2%;
+
+    --muted: 217 33% 17%;
+    --muted-foreground: 215 20.2% 65.1%;
+
+    --accent: 199 89% 48%;
+    --accent-foreground: 222 47.4% 11.2%;
+
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 217 33% 17%;
+    --input: 217 33% 17%;
+    --ring: 262 83% 58%;
+  }
+}

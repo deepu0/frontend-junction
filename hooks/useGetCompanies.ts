@@ -13,7 +13,7 @@ export default async function useGetCompanies() {
   } catch (err) {
     console.log(err);
   } finally {
-    console.log('done');
+    // Completed fetch
   }
 }
 

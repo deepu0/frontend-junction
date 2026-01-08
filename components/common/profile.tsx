@@ -9,18 +9,15 @@ import { usePathname } from 'next/navigation';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
-import { createBrowserClient } from '@supabase/ssr';
+import { getSupabaseBrowserClient } from '@/lib/supabase-browser';
 import { useAuth } from '../session-provider';
 import { useRouter } from 'next/navigation';
 
 export default function Profile() {
   const router = useRouter();
   const path = usePathname();
-  const supabase = createBrowserClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-  );
-  const { user = '', setUser } = useAuth();
+  const supabase = getSupabaseBrowserClient();
+  const { user = null, setUser } = useAuth();
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
