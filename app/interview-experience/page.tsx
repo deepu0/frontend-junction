@@ -1,6 +1,8 @@
 import InterviewExperiences from '@/components/experiences';
 import useGetExperiences from '@/hooks/useGetExperiences';
 import type { Metadata } from 'next';
+import { Suspense } from 'react';
+import Loading from '../loading';
 
 export const dynamic = 'force-dynamic';
 
@@ -26,7 +28,9 @@ export default async function Interview() {
 
   return (
     <main className='flex min-h-screen flex-col items-center justify-between p-4 mt-10'>
-      <InterviewExperiences interviewData={data} />
+      <Suspense fallback={<Loading />}>
+        <InterviewExperiences interviewData={data} />
+      </Suspense>
     </main>
   );
 }

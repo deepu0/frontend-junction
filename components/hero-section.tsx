@@ -1,15 +1,84 @@
 'use client';
 
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { FaSearch } from 'react-icons/fa';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
+import { getSupabaseBrowserClient } from '@/lib/supabase-browser';
 
 export default function HeroSection() {
   const router = useRouter();
   const [search, setSearch] = useState('');
+  const [results, setResults] = useState<any[]>([]);
+  const [isSearching, setIsSearching] = useState(false);
+  const [showPreview, setShowPreview] = useState(false);
+  const supabase = getSupabaseBrowserClient();
+  const searchRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        searchRef.current &&
+        !searchRef.current.contains(event.target as Node)
+      ) {
+        setShowPreview(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  useEffect(() => {
+    const fetchPreview = async () => {
+      if (search.trim().length < 2) {
+        setResults([]);
+        return;
+      }
+      setIsSearching(true);
+      try {
+        // Simple search across titles in parallel
+        const [{ data: d1 }, { data: d2 }, { data: d3 }] = await Promise.all([
+          supabase
+            .from('experiences')
+            .select('id, title, company_name, slug')
+            .ilike('title', `%${search}%`)
+            .limit(2),
+          supabase
+            .from('new_interview')
+            .select('id, title, company, slug')
+            .ilike('title', `%${search}%`)
+            .limit(2),
+          supabase
+            .from('scraped_experiences')
+            .select('id, title, company, slug')
+            .ilike('title', `%${search}%`)
+            .limit(2),
+        ]);
+
+        const combined = [
+          ...(d1?.map((i) => ({
+            ...i,
+            type: 'legacy',
+            company: i.company_name,
+          })) || []),
+          ...(d2?.map((i) => ({ ...i, type: 'user' })) || []),
+          ...(d3?.map((i) => ({ ...i, type: 'scraped' })) || []),
+        ].slice(0, 5);
+
+        setResults(combined);
+        setShowPreview(true);
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setIsSearching(false);
+      }
+    };
+
+    const timer = setTimeout(fetchPreview, 300);
+    return () => clearTimeout(timer);
+  }, [search, supabase]);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -55,7 +124,8 @@ export default function HeroSection() {
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.4, delay: 0.2 }}
-            className='max-w-xl mx-auto mb-10'
+            className='max-w-xl mx-auto mb-10 relative'
+            ref={searchRef}
           >
             <form onSubmit={handleSearch} className='relative group'>
               <div className='absolute inset-0 bg-primary/20 blur-xl rounded-full opacity-0 group-hover:opacity-100 transition-opacity' />
@@ -67,6 +137,7 @@ export default function HeroSection() {
                   className='flex-1 bg-transparent border-none focus:outline-none px-4 py-3 text-foreground placeholder:text-muted-foreground'
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
+                  onFocus={() => search.length >= 2 && setShowPreview(true)}
                 />
                 <button
                   type='submit'
@@ -76,6 +147,52 @@ export default function HeroSection() {
                 </button>
               </div>
             </form>
+
+            {/* Search Preview Dropdown */}
+            <AnimatePresence>
+              {showPreview && (results.length > 0 || isSearching) && (
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: 10 }}
+                  className='absolute top-full left-0 right-0 mt-3 bg-background/90 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl overflow-hidden z-50 text-left'
+                >
+                  <div className='p-2'>
+                    {isSearching && results.length === 0 ? (
+                      <div className='p-4 text-center text-muted-foreground'>
+                        Searching...
+                      </div>
+                    ) : (
+                      results.map((res) => {
+                        const path = res.slug
+                          ? `/interview-experience/${res.slug}`
+                          : `/interview-experience/${res.type}-${res.id}`;
+                        return (
+                          <Link
+                            key={`${res.type}-${res.id}`}
+                            href={path}
+                            className='flex items-center gap-3 p-3 hover:bg-white/5 rounded-xl transition-colors group'
+                            onClick={() => setShowPreview(false)}
+                          >
+                            <div className='w-10 h-10 rounded-lg bg-white/5 flex items-center justify-center text-lg'>
+                              💼
+                            </div>
+                            <div className='flex-1 overflow-hidden'>
+                              <div className='font-medium text-foreground truncate group-hover:text-primary transition-colors'>
+                                {res.title}
+                              </div>
+                              <div className='text-xs text-muted-foreground truncate'>
+                                {res.company}
+                              </div>
+                            </div>
+                          </Link>
+                        );
+                      })
+                    )}
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </motion.div>
 
           {/* CTAs */}
@@ -85,13 +202,6 @@ export default function HeroSection() {
                 Browse Experiences
               </button>
             </Link>
-            {/* 
-                        <Link href="/jobs">
-                            <button className="px-8 py-3.5 rounded-full bg-transparent hover:bg-white/5 border border-white/10 text-white font-medium transition-all">
-                                Find Jobs
-                            </button>
-                        </Link> 
-                        */}
           </div>
         </motion.div>
       </div>
@@ -151,7 +261,6 @@ function FloatingLogos() {
                     alt={logo.name}
                     fill
                     className='object-contain'
-                    unoptimized
                   />
                 </div>
               </div>
