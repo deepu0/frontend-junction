@@ -1,33 +1,39 @@
 'use client';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { revalidatePath } from 'next/cache';
 import { usePathname } from 'next/navigation';
 import React from 'react';
 import handleLogin from '@/lib/handleLogin';
 import { useLoading } from './loader';
 import { useRouter } from 'next/navigation';
 
-ILogin: {
+interface ILoginProps {
+  path?: string;
 }
-export default function Login({ path = '' }: any) {
+
+export default function Login({ path = '' }: ILoginProps) {
   const { loading, setLoading } = useLoading();
   const router = useRouter();
   const pathname = usePathname();
-  const redirectTo = `/auth/callback?next=${pathname}`;
+  const nextPath = pathname === '/' ? '' : pathname;
+  // If we are on the home page, redirect to /add-experience after login
+  // If we are on another page, we might want to return there, but for now enforcing add-experience per original logic
+  const targetPath = '/add-experience';
+  const redirectTo = `/auth/callback?next=${targetPath}`;
 
   const onClickLogin = async () => {
-    setLoading(true);
-    await handleLogin({
-      provider: 'google',
-      redirectTo: path || redirectTo,
-    });
-    revalidatePath('/', 'layout');
-
-    //await delay(2000);
-    router.refresh();
-
-    setLoading(false);
+    try {
+      setLoading(true);
+      await handleLogin({
+        provider: 'google',
+        redirectTo: path || redirectTo,
+      });
+      // Don't do anything here - Supabase will redirect the browser
+    } catch (error) {
+      console.error('Login failed:', error);
+      setLoading(false);
+      router.refresh();
+    }
   };
   return (
     <Button

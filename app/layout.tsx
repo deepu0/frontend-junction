@@ -23,7 +23,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang='en' className='lite dark'>
+    <html lang='en' suppressHydrationWarning>
       {process.env.NEXT_GOOGLE_ANALYTICS && (
         <Script
           async
@@ -46,8 +46,8 @@ export default function RootLayout({
       <body className={inter.className}>
         <ThemeProvider
           attribute='class'
-          defaultTheme='dark'
-          //enableSystem
+          defaultTheme='system'
+          enableSystem
           disableTransitionOnChange
         >
           <Toaster />

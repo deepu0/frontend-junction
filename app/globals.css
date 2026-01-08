@@ -4,70 +4,79 @@
 
 @layer base {
   :root {
+    /* Light Mode Values */
     --background: 0 0% 100%;
-    --foreground: 224 71.4% 4.1%;
+    --foreground: 222 47% 11%;
 
     --card: 0 0% 100%;
-    --card-foreground: 224 71.4% 4.1%;
+    --card-foreground: 222 47% 11%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 224 71.4% 4.1%;
+    --popover-foreground: 222 47% 11%;
 
-    --primary: 220.9 39.3% 11%;
-    --primary-foreground: 210 20% 98%;
+    --primary: 262 83% 58%;
+    --primary-foreground: 210 40% 98%;
 
-    --secondary: 220 14.3% 95.9%;
-    --secondary-foreground: 220.9 39.3% 11%;
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 222 47.4% 11.2%;
 
-    --muted: 220 14.3% 95.9%;
-    --muted-foreground: 220 8.9% 46.1%;
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
 
-    --accent: 220 14.3% 95.9%;
-    --accent-foreground: 220.9 39.3% 11%;
+    --accent: 210 40% 96.1%;
+    --accent-foreground: 222 47.4% 11.2%;
 
     --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 20% 98%;
+    --destructive-foreground: 210 40% 98%;
 
-    --border: 220 13% 91%;
-    --input: 220 13% 91%;
-    --ring: 224 71.4% 4.1%;
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 262 83% 58%;
 
-    --radius: 0.5rem;
+    --radius: 0.75rem;
+
+    /* Custom Gradients - Adjusted for Light */
+    --gradient-primary: linear-gradient(
+      135deg,
+      hsl(262 83% 58%),
+      hsl(199 89% 48%)
+    );
+    --gradient-glow: radial-gradient(
+      circle at center,
+      hsla(262, 83%, 58%, 0.05),
+      transparent 70%
+    );
   }
 
   .dark {
-    --background: 224 71.4% 4.1%;
-    --foreground: 210 20% 98%;
+    /* Dark Mode Values (Preserved) */
+    --background: 222 47% 11%;
+    --foreground: 210 40% 98%;
 
-    --card: 224 71.4% 4.1%;
-    --card-foreground: 210 20% 98%;
+    --card: 217 33% 17%;
+    --card-foreground: 210 40% 98%;
 
-    --popover: 224 71.4% 4.1%;
-    --popover-foreground: 210 20% 98%;
+    --popover: 222 47% 11%;
+    --popover-foreground: 210 40% 98%;
 
-    --primary: 210 20% 98%;
-    --primary-foreground: 220.9 39.3% 11%;
+    --primary: 262 83% 58%;
+    --primary-foreground: 210 40% 98%;
 
-    --secondary: 215 27.9% 16.9%;
-    --secondary-foreground: 210 20% 98%;
+    --secondary: 199 89% 48%;
+    --secondary-foreground: 222 47.4% 11.2%;
 
-    --muted: 215 27.9% 16.9%;
-    --muted-foreground: 217.9 10.6% 64.9%;
+    --muted: 217 33% 17%;
+    --muted-foreground: 215 20.2% 65.1%;
 
-    --accent: 215 27.9% 16.9%;
+    --accent: 199 89% 48%;
     --accent-foreground: 210 20% 98%;
 
     --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 20% 98%;
+    --destructive-foreground: 210 40% 98%;
 
-    --border: 215 27.9% 16.9%;
-    --input: 215 27.9% 16.9%;
-    --ring: 216 12.2% 83.9%;
-  }
-}
-@media (prefers-color-scheme: light) {
-  html {
-    color-scheme: dark;
+    --border: 217 33% 17%;
+    --input: 217 33% 17%;
+    --ring: 262 83% 58%;
   }
 }
 
@@ -75,6 +84,22 @@
   * {
     @apply border-border;
   }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-feature-settings:
+      'rlig' 1,
+      'calt' 1;
+    background-image: var(--gradient-glow);
+    background-attachment: fixed;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
   body {
     @apply bg-background text-foreground;
   }
@@ -84,6 +109,7 @@
   0% {
     transform: translateX(0);
   }
+
   100% {
     transform: translateX(-100%);
   }
@@ -108,12 +134,17 @@
 .custom-quill-editor {
   /* width: fit-content; */
   /* min-width: 90%; */
-  color: #fff; /* Set text color to white */
-  background-color: #222; /* Set background color to dark gray */
-  border: 1px solid #333; /* Set border color to slightly darker than background */
-  border-radius: 4px; /* Add border radius for rounded corners */
+  color: #fff;
+  /* Set text color to white */
+  background-color: #222;
+  /* Set background color to dark gray */
+  border: 1px solid #333;
+  /* Set border color to slightly darker than background */
+  border-radius: 4px;
+  /* Add border radius for rounded corners */
   padding: 10px;
-  margin-top: 20px; /* Add padding for spacing */
+  margin-top: 20px;
+  /* Add padding for spacing */
 }
 
 .custom-quill-editor.disabled {
@@ -121,6 +152,7 @@
   pointer-events: none;
   opacity: 0.4;
 }
+
 .custom-quill-editor .ql-snow .ql-picker {
   color: white;
 }
@@ -178,7 +210,8 @@
 
 .custom-quill-editor .ql-toolbar.ql-snow {
   /* //border-bottom: none; */
-  background: #333; /* Darken toolbar background */
+  background: #333;
+  /* Darken toolbar background */
   /* border-top-left-radius: 4px;
   border-top-right-radius: 4px; */
   border-radius: 4px;
@@ -197,7 +230,8 @@
   padding: 8px;
   height: 36px;
   width: 36px;
-  color: #fff; /* Set toolbar button text color to white */
+  color: #fff;
+  /* Set toolbar button text color to white */
 }
 
 .custom-quill-editor .ql-toolbar.ql-snow .ql-formats button .ql-stroke {
@@ -209,15 +243,18 @@
 }
 
 .custom-quill-editor .ql-container.ql-snow {
-  border: none !important; /* Remove border for container */
+  border: none !important;
+  /* Remove border for container */
   max-height: 300px;
   overflow: auto;
-  background-color: #222; /* Set editor background color to dark gray */
+  background-color: #222;
+  /* Set editor background color to dark gray */
 }
 
 .custom-quill-editor .ql-editor.ql-blank::before {
   font-style: normal;
-  color: #aaa; /* Set placeholder text color to light gray */
+  color: #aaa;
+  /* Set placeholder text color to light gray */
 }
 
 .custom-quill-editor .ql-snow .ql-picker.ql-size .ql-picker-label,

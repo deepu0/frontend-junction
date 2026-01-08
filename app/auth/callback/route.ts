@@ -27,10 +27,20 @@ export async function GET(request: Request) {
         },
       }
     );
-    const { error } = await supabase.auth.exchangeCodeForSession(code);
+    const { error, data } = await supabase.auth.exchangeCodeForSession(code);
     if (!error) {
+      console.log(
+        `[Callback] Session exchanged successfully. User: ${data.session.user.id}`
+      );
       return NextResponse.redirect(`${origin}${next}`);
+    } else {
+      console.error(
+        '[Callback] Error exchanging code for session:',
+        error.message
+      );
     }
+  } else {
+    console.error('[Callback] No code provided in URL');
   }
 
   // return the user to an error page with instructions
