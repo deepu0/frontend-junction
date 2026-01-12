@@ -21,6 +21,12 @@ import {
 import { toast } from './ui/use-toast';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from './session-provider';
+import dynamic from 'next/dynamic';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from './ui/tabs';
+
+const TextEditor = dynamic(() => import('./common/text-editor'), {
+  ssr: false,
+});
 
 interface FormData {
   linkedin: string;
@@ -52,6 +58,8 @@ const initialData = {
 };
 
 const InterviewExperienceForm: React.FC = () => {
+  const [isExclusive, setIsExclusive] = useState<boolean>(false);
+  const [exclusiveContent, setExclusiveContent] = useState<string>('');
   const { user } = useAuth();
   const CHAR_LIMITS: CharacterLimits = {
     title: 100,
@@ -96,10 +104,17 @@ const InterviewExperienceForm: React.FC = () => {
       newErrors.title = 'Title should be at least 10 characters long';
     }
 
-    if (!formData.link.trim()) {
-      newErrors.link = 'Experience/blog link is required';
-    } else if (!isValidUrl(formData.link)) {
-      newErrors.link = 'Please enter a valid URL';
+    if (!isExclusive) {
+      if (!formData.link.trim()) {
+        newErrors.link = 'Experience/blog link is required';
+      } else if (!isValidUrl(formData.link)) {
+        newErrors.link = 'Please enter a valid URL';
+      }
+    } else {
+      if (!exclusiveContent.trim() || exclusiveContent === '<p><br></p>') {
+        newErrors.content =
+          'Experience content is required for exclusive posts';
+      }
     }
 
     if (!formData.company.trim()) {
@@ -148,13 +163,17 @@ const InterviewExperienceForm: React.FC = () => {
           title: formData.title,
           company: formData.company,
           location: formData.location,
-          tags: ['frontend', `${formData.company}`],
-          description: '',
+          tags: ['frontend', formData.company.toLowerCase()],
+          description: isExclusive ? exclusiveContent : '',
           offer_status: formData.offerStatus,
           added_by: user.id,
           job_role: formData.role,
           total_yoe: 3,
-          blog_link: formData.link,
+          blog_link: isExclusive ? null : formData.link,
+          is_exclusive: isExclusive,
+          approval_status: 'pending', // Explicitly set to pending for admin review
+          difficulty: formData.difficultyLevel,
+          linkedin_profile: formData.linkedin,
         };
 
         const { data, error: insertError } = await supabase
@@ -224,7 +243,7 @@ const InterviewExperienceForm: React.FC = () => {
         <CardContent>
           <form onSubmit={handleSubmit} className='space-y-6'>
             {submitted && (
-              <Alert className='bg-green-800 text-white border-green-600'>
+              <Alert className='bg-green-800 text-white border-green-600 mb-6'>
                 <CheckCircle className='h-4 w-4' />
                 <AlertDescription>
                   Experience submitted successfully!
@@ -232,185 +251,167 @@ const InterviewExperienceForm: React.FC = () => {
               </Alert>
             )}
 
-            {/* Name Field */}
-            {/* <div className='space-y-2'>
-              <Label htmlFor='name'>Name</Label>
-              <Input
-                id='name'
-                name='name'
-                value={formData.name}
-                onChange={handleChange}
-                className={`bg-gray-700 border-gray-600 ${errors.name && formSubmitAttempted ? 'border-red-500' : ''}`}
-                placeholder='Your name'
-              />
-              {errors.name && formSubmitAttempted && (
-                <p className='text-red-400 text-sm'>{errors.name}</p>
-              )}
-            </div> */}
-
-            {/* LinkedIn Profile Field */}
-
-            {/* Title Field */}
-            <div className='space-y-2'>
-              <Label htmlFor='title'>Title</Label>
-              <Input
-                id='title'
-                name='title'
-                value={formData.title}
-                onChange={handleChange}
-                className={`bg-gray-700 border-gray-600 ${errors.title && formSubmitAttempted ? 'border-red-500' : ''}`}
-                placeholder='Ex- UI 2 interview experience at Acko'
-              />
-              {errors.title && formSubmitAttempted && (
-                <p className='text-red-400 text-sm'>{errors.title}</p>
-              )}
-            </div>
-            <div className='space-y-2'>
-              <div className='flex items-center gap-2'>
-                <Label htmlFor='linkedin'>LinkedIn Profile</Label>
-                <Linkedin className='h-4 w-4 text-blue-400' />
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger>
-                      <Info className='h-4 w-4 text-gray-400' />
-                    </TooltipTrigger>
-                    <TooltipContent className='bg-gray-700 text-white'>
-                      Optional: Add your LinkedIn profile URL
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
-              </div>
-              <Input
-                id='linkedin'
-                name='linkedin'
-                value={formData.linkedin}
-                onChange={handleChange}
-                className={`bg-gray-700 border-gray-600 ${errors.linkedin && formSubmitAttempted ? 'border-red-500' : ''}`}
-                placeholder='https://linkedin.com/in/your-profile'
-              />
-              {errors.linkedin && formSubmitAttempted && (
-                <p className='text-red-400 text-sm'>{errors.linkedin}</p>
-              )}
-            </div>
-
-            {/* Link Field */}
-            <div className='space-y-2'>
-              <Label htmlFor='link'>Experience/Blog Link</Label>
-              <Input
-                id='link'
-                name='link'
-                value={formData.link}
-                onChange={handleChange}
-                className={`bg-gray-700 border-gray-600 ${errors.link && formSubmitAttempted ? 'border-red-500' : ''}`}
-                placeholder='https://your-blog-post.com'
-              />
-              {errors.link && formSubmitAttempted && (
-                <p className='text-red-400 text-sm'>{errors.link}</p>
-              )}
-            </div>
-
-            {/* Company Field */}
-            <div className='space-y-2'>
-              <Label htmlFor='company'>Company</Label>
-              <Input
-                id='company'
-                name='company'
-                value={formData.company}
-                onChange={handleChange}
-                className={`bg-gray-700 border-gray-600 ${errors.company && formSubmitAttempted ? 'border-red-500' : ''}`}
-                placeholder='Company name'
-              />
-              {errors.company && formSubmitAttempted && (
-                <p className='text-red-400 text-sm'>{errors.company}</p>
-              )}
-            </div>
-
-            {/* Offer Status Field */}
-            <div className='space-y-2'>
-              <Label htmlFor='offerStatus'>Offer Status</Label>
-              <Select
-                value={formData.offerStatus}
-                onValueChange={(value) =>
-                  handleSelectChange(value, 'offerStatus')
-                }
-              >
-                <SelectTrigger
-                  className={`bg-gray-700 border-gray-600 ${errors.offerStatus && formSubmitAttempted ? 'border-red-500' : ''}`}
+            {/* Tabs for Mode Selection */}
+            <Tabs
+              defaultValue='link'
+              className='w-full'
+              onValueChange={(val) => setIsExclusive(val === 'exclusive')}
+            >
+              <TabsList className='grid w-full grid-cols-2 bg-gray-700'>
+                <TabsTrigger
+                  value='link'
+                  className='data-[state=active]:bg-blue-600'
                 >
-                  <SelectValue placeholder='Select offer status' />
-                </SelectTrigger>
-                <SelectContent className='bg-gray-700 border-gray-600'>
-                  <SelectItem value='accepted'>Accepted</SelectItem>
-                  <SelectItem value='rejected'>Rejected</SelectItem>
-                  <SelectItem value='pending'>Pending</SelectItem>
-                </SelectContent>
-              </Select>
-              {errors.offerStatus && formSubmitAttempted && (
-                <p className='text-red-400 text-sm'>{errors.offerStatus}</p>
-              )}
-            </div>
+                  Quick Link
+                </TabsTrigger>
+                <TabsTrigger
+                  value='exclusive'
+                  className='data-[state=active]:bg-blue-600'
+                >
+                  Write Exclusive
+                </TabsTrigger>
+              </TabsList>
 
-            {/* Location Field */}
-            <div className='space-y-2'>
-              <Label htmlFor='location'>Location</Label>
-              <Input
-                id='location'
-                name='location'
-                value={formData.location}
-                onChange={handleChange}
-                className={`bg-gray-700 border-gray-600 ${errors.location && formSubmitAttempted ? 'border-red-500' : ''}`}
-                placeholder='Interview location'
-              />
-              {errors.location && formSubmitAttempted && (
-                <p className='text-red-400 text-sm'>{errors.location}</p>
-              )}
-            </div>
+              <div className='mt-6 space-y-6'>
+                {/* Unified Title Field */}
+                <div className='space-y-2'>
+                  <Label htmlFor='title'>Title</Label>
+                  <Input
+                    id='title'
+                    name='title'
+                    value={formData.title}
+                    onChange={handleChange}
+                    className={`bg-gray-700 border-gray-600 ${errors.title && formSubmitAttempted ? 'border-red-500' : ''}`}
+                    placeholder='Ex- UI 2 interview experience at Acko'
+                  />
+                  {errors.title && formSubmitAttempted && (
+                    <p className='text-red-400 text-sm'>{errors.title}</p>
+                  )}
+                </div>
 
-            {/* Role Field */}
-            <div className='space-y-2'>
-              <Label htmlFor='role'>Role</Label>
-              <Input
-                id='role'
-                name='role'
-                value={formData.role}
-                onChange={handleChange}
-                className={`bg-gray-700 border-gray-600 ${errors.role && formSubmitAttempted ? 'border-red-500' : ''}`}
-                placeholder='Job role/position'
-              />
-              {errors.role && formSubmitAttempted && (
-                <p className='text-red-400 text-sm'>{errors.role}</p>
-              )}
-            </div>
+                <div className='grid grid-cols-1 sm:grid-cols-2 gap-4'>
+                  {/* Company Field */}
+                  <div className='space-y-2'>
+                    <Label htmlFor='company'>Company</Label>
+                    <Input
+                      id='company'
+                      name='company'
+                      value={formData.company}
+                      onChange={handleChange}
+                      className={`bg-gray-700 border-gray-600 ${errors.company && formSubmitAttempted ? 'border-red-500' : ''}`}
+                      placeholder='Company name'
+                    />
+                  </div>
 
-            {/* Difficulty Level Field */}
-            <div className='space-y-2'>
-              <Label htmlFor='difficultyLevel'>
-                Difficulty Level (Optional)
-              </Label>
-              <Select
-                value={formData.difficultyLevel}
-                onValueChange={(value) =>
-                  handleSelectChange(value, 'difficultyLevel')
-                }
-              >
-                <SelectTrigger className='bg-gray-700 border-gray-600'>
-                  <SelectValue placeholder='Select difficulty level' />
-                </SelectTrigger>
-                <SelectContent className='bg-gray-700 border-gray-600'>
-                  <SelectItem value='easy'>Easy</SelectItem>
-                  <SelectItem value='medium'>Medium</SelectItem>
-                  <SelectItem value='hard'>Hard</SelectItem>
-                  <SelectItem value='very-hard'>Very Hard</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+                  {/* Role Field */}
+                  <div className='space-y-2'>
+                    <Label htmlFor='role'>Role</Label>
+                    <Input
+                      id='role'
+                      name='role'
+                      value={formData.role}
+                      onChange={handleChange}
+                      className={`bg-gray-700 border-gray-600 ${errors.role && formSubmitAttempted ? 'border-red-500' : ''}`}
+                      placeholder='Job role'
+                    />
+                  </div>
+                </div>
+
+                <TabsContent value='link' className='space-y-4 m-0'>
+                  <div className='space-y-2'>
+                    <Label htmlFor='link'>Experience/Blog Link</Label>
+                    <Input
+                      id='link'
+                      name='link'
+                      value={formData.link}
+                      onChange={handleChange}
+                      className={`bg-gray-700 border-gray-600 ${errors.link && formSubmitAttempted ? 'border-red-500' : ''}`}
+                      placeholder='https://your-blog-post.com'
+                    />
+                    <p className='text-xs text-gray-400'>
+                      Our AI will summarize this link after you submit.
+                    </p>
+                  </div>
+                </TabsContent>
+
+                <TabsContent value='exclusive' className='space-y-4 m-0'>
+                  <div className='space-y-2'>
+                    <Label>Interview Story (Rich Text)</Label>
+                    <div className='bg-gray-700 rounded-md border border-gray-600 min-h-[300px] text-black'>
+                      <TextEditor
+                        value={exclusiveContent}
+                        onChange={setExclusiveContent}
+                        placeHolder='Describe your rounds, questions, and experience in detail...'
+                        showAllOptions={true}
+                      />
+                    </div>
+                    {errors.content && formSubmitAttempted && (
+                      <p className='text-red-400 text-sm'>{errors.content}</p>
+                    )}
+                  </div>
+                </TabsContent>
+
+                {/* Additional Metadata */}
+                <div className='grid grid-cols-1 sm:grid-cols-2 gap-4'>
+                  <div className='space-y-2'>
+                    <Label htmlFor='offerStatus'>Offer Status</Label>
+                    <Select
+                      value={formData.offerStatus}
+                      onValueChange={(val) =>
+                        handleSelectChange(val, 'offerStatus')
+                      }
+                    >
+                      <SelectTrigger className='bg-gray-700 border-gray-600'>
+                        <SelectValue placeholder='Select status' />
+                      </SelectTrigger>
+                      <SelectContent className='bg-gray-700'>
+                        <SelectItem value='accepted'>Accepted</SelectItem>
+                        <SelectItem value='rejected'>Rejected</SelectItem>
+                        <SelectItem value='pending'>Pending</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className='space-y-2'>
+                    <Label htmlFor='difficultyLevel'>Difficulty</Label>
+                    <Select
+                      value={formData.difficultyLevel}
+                      onValueChange={(val) =>
+                        handleSelectChange(val, 'difficultyLevel')
+                      }
+                    >
+                      <SelectTrigger className='bg-gray-700 border-gray-600'>
+                        <SelectValue placeholder='Select level' />
+                      </SelectTrigger>
+                      <SelectContent className='bg-gray-700'>
+                        <SelectItem value='easy'>Easy</SelectItem>
+                        <SelectItem value='medium'>Medium</SelectItem>
+                        <SelectItem value='hard'>Hard</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+
+                <div className='space-y-2'>
+                  <Label htmlFor='linkedin'>LinkedIn Profile (Optional)</Label>
+                  <Input
+                    id='linkedin'
+                    name='linkedin'
+                    value={formData.linkedin}
+                    onChange={handleChange}
+                    className='bg-gray-700 border-gray-600'
+                    placeholder='https://linkedin.com/in/your-profile'
+                  />
+                </div>
+              </div>
+            </Tabs>
 
             <Button
               type='submit'
               disabled={isLoading}
-              className='w-full bg-blue-600 hover:bg-blue-700'
+              className='w-full bg-blue-600 hover:bg-blue-700 font-bold py-6 rounded-xl mt-6'
             >
-              Submit Experience
+              {isLoading ? 'Submitting...' : '✨ Submit Experience'}
             </Button>
           </form>
         </CardContent>

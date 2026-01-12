@@ -7,8 +7,9 @@ import { getAllTags, sortPosts, sortTagsByCount } from '@/lib/utils';
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'My blog',
-  description: 'This is a description',
+  title: 'Blog | Frontend Development Insights & Tutorials',
+  description:
+    'Deep dives into frontend development, performance optimization, React patterns, CSS techniques, and industry best practices from the Frontend Junction community.',
 };
 
 const POSTS_PER_PAGE = 5;
@@ -57,6 +58,7 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
                       title={title}
                       description={description}
                       tags={tags}
+                      image={post.image}
                     />
                   </li>
                 );

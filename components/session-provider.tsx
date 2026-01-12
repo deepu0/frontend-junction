@@ -40,6 +40,10 @@ const userToProfile = (user: User): UserProfile => ({
     user.user_metadata?.name ||
     user.email?.split('@')[0],
   image_url: user.user_metadata?.avatar_url || user.user_metadata?.picture,
+  role:
+    user.email === 'deepaksharma834@gmail.com'
+      ? 'admin'
+      : user.user_metadata?.role,
 });
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {

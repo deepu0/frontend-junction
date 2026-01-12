@@ -31,12 +31,18 @@ export const metadata: Metadata = {
     'React interviews',
     'JavaScript interviews',
     'frontend preparation',
+    'frontend system design',
+    'frontend coding challenges',
+    'software engineer interview prep',
   ],
   authors: [
     { name: 'Deepak Sharma', url: 'https://linkedin.com/in/depaksharma' },
   ],
   creator: 'Frontend Junction',
   publisher: 'Frontend Junction',
+  alternates: {
+    canonical: '/',
+  },
   formatDetection: {
     email: false,
     telephone: false,

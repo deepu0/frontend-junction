@@ -1,11 +1,14 @@
 import { posts } from '#site/content';
 import { MDXContent } from '@/components/mdx-components';
 import { notFound } from 'next/navigation';
+import Image from 'next/image';
 
 import '@/styles/mdx.css';
 import { Metadata } from 'next';
 import { siteConfig } from '@/config/site';
 import { Tag } from '@/components/tag';
+import ViewCounter from '@/components/view-counter';
+import { ShareButtons } from '@/components/share-buttons';
 interface PostPageProps {
   params: {
     slug: string[];
@@ -35,6 +38,9 @@ export async function generateMetadata({
     title: post.title,
     description: post.description,
     authors: { name: siteConfig.author },
+    alternates: {
+      canonical: post.slug,
+    },
     openGraph: {
       title: post.title,
       description: post.description,
@@ -80,6 +86,22 @@ export default async function PostPage({ params }: PostPageProps) {
       <div className='flex gap-2 mb-2 flex-wrap'>
         {post.tags?.map((tag) => <Tag tag={tag} key={tag} />)}
       </div>
+      <div className='flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 pt-2'>
+        <ViewCounter slug={post.slugAsParams} />
+        <ShareButtons url={post.slug} title={post.title} />
+      </div>
+      {post.image && (
+        <div className='relative aspect-video my-8 overflow-hidden rounded-xl border border-border'>
+          <Image
+            src={post.image.src}
+            alt={post.title}
+            fill
+            className='object-cover'
+            sizes='(max-width: 768px) 100vw, 800px'
+            priority
+          />
+        </div>
+      )}
       {post.description ? (
         <p className='text-xl mt-0 text-muted-foreground'>{post.description}</p>
       ) : null}

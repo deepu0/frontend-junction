@@ -1,0 +1,150 @@
+---
+title: 'React JS: Composition is King 👑'
+description: 'In the world of React JS, the principle of composition rules. Learn about HOCs, Render Props, and Compound Components for scalable applications.'
+date: '2024-11-20'
+tags: ['React', 'composition', 'HOC', 'patterns', 'architecture']
+published: true
+---
+
+In the world of React JS, the principle of composition rules, offering a robust foundation for building scalable and maintainable applications. Let's delve deep into why composition is considered the king in React JS.
+
+## Understanding Composition
+
+In React, we can make components more generic by accepting props, which are to React components what parameters are to functions.
+
+```tsx
+type UserProps = {
+  name: string;
+  age: number;
+  photoUrl: string;
+};
+
+function UserPhoto({ photoUrl }: { photoUrl: string }) {
+  return <img src={photoUrl} alt='User Photo' />;
+}
+
+function UserName({ name }: { name: string }) {
+  return <h2>{name}</h2>;
+}
+
+function UserDetails({ age }: { age: number }) {
+  return <p>Age: {age}</p>;
+}
+
+function UserProfile({ name, age, photoUrl }: UserProps) {
+  return (
+    <div>
+      <UserPhoto photoUrl={photoUrl} />
+      <UserName name={name} />
+      <UserDetails age={age} />
+    </div>
+  );
+}
+```
+
+This is a classic example of composition—smaller components combined to form a more complex component.
+
+## 1. Higher-Order Components (HOCs)
+
+HOCs are functions that take a component and return a new component with additional functionality.
+
+```jsx
+function withLoading(Component) {
+  return function WrappedComponent({ isLoading, ...props }) {
+    if (isLoading) {
+      return <Loader />;
+    }
+    return <Component {...props} />;
+  };
+}
+
+function DataComponent({ data }) {
+  return <div>Data: {data}</div>;
+}
+
+const DataComponentWithLoading = withLoading(DataComponent);
+
+// Usage
+<DataComponentWithLoading isLoading={true} data={null} />;
+```
+
+**Real-World Use Cases:**
+
+- **Authentication:** Wrapping components with auth checks
+- **Analytics:** Tracking user interactions
+- **Error Handling:** Displaying fallback UI
+- **Styling:** Enhancing with themes
+
+## 2. Render Props
+
+The render props pattern involves a component that takes a function as a prop, which returns React elements to render.
+
+```jsx
+function DataFetcher({ url, render }) {
+  const [data, setData] = useState(null);
+
+  useEffect(() => {
+    fetch(url)
+      .then((res) => res.json())
+      .then(setData);
+  }, [url]);
+
+  return render(data);
+}
+
+// Usage
+<DataFetcher url='/api/users' render={(data) => <UserList users={data} />} />;
+```
+
+## 3. Compound Components
+
+Compound components are a set of components that work together, sharing implicit state and behavior.
+
+```jsx
+function Toggle({ children }) {
+  const [isOn, setIsOn] = useState(false);
+  const toggle = () => setIsOn((prev) => !prev);
+
+  return React.Children.map(children, (child) => {
+    return React.cloneElement(child, { isOn, toggle });
+  });
+}
+
+function ToggleOn({ isOn, children }) {
+  return isOn ? children : null;
+}
+
+function ToggleOff({ isOn, children }) {
+  return isOn ? null : children;
+}
+
+function ToggleButton({ toggle }) {
+  return <button onClick={toggle}>Toggle</button>;
+}
+
+// Usage
+<Toggle>
+  <ToggleOn>On</ToggleOn>
+  <ToggleOff>Off</ToggleOff>
+  <ToggleButton />
+</Toggle>;
+```
+
+**Real-World Use Cases:**
+
+- **UI Libraries:** Accordions, tabs, modals
+- **Table Components:** Headers, bodies, rows
+- **Form Components:** Dynamic, interactive forms
+- **Navigation Menus:** Flexible menu structures
+
+## Conclusion
+
+Composition in React JS is a powerful concept that enables developers to build complex, scalable, and maintainable applications by combining smaller, reusable components.
+
+By leveraging advanced patterns like HOCs, render props, and compound components, developers can enhance the flexibility of their applications.
+
+**In the React ecosystem, composition indeed wears the crown.**
+
+---
+
+_Originally published on [LinkedIn](https://www.linkedin.com/pulse/react-js-composition-king-deepak-sharma)_

@@ -53,16 +53,16 @@ export default function Profile() {
             <Link href='/add-experience'>Add Interview Experience</Link>
           </Button>
         )}
-        {/* {isAdmin && (
-					<Link href="/dashboard">
-						<Button
-							variant="ghost"
-							className="w-full flex justify-between items-center"
-						>
-							Dashboard <DashboardIcon />
-						</Button>
-					</Link>
-				)} */}
+        {isAdmin && (
+          <Link href='/admin'>
+            <Button
+              variant='ghost'
+              className='w-full flex justify-between items-center'
+            >
+              Admin Panel
+            </Button>
+          </Link>
+        )}
         <form action='/auth/signout' method='post'>
           <Button
             variant='ghost'

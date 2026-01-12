@@ -42,8 +42,8 @@ export default function FooterComponent() {
               </li>
               <li>
                 <Link
-                  href='/mentorship'
-                  className='hover:text-primary transition-colors opacity-50 cursor-not-allowed'
+                  href='https://topmate.io/deepak_sharma'
+                  className='hover:text-primary transition-colors'
                 >
                   Mentorship
                 </Link>

@@ -46,6 +46,7 @@ export async function getExperienceBySlug(identifierEncoded: string) {
       `[getExperienceBySlug] Found in scraped_experiences: ${scrapedData.title}`
     );
     return {
+      id: scrapedData.id,
       title: scrapedData.title,
       summary: scrapedData.summary,
       content:
@@ -73,6 +74,7 @@ export async function getExperienceBySlug(identifierEncoded: string) {
       `[getExperienceBySlug] Found in new_interview: ${userData.title}`
     );
     return {
+      id: userData.id,
       title: userData.title,
       summary: userData.summary || userData.description,
       content:
@@ -98,6 +100,7 @@ export async function getExperienceBySlug(identifierEncoded: string) {
       `[getExperienceBySlug] Found in experiences: ${legacyData.title}`
     );
     return {
+      id: legacyData.id,
       title: legacyData.title,
       summary: legacyData.summary,
       content:

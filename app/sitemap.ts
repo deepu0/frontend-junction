@@ -1,5 +1,6 @@
 import { MetadataRoute } from 'next';
 import { createClient } from '@supabase/supabase-js';
+import { posts } from '#site/content';
 
 const BASE_URL = 'https://www.frontend-junction.com';
 
@@ -18,7 +19,23 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: 'daily',
       priority: 0.9,
     },
+    {
+      url: `${BASE_URL}/blog`,
+      lastModified: new Date(),
+      changeFrequency: 'weekly',
+      priority: 0.8,
+    },
   ];
+
+  // Blog posts from Velite (static at build time)
+  const blogPages: MetadataRoute.Sitemap = posts
+    .filter((post) => post.published)
+    .map((post) => ({
+      url: `${BASE_URL}/${post.slug}`,
+      lastModified: new Date(post.date),
+      changeFrequency: 'monthly' as const,
+      priority: 0.7,
+    }));
 
   // Fetch dynamic experience pages
   let experiencePages: MetadataRoute.Sitemap = [];
@@ -71,5 +88,5 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     console.error('[Sitemap] Error fetching experiences:', error);
   }
 
-  return [...staticPages, ...experiencePages];
+  return [...staticPages, ...blogPages, ...experiencePages];
 }

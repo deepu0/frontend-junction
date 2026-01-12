@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { FaExternalLinkAlt, FaCalendar, FaUser } from 'react-icons/fa';
 import { Metadata } from 'next';
 import ReactMarkdown from 'react-markdown';
+import ViewCounter from '@/components/view-counter';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 60; // ISR
@@ -77,6 +78,12 @@ export default async function ExperienceSlugPage({ params }: Props) {
                   })}
                 </span>
               </div>
+              <div className='flex items-center gap-2'>
+                <ViewCounter
+                  slug={experience.id}
+                  apiPath='/api/interview/view'
+                />
+              </div>
               <div className='px-2 py-0.5 rounded border border-border text-xs uppercase tracking-wider font-semibold'>
                 {experience.source}
               </div>
@@ -85,9 +92,13 @@ export default async function ExperienceSlugPage({ params }: Props) {
 
           {/* Content Analysis (AI Generated or Raw) */}
           <div className='prose prose-lg dark:prose-invert max-w-none prose-headings:font-bold prose-headings:text-foreground prose-p:text-muted-foreground prose-strong:text-foreground prose-a:text-primary hover:prose-a:underline prose-img:rounded-xl'>
-            <ReactMarkdown>
-              {experience.content || experience.summary || ''}
-            </ReactMarkdown>
+            {experience.content?.trim().startsWith('<') ? (
+              <div dangerouslySetInnerHTML={{ __html: experience.content }} />
+            ) : (
+              <ReactMarkdown>
+                {experience.content || experience.summary || ''}
+              </ReactMarkdown>
+            )}
           </div>
 
           {/* Original Source CTA */}

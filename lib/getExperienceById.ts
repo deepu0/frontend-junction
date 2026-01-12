@@ -48,6 +48,7 @@ export async function getExperienceById(id: string) {
   // Normalize
   if (type === 'scraped') {
     return {
+      id: data.id,
       title: data.title,
       summary: data.summary,
       content: data.metadata?.content || data.summary, // Fallback
@@ -59,10 +60,11 @@ export async function getExperienceById(id: string) {
     };
   } else if (type === 'user') {
     return {
+      id: data.id,
       title: data.title,
-      summary: data.summary || data.detail_experience,
-      content: data.detail_experience,
-      author: 'Community Member', // We could fetch user name but keep it anon for now
+      summary: data.description,
+      content: data.description,
+      author: 'Community Member',
       source: 'Frontend Junction',
       original_link: data.blog_link,
       date: data.created_at,
@@ -70,6 +72,7 @@ export async function getExperienceById(id: string) {
     };
   } else {
     return {
+      id: data.id,
       title: data.title,
       summary: data.summary || data.detail_experience,
       content: data.detail_experience,

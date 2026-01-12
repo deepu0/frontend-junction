@@ -1,0 +1,179 @@
+---
+title: 'Supercharge Your React Apps with Currying: Real-Life Examples and Best Practices'
+description: 'Learn how currying in React JS can revolutionize the way you write code with enhanced reusability and cleaner event handling.'
+date: '2024-10-25'
+tags: ['React', 'currying', 'functional programming', 'patterns', 'JavaScript']
+published: true
+---
+
+🌟 Are you a React developer looking to elevate your coding skills and enhance code reusability? If so, you're in for a treat! In this article, we'll delve into the powerful concept of "Currying" in React JS.
+
+## Understanding Currying
+
+Currying is a functional programming technique that transforms a function with multiple arguments into a series of functions, each taking a single argument. This technique enables flexible and modular code design.
+
+## Why Use Currying in React?
+
+- **Efficiency:** Create more efficient and reusable components
+- **Flexibility:** Dynamically generate new functions and customize behavior
+- **Clean Code:** Write cleaner, more concise, and highly maintainable code
+
+## Real-World Examples
+
+### 1️⃣ Event Handling
+
+Currying streamlines the management of event handlers:
+
+```jsx
+const withCustomParams = (param1, param2) => (event) => {
+  // Perform customized logic using curried parameters
+  console.log(param1, param2, event.target);
+};
+
+const MyComponent = () => {
+  const handleClick = withCustomParams('Param1', 'Param2');
+
+  return (
+    <div>
+      <button onClick={handleClick}>Click Me</button>
+    </div>
+  );
+};
+```
+
+### 2️⃣ Dynamic Component Creation
+
+Create HOCs with curried configuration:
+
+```jsx
+const createDynamicComponent = (config) => (props) => {
+  return (
+    <div style={{ color: config.color, fontSize: config.size }}>
+      {props.children}
+    </div>
+  );
+};
+
+const MyComponent = () => {
+  const DynamicComponent = createDynamicComponent({
+    color: 'blue',
+    size: 'large',
+  });
+
+  return (
+    <div>
+      <DynamicComponent>Hello World</DynamicComponent>
+    </div>
+  );
+};
+```
+
+### 3️⃣ Handling Dynamic Event Handlers
+
+**Without Currying:**
+
+```jsx
+const MyComponent = () => {
+  const handleClick = (id) => {
+    // Handle click logic for specific ID
+  };
+
+  return (
+    <div>
+      <button onClick={() => handleClick(1)}>Button 1</button>
+      <button onClick={() => handleClick(2)}>Button 2</button>
+      <button onClick={() => handleClick(3)}>Button 3</button>
+    </div>
+  );
+};
+```
+
+**With Currying:**
+
+```jsx
+const MyComponent = () => {
+  const handleClick = (id) => () => {
+    // Handle click logic for specific ID
+    console.log(`Button ${id} clicked`);
+  };
+
+  return (
+    <div>
+      <button onClick={handleClick(1)}>Button 1</button>
+      <button onClick={handleClick(2)}>Button 2</button>
+      <button onClick={handleClick(3)}>Button 3</button>
+    </div>
+  );
+};
+```
+
+### 4️⃣ Form Field Handlers
+
+```jsx
+const MyForm = () => {
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    phone: '',
+  });
+
+  const handleChange = (field) => (event) => {
+    setFormData((prev) => ({
+      ...prev,
+      [field]: event.target.value,
+    }));
+  };
+
+  return (
+    <form>
+      <input onChange={handleChange('name')} placeholder='Name' />
+      <input onChange={handleChange('email')} placeholder='Email' />
+      <input onChange={handleChange('phone')} placeholder='Phone' />
+    </form>
+  );
+};
+```
+
+### 5️⃣ API Request Builders
+
+```jsx
+const createApiRequest = (baseUrl) => (endpoint) => async (params) => {
+  const response = await fetch(`${baseUrl}${endpoint}`, {
+    method: 'POST',
+    body: JSON.stringify(params),
+  });
+  return response.json();
+};
+
+// Usage
+const api = createApiRequest('https://api.example.com');
+const createUser = api('/users');
+const createPost = api('/posts');
+
+// Call with params
+await createUser({ name: 'John' });
+await createPost({ title: 'Hello World' });
+```
+
+## When to Use Currying
+
+✅ **Use currying when:**
+
+- You need to create reusable function factories
+- Event handlers need custom parameters
+- Building configuration-based components
+- Creating API request builders
+
+❌ **Avoid currying when:**
+
+- Simple functions with few arguments
+- Performance is critical (extra function calls)
+- Code readability suffers
+
+## Conclusion
+
+Currying in React JS opens up a realm of flexibility and code reusability. By breaking down functions into smaller, curried versions, you can dynamically generate new functions, customize behavior, and compose complex logic effortlessly.
+
+---
+
+_Originally published on [LinkedIn](https://www.linkedin.com/pulse/supercharge-your-react-apps-currying-real-life-best-deepak-sharma-)_
