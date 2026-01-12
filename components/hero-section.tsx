@@ -42,22 +42,25 @@ const HeroContent = memo(
           </p>
 
           {/* Search */}
-          <div className='max-w-xl mx-auto mb-10 relative z-20' ref={searchRef}>
+          <div
+            className='max-w-xl mx-auto mb-10 relative z-20 px-2 sm:px-0'
+            ref={searchRef}
+          >
             <form onSubmit={handleSearch} className='relative group'>
               <div className='absolute inset-0 bg-primary/20 blur-xl rounded-full opacity-0 group-hover:opacity-100 transition-opacity' />
-              <div className='relative flex items-center bg-background/80 backdrop-blur-md border border-border rounded-full p-2 shadow-2xl ring-1 ring-primary/5 focus-within:ring-primary/50 transition-all'>
-                <FaSearch className='ml-4 text-muted-foreground' />
+              <div className='relative flex items-center bg-background/80 backdrop-blur-md border border-border rounded-full p-1.5 sm:p-2 shadow-2xl ring-1 ring-primary/5 focus-within:ring-primary/50 transition-all'>
+                <FaSearch className='ml-3 sm:ml-4 text-muted-foreground w-3.5 h-3.5 sm:w-4 sm:h-4' />
                 <input
                   type='text'
-                  placeholder='Search companies, roles, or skills...'
-                  className='flex-1 bg-transparent border-none focus:outline-none px-4 py-3 text-foreground placeholder:text-muted-foreground'
+                  placeholder='Search companies, roles...'
+                  className='flex-1 bg-transparent border-none focus:outline-none px-2 sm:px-4 py-2 sm:py-3 text-sm sm:text-base text-foreground placeholder:text-muted-foreground min-w-0'
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
                   onFocus={() => search.length >= 2 && setShowPreview(true)}
                 />
                 <button
                   type='submit'
-                  className='px-6 py-3 bg-primary hover:bg-primary/90 text-primary-foreground font-medium rounded-full transition-all active:scale-95'
+                  className='px-4 sm:px-6 py-2 sm:py-3 bg-primary hover:bg-primary/90 text-primary-foreground text-sm sm:text-base font-medium rounded-full transition-all active:scale-95 whitespace-nowrap'
                 >
                   Search
                 </button>
@@ -70,7 +73,7 @@ const HeroContent = memo(
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: 10 }}
-                  className='absolute top-full left-0 right-0 mt-3 bg-background/95 backdrop-blur-xl border border-border rounded-2xl shadow-2xl overflow-hidden z-50 text-left'
+                  className='absolute top-full left-0 right-0 mt-3 bg-background/95 backdrop-blur-xl border border-border rounded-2xl shadow-2xl overflow-hidden z-50 text-left max-h-[70vh] overflow-y-auto'
                 >
                   <div className='p-2'>
                     {isSearching && results.length === 0 ? (

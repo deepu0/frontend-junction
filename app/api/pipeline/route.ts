@@ -6,15 +6,38 @@ import { LeetCodeSource } from '@/lib/content-pipeline/sources/leetcode';
 import { MediumSource } from '@/lib/content-pipeline/sources/medium';
 import { DevToSource } from '@/lib/content-pipeline/sources/devto';
 import { TelegramSource } from '@/lib/content-pipeline/sources/telegram';
+import { HashnodeSource } from '@/lib/content-pipeline/sources/hashnode';
 import { ScrapedArticle } from '@/lib/content-pipeline/types';
 
 export async function GET(request: Request) {
-  // Security: Check for a secret token to prevent abuse (e.g. from Cron)
-  // ... (security checks remain)
+  // Security: Check for a secret token OR an admin session
+  const { searchParams } = new URL(request.url);
+  const token = searchParams.get('token');
+  const cronSecret = process.env.CRON_SECRET;
 
-  // ... (client setup remains)
+  const cookieStore = cookies();
+  const supabase = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        get(name: string) {
+          return cookieStore.get(name)?.value;
+        },
+      },
+    }
+  );
 
-  // ... (auth checks remain)
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
+  const isAdmin = session?.user.email === 'deepaksharma834@gmail.com';
+
+  const isAuthorized = (cronSecret && token === cronSecret) || isAdmin;
+
+  if (!isAuthorized) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
 
   try {
     const sources = [
@@ -22,6 +45,7 @@ export async function GET(request: Request) {
       new MediumSource(),
       new DevToSource(),
       new TelegramSource(),
+      new HashnodeSource(),
     ];
     const allArticles: ScrapedArticle[] = [];
 

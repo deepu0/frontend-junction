@@ -93,6 +93,8 @@ export const metadata: Metadata = {
   },
 };
 
+import { MobileStickyCta } from '@/components/common/mobile-sticky-cta';
+
 export default function RootLayout({
   children,
 }: {
@@ -135,8 +137,8 @@ export default function RootLayout({
         </a>
         <ThemeProvider
           attribute='class'
-          defaultTheme='system'
-          enableSystem
+          defaultTheme='dark'
+          enableSystem={false}
           disableTransitionOnChange
         >
           <Toaster />
@@ -144,6 +146,7 @@ export default function RootLayout({
             <AuthProvider>
               <SiteHeader />
               <main id='main-content'>{children}</main>
+              <MobileStickyCta />
             </AuthProvider>
           </LoadingProvider>
         </ThemeProvider>

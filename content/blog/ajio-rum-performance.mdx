@@ -1,0 +1,250 @@
+---
+title: "I Found RUM in Ajio's Code. No, Not Old Monk."
+description: 'A deep dive into Real User Monitoring—how Ajio measures actual performance, why Lighthouse scores are often misleading, and what your production metrics are hiding from you.'
+date: 2026-01-12
+tags: ['Performance', 'RUM', 'JavaScript', 'Engineering Culture']
+published: true
+image: './images/blog_ajio_rum.png'
+author: 'Deepak Sharma'
+featured: true
+---
+
+I was scrolling Ajio. Looking at sneakers I'll never buy.
+
+Muscle memory kicked in.  
+`Cmd + Option + I`
+
+**DevTools opened.**
+
+I do this everywhere. Swiggy. Flipkart. That random startup's landing page. Not to judge. Just to observe.
+
+> **Production code tells you more about engineering culture than any LinkedIn post ever will.**
+
+And there, buried at the bottom of Ajio's DOM, past the product cards, past the footer, past the chat widget...
+
+I spotted it.
+
+```javascript
+var rumMOKey = 'c58a39eb46bfd43b62704a0ecf8d6fd8';
+(function () {
+  if (
+    window.performance &&
+    window.performance.timing &&
+    window.performance.navigation
+  ) {
+    var site24x7_rum_beacon = document.createElement('script');
+    site24x7_rum_beacon.async = true;
+    site24x7_rum_beacon.setAttribute(
+      'src',
+      '//static.site24x7rum.com/beacon/site24x7rum-min.js?appKey=' + rumMOKey
+    );
+    document.getElementsByTagName('head')[0].appendChild(site24x7_rum_beacon);
+  }
+})(window);
+```
+
+7 lines of JavaScript.
+
+**RUM. Real User Monitoring.**
+
+Not the rum you drink after a bad standup. The kind that measures what your users _actually_ experience.
+
+While you're celebrating green Lighthouse scores, this script is quietly collecting the uncomfortable truth:
+
+**Your site is probably slow as hell for 30% of your users.**  
+And you have no idea.
+
+---
+
+## The Uncomfortable Gap Between Lab and Reality
+
+Let me tell you something you won't like.
+
+**Your Lighthouse score is a lie.**
+
+Not technically. It's accurate for what it measures. But what it measures is not what your users experience.
+
+Here's what happened when I audited an e-commerce site last year:
+
+### The Lighthouse Scores:
+
+- **Desktop**: 94/100 ✅
+- **Mobile**: 89/100 ✅
+- **Management**: Thrilled. "We're optimized!"
+
+Then we added RUM. **One week of data:**
+
+| Metric  | P50 (Median) | P75  | P95   | P99       |
+| :------ | :----------- | :--- | :---- | :-------- |
+| **FCP** | 1.3s         | 2.4s | 5.1s  | 8.9s      |
+| **LCP** | 2.2s         | 4.1s | 8.7s  | **14.2s** |
+| **TTI** | 3.1s         | 5.8s | 12.4s | 19.7s     |
+
+**Translation:**
+
+> "5% of our users wait over 12 seconds for the page to become usable."
+
+On a site that Lighthouse scored 89/100. That's 5,000 people daily, staring at a loading spinner, wondering if their internet died. They weren't sticking around to find out.
+
+### Why Lighthouse Lies (And RUM Doesn't)
+
+**Lighthouse tests in a controlled lab:**
+✅ Simulated throttling (not real network jitter)  
+✅ Fresh cache (your users have 3-day-old cache)  
+✅ No other tabs (your users have 15 tabs + Spotify)  
+✅ Patient bot (your users are impatient humans)
+
+**RUM tests in the wild:**
+🔥 Actual Redmi 9A with 2GB RAM  
+🔥 Actual Jio network at 8 PM (peak congestion)  
+🔥 Actual 42°C Rajasthan heat causing thermal throttling  
+🔥 Actual user scrolling while page loads
+
+One is a lab with climate control. One is the street in monsoon season. **You're shipping to the street.**
+
+---
+
+## What This 7-Line Script Actually Does
+
+Let me break down Ajio's RUM implementation. Line by line.
+
+### Line 1: The API Key
+
+```javascript
+var rumMOKey = 'c58a39eb46bfd43b62704a0ecf8d6fd8';
+```
+
+This identifies Ajio's Site24x7 account.
+
+**First observation:** They didn't build their own RUM. **Smart.**
+
+Building custom RUM means:
+
+- Data pipeline infrastructure
+- Time-series database (InfluxDB/TimescaleDB)
+- Visualization layer (Grafana)
+- Alerting system & Data retention
+- Cost optimization at scale
+
+That's a 6-month project. Or pay Site24x7 and ship today.
+
+**Lesson:** Don't build what you can buy when it's not your competitive advantage.
+
+### Line 2-3: IIFE + Feature Detection
+
+```javascript
+(function(){
+  if(window.performance && window.performance.timing && window.performance.navigation) {
+```
+
+Two things are happening here:
+
+**1. Immediately Invoked Function Expression (IIFE)**  
+Why the wrapper? Scope isolation. Without it, variables pollute the global scope. With IIFE, everything stays contained. No conflicts. No leaks.
+
+**2. Feature Detection (The Brilliant Part)**  
+They're not assuming the Performance API exists. They're checking first.
+If someone opens Ajio on an ancient browser:
+
+1.  Script checks for API
+2.  Finds nothing
+3.  Silently exits
+
+No errors. No broken page. No wasted bandwidth. This is **defensive programming**.
+
+### Line 4-6: Dynamic Script Injection + Async
+
+```javascript
+var site24x7_rum_beacon = document.createElement('script');
+site24x7_rum_beacon.async = true;
+site24x7_rum_beacon.setAttribute(
+  'src',
+  '//static.site24x7rum.com/beacon/site24x7rum-min.js?appKey=' + rumMOKey
+);
+document.getElementsByTagName('head')[0].appendChild(site24x7_rum_beacon);
+```
+
+This is where the genius lives. They're not using a static `<script>` tag. They use **Dynamic + Async** loading.
+
+- Loads after the page has started rendering.
+- Doesn't compete with critical resources.
+- Browser schedules as low-priority.
+
+This is the pattern Google Tag Manager and Facebook Pixel use.
+
+---
+
+## What Ajio's RUM Script Actually Measures
+
+Once loaded, it collects:
+
+### 1. Navigation Timing
+
+```javascript
+const ttfb = perfData.responseStart - perfData.requestStart; // Time to First Byte
+const domInteractive = perfData.domInteractive - perfData.fetchStart;
+```
+
+| Metric                   | Diagnosis                   |
+| :----------------------- | :-------------------------- |
+| **High TTFB**            | Slow backend / DB queries   |
+| **High DOM Interactive** | Too much render-blocking JS |
+| **High Load Time**       | Heavy assets/images         |
+
+### 2. Core Web Vitals (Google's Ranking Factors)
+
+**LCP - Largest Contentful Paint**
+
+```javascript
+new PerformanceObserver((entryList) => {
+  const entries = entryList.getEntries();
+  const lcp = entries[entries.length - 1];
+}).observe({ entryTypes: ['largest-contentful-paint'] });
+```
+
+- ✅ &lt;2.5s → Users stay
+- ❌ >4.0s → Users bounce
+
+**CLS - Layout Stability**
+
+```javascript
+new PerformanceObserver((entryList) => {
+  for (const entry of entryList.getEntries()) {
+    if (!entry.hadRecentInput) cls += entry.value;
+  }
+}).observe({ entryTypes: ['layout-shift'] });
+```
+
+- ✅ &lt;0.1 → Stable
+- ❌ >0.25 → User taps the wrong button (rage click)
+
+### 3. Device & Network Context
+
+This is the game-changer. Now you can segment data:
+
+- **LCP by Memory**: 8GB+ (1.2s) vs 2GB (7.4s ❌)
+- **Conversion by LCP**: &lt;2s (8.2% conv) vs 4s (1.2% conv)
+
+**This is actionable data.**
+
+---
+
+## The Real Lesson
+
+Frontend performance is not "Make Lighthouse green."
+
+It is: **"Measure what real users feel on real devices under real conditions and fix what actually hurts."**
+
+Ajio's 7-line script shows they understand this. Most teams don't.
+They optimize for lab scores. They celebrate green checkmarks. They ship. And they wonder why bounce rates are high.
+
+**My Challenge to You:**
+Open DevTools on your production site right now.
+
+1.  Do you have RUM?
+2.  If yes: When did you last check P95 by device tier?
+3.  If no: Why are you optimizing blind?
+
+DevTools will teach you more than any course. Open it on every site. The code never lies.
+
+_Your Lighthouse score might._

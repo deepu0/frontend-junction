@@ -1,11 +1,37 @@
+import { createServerClient } from '@supabase/ssr';
+import { cookies } from 'next/headers';
 import { NextResponse } from 'next/server';
-import { parse } from 'node-html-parser';
 import { GoogleGenerativeAI } from '@google/generative-ai';
+import { parse } from 'node-html-parser';
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
 
 export async function POST(req: Request) {
   try {
+    // Security: Require active session to prevent quota abuse
+    const cookieStore = cookies();
+    const supabase = createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        cookies: {
+          get(name: string) {
+            return cookieStore.get(name)?.value;
+          },
+        },
+      }
+    );
+
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
+    if (!session) {
+      return NextResponse.json(
+        { error: 'Authentication required' },
+        { status: 401 }
+      );
+    }
+
     const { url } = await req.json();
 
     if (!url) {
@@ -22,7 +48,7 @@ export async function POST(req: Request) {
     // Remove script and style tags to reduce noise
     root
       .querySelectorAll('script, style, nav, footer, header')
-      .forEach((el) => el.remove());
+      .forEach((el: any) => el.remove());
 
     // Get text content and clean it up
     const rawText = root.textContent || '';

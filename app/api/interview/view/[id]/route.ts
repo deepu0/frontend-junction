@@ -1,17 +1,28 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
+import { createServerClient } from '@supabase/ssr';
+import { cookies } from 'next/headers';
+import { NextResponse, NextRequest } from 'next/server';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const supabaseKey =
-  process.env.SUPABASE_SERVICE_ROLE_KEY ||
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
-const supabase = createClient(supabaseUrl, supabaseKey);
+// Securely use SERVICE_ROLE only on the server
+const supabaseAdminKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
 
 export async function GET(
   req: NextRequest,
   { params }: { params: { id: string } }
 ) {
   const id = params.id;
+  const cookieStore = cookies();
+  const supabase = createServerClient(
+    supabaseUrl,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        get(name: string) {
+          return cookieStore.get(name)?.value;
+        },
+      },
+    }
+  );
 
   try {
     const { data, error } = await supabase
@@ -35,6 +46,18 @@ export async function POST(
   { params }: { params: { id: string } }
 ) {
   const id = params.id;
+  const cookieStore = cookies();
+  const supabase = createServerClient(
+    supabaseUrl,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        get(name: string) {
+          return cookieStore.get(name)?.value;
+        },
+      },
+    }
+  );
 
   try {
     const { error } = await supabase.rpc('increment_interview_view', {
