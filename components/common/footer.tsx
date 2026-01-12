@@ -42,6 +42,14 @@ export default function FooterComponent() {
               </li>
               <li>
                 <Link
+                  href='/blog'
+                  className='hover:text-primary transition-colors'
+                >
+                  Blog
+                </Link>
+              </li>
+              <li>
+                <Link
                   href='https://topmate.io/deepak_sharma'
                   className='hover:text-primary transition-colors'
                 >

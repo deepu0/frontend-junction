@@ -1,4 +1,4 @@
-. "$(dirname "$0")/_/husky.sh"
+
 
 # Load NVM for GUI clients like GitHub Desktop
 export NVM_DIR="$HOME/.nvm"

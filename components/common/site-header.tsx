@@ -1,5 +1,5 @@
 'use client';
-
+import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
@@ -29,6 +29,8 @@ export function SiteHeader() {
     { name: 'Jobs', href: '/jobs', disabled: true },
     { name: 'Mentorship', href: 'https://topmate.io/deepak_sharma' },
   ];
+
+  const [open, setOpen] = React.useState(false);
 
   return (
     <header className='sticky top-0 z-50 w-full border-b border-border bg-background/80 backdrop-blur-xl supports-[backdrop-filter]:bg-background/60'>
@@ -69,23 +71,23 @@ export function SiteHeader() {
           </nav>
         </div>
 
-        <div className='flex items-center gap-4'>
+        <div className='flex items-center gap-2'>
           <div className='hidden md:flex items-center gap-4 mr-2'>
             <ModeToggle />
             {user ? <Profile /> : <Login path={pathname} />}
           </div>
 
-          <Sheet>
+          <Sheet open={open} onOpenChange={setOpen}>
             <SheetTrigger asChild>
               <Button
                 variant='ghost'
-                className='px-0 text-base hover:bg-transparent focus-visible:bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 md:hidden'
+                className='px-2 text-base hover:bg-transparent focus-visible:bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 md:hidden'
               >
                 <Menu className='h-6 w-6' />
                 <span className='sr-only'>Toggle Menu</span>
               </Button>
             </SheetTrigger>
-            <SheetContent side='left' className='pr-0'>
+            <SheetContent side='right' className='w-[300px] sm:w-[400px]'>
               <SheetHeader>
                 <SheetTitle className='text-left font-bold'>Menu</SheetTitle>
               </SheetHeader>
@@ -94,6 +96,7 @@ export function SiteHeader() {
                   <Link
                     key={item.href}
                     href={item.href}
+                    onClick={() => setOpen(false)}
                     target={item.href.startsWith('http') ? '_blank' : undefined}
                     className={cn(
                       'text-lg font-medium transition-colors hover:text-primary',
@@ -111,15 +114,20 @@ export function SiteHeader() {
                     )}
                   </Link>
                 ))}
+                <div className='pt-4 mt-4 border-t border-border md:hidden'>
+                  {user ? (
+                    <div onClick={() => setOpen(false)}>
+                      <Profile />
+                    </div>
+                  ) : (
+                    <div onClick={() => setOpen(false)}>
+                      <Login path={pathname} />
+                    </div>
+                  )}
+                </div>
               </nav>
             </SheetContent>
           </Sheet>
-
-          {/* Mobile Tools (visible only on mobile) */}
-          <div className='flex md:hidden items-center gap-2'>
-            <ModeToggle />
-            {user ? <Profile /> : <Login path={pathname} />}
-          </div>
         </div>
       </div>
     </header>
