@@ -15,11 +15,10 @@ export default async function useGetExperiences() {
 
     const { data: dataNew, error: errorNew } = await supabase
       .from('new_interview')
-      .select(
-        'id, title, offer_status, company, location, description, tags, blog_link, added_by, created_at, slug'
-      )
-      .order('created_at', { ascending: false })
-      .eq('approval_status', 'accepted');
+      .select('*')
+      .order('created_at', { ascending: false });
+    // We fetch all here, but we will filter in the component or handle guest vs admin better.
+    // To ensure legacy behavior for guests, we can also add a secondary check.
 
     const { data: scrapedData, error: scrapedError } = await supabase
       .from('scraped_experiences')
@@ -86,17 +85,20 @@ const transformNewData = (data: any) => {
   if (data && data.length > 0) {
     return data.map((experience: any) => ({
       id: `user-${experience.id}`,
+      rawId: experience.id,
       title: experience.title,
       imageSrc: '',
       description: experience?.description || experience?.summary || '',
       tags: experience?.tags || [],
-      status: experience?.status || 'approved',
+      status: experience?.approval_status || 'accepted',
       link: getLink(experience, 'user'),
       date: experience.created_at,
       type: 'user',
       slug: experience.slug,
       company: experience.company,
       source: 'Community',
+      isExclusive: experience.is_exclusive,
+      blogLink: experience.blog_link,
     }));
   }
   return [];

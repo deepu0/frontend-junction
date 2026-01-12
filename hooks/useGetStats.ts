@@ -23,71 +23,15 @@ export default function useGetStats() {
   useEffect(() => {
     async function fetchStats() {
       try {
-        // Run all count queries in parallel for maximum speed
-        const [
-          { count: expCount },
-          { count: newCount },
-          { count: scrapedCount },
-          { count: userCount },
-          { count: offersCount },
-          // For unique companies, we still need the data if no RPC, but let's select ONLY the column
-          { data: c1 },
-          { data: c2 },
-          { data: c3 },
-        ] = await Promise.all([
-          supabase
-            .from('experiences')
-            .select('*', { count: 'exact', head: true })
-            .eq('verification_status', 'approved'),
-          supabase
-            .from('new_interview')
-            .select('*', { count: 'exact', head: true })
-            .eq('approval_status', 'accepted'),
-          supabase
-            .from('scraped_experiences')
-            .select('*', { count: 'exact', head: true })
-            .eq('status', 'approved'),
-          supabase.from('users').select('*', { count: 'exact', head: true }),
-          supabase
-            .from('new_interview')
-            .select('*', { count: 'exact', head: true })
-            .eq('approval_status', 'accepted')
-            .eq('offer_status', 'accepted'),
-          supabase
-            .from('experiences')
-            .select('company_name')
-            .eq('verification_status', 'approved'),
-          supabase
-            .from('new_interview')
-            .select('company')
-            .eq('approval_status', 'accepted'),
-          supabase
-            .from('scraped_experiences')
-            .select('company')
-            .eq('status', 'approved'),
-        ]);
-
-        const totalStories =
-          (expCount || 0) + (newCount || 0) + (scrapedCount || 0);
-
-        const companySet = new Set<string>();
-        c1?.forEach(
-          (i) => i.company_name && companySet.add(i.company_name as string)
-        );
-        c2?.forEach((i) => i.company && companySet.add(i.company as string));
-        c3?.forEach((i) => i.company && companySet.add(i.company as string));
-
-        let successRate = '85%';
-        if (newCount && newCount > 0 && offersCount) {
-          const rate = Math.round((offersCount / newCount) * 100);
-          if (rate > 0) successRate = `${rate}%`;
-        }
+        const response = await fetch('/api/admin/stats');
+        if (!response.ok) throw new Error('Failed to fetch stats');
+        const data = await response.json();
 
         setStats({
-          stories: totalStories,
-          companies: companySet.size,
-          members: userCount || 0,
-          successRate: successRate,
+          stories: data.stories || 0,
+          companies: data.companies || 0,
+          members: data.members || 0,
+          successRate: data.successRate || '85%',
         });
       } catch (error) {
         console.error('[useGetStats] Error:', error);
@@ -97,7 +41,7 @@ export default function useGetStats() {
     }
 
     fetchStats();
-  }, [supabase]);
+  }, []);
 
   return { stats, isLoading };
 }

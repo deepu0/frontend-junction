@@ -4,6 +4,8 @@ import Image from 'next/image';
 import Link from 'next/link';
 
 interface CardProps {
+  id?: string;
+  rawId?: string;
   title: string;
   imageSrc?: string;
   description: string;
@@ -14,6 +16,9 @@ interface CardProps {
   companyDomain?: string;
   source?: string;
   date?: string;
+  isAdmin?: boolean;
+  isExclusive?: boolean;
+  blogLink?: string;
 }
 
 const LOCAL_LOGOS: Record<string, string> = {
@@ -224,10 +229,17 @@ const COMPANY_WEBSITES: Record<string, string> = {
   zscaler: 'https://www.zscaler.com',
 };
 
+import { supabase } from '@/lib/supabase';
+import { toast } from '../ui/use-toast';
+import { Loader2, Wand2, CheckCircle2, Trash2 } from 'lucide-react';
+import ViewCounter from '../view-counter';
+
 const CardComponent: React.FC<CardProps> = ({
+  id,
+  rawId,
   title,
   imageSrc,
-  description,
+  description: initialDescription,
   tags,
   status,
   link,
@@ -235,7 +247,105 @@ const CardComponent: React.FC<CardProps> = ({
   companyDomain,
   source,
   date,
+  isAdmin,
+  isExclusive,
+  blogLink,
 }) => {
+  const [isProcessing, setIsProcessing] = React.useState(false);
+  const [description, setDescription] = React.useState(initialDescription);
+  const [currentStatus, setCurrentStatus] = React.useState(status);
+
+  const handleSummarize = async () => {
+    if (!blogLink || isProcessing) return;
+    setIsProcessing(true);
+    try {
+      const res = await fetch('/api/summarize', {
+        method: 'POST',
+        body: JSON.stringify({ url: blogLink }),
+      });
+      const data = await res.json();
+      if (data.summary) {
+        // Update DB
+        const { error } = await supabase
+          .from('new_interview')
+          .update({ description: data.summary })
+          .eq('id', rawId);
+
+        if (error) throw error;
+        setDescription(data.summary);
+        toast({
+          title: 'AI Summary Generated!',
+          description: 'The description has been updated.',
+        });
+      }
+    } catch (err: any) {
+      toast({
+        title: 'Summrization Failed',
+        description: err.message,
+        variant: 'destructive',
+      });
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  const handleApprove = async () => {
+    if (isProcessing) return;
+    setIsProcessing(true);
+    try {
+      const { error } = await supabase
+        .from('new_interview')
+        .update({ approval_status: 'accepted' })
+        .eq('id', rawId);
+
+      if (error) throw error;
+      setCurrentStatus('accepted');
+      toast({
+        title: 'Post Approved!',
+        description: 'It is now live on the feed.',
+      });
+    } catch (err: any) {
+      toast({
+        title: 'Approval Failed',
+        description: err.message,
+        variant: 'destructive',
+      });
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  const handleDelete = async () => {
+    if (
+      !window.confirm(
+        'Are you sure you want to delete this experience? This action cannot be undone.'
+      )
+    )
+      return;
+    if (isProcessing) return;
+    setIsProcessing(true);
+    try {
+      const { error } = await supabase
+        .from('new_interview')
+        .delete()
+        .eq('id', rawId);
+
+      if (error) throw error;
+      toast({
+        title: 'Post Deleted',
+        description: 'Experience has been removed from the database.',
+      });
+      window.location.reload();
+    } catch (err: any) {
+      toast({
+        title: 'Delete Failed',
+        description: err.message,
+        variant: 'destructive',
+      });
+    } finally {
+      setIsProcessing(false);
+    }
+  };
   // Helper for logo URL
   const getLogoUrl = () => {
     // 1. Check Local Mapping first (Highest Priority for curated logos)
@@ -290,25 +400,33 @@ const CardComponent: React.FC<CardProps> = ({
               </div>
             </a>
           ) : (
-            <div className='w-12 h-12 rounded-xl bg-secondary/20 flex items-center justify-center text-lg font-bold text-secondary border border-border'>
+            <div className='w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center text-lg font-bold text-primary border border-primary/20'>
               {(company || title).charAt(0)}
             </div>
           )}
         </div>
 
-        {/* Status / Source Badge */}
-        <div className='flex flex-col items-end gap-1'>
-          {status && (
-            <span
-              className={`px-2 py-0.5 rounded-full text-[10px] font-medium border uppercase tracking-wider ${
-                status === 'approved'
-                  ? 'bg-green-500/10 text-green-600 border-green-500/20'
-                  : 'bg-muted text-muted-foreground'
-              }`}
-            >
-              {status}
-            </span>
-          )}
+        {/* Status / Source Badge / Admin Actions */}
+        <div className='flex flex-col items-end gap-2'>
+          <div className='flex gap-2'>
+            {currentStatus && (
+              <span
+                className={`px-2 py-0.5 rounded-full text-[10px] font-medium border uppercase tracking-wider ${
+                  currentStatus === 'accepted' || currentStatus === 'approved'
+                    ? 'bg-green-500/10 text-green-600 border-green-500/20'
+                    : 'bg-yellow-500/10 text-yellow-600 border-yellow-500/20'
+                }`}
+              >
+                {currentStatus}
+              </span>
+            )}
+            {isExclusive && (
+              <span className='px-2 py-0.5 rounded-full text-[10px] font-medium bg-blue-500/10 text-blue-600 border border-blue-500/20 uppercase tracking-wider'>
+                Exclusive
+              </span>
+            )}
+          </div>
+
           {source && (
             <span
               className='text-[10px] font-medium text-muted-foreground bg-muted px-2 py-0.5 rounded-full border border-border'
@@ -316,6 +434,53 @@ const CardComponent: React.FC<CardProps> = ({
             >
               via {source}
             </span>
+          )}
+
+          {isAdmin && (
+            <div className='flex flex-col gap-2 mt-2'>
+              {currentStatus === 'pending' && (
+                <>
+                  {!isExclusive && blogLink && (
+                    <button
+                      onClick={handleSummarize}
+                      disabled={isProcessing}
+                      className='flex items-center gap-1 text-[10px] bg-violet-600 hover:bg-violet-700 text-white px-2 py-1.5 rounded-md transition-colors disabled:opacity-50 font-semibold'
+                    >
+                      {isProcessing ? (
+                        <Loader2 className='w-3 h-3 animate-spin' />
+                      ) : (
+                        <Wand2 className='w-3 h-3' />
+                      )}
+                      AI Summarize
+                    </button>
+                  )}
+                  <button
+                    onClick={handleApprove}
+                    disabled={isProcessing}
+                    className='flex items-center gap-1 text-[10px] bg-green-600 hover:bg-green-700 text-white px-2 py-1.5 rounded-md transition-colors disabled:opacity-50 font-semibold'
+                  >
+                    {isProcessing ? (
+                      <Loader2 className='w-3 h-3 animate-spin' />
+                    ) : (
+                      <CheckCircle2 className='w-3 h-3' />
+                    )}
+                    Approve
+                  </button>
+                </>
+              )}
+              <button
+                onClick={handleDelete}
+                disabled={isProcessing}
+                className='flex items-center gap-1 text-[10px] bg-red-600/10 hover:bg-red-600 text-red-500 hover:text-white px-2 py-1.5 rounded-md transition-all disabled:opacity-50 border border-red-600/20'
+              >
+                {isProcessing ? (
+                  <Loader2 className='w-3 h-3 animate-spin' />
+                ) : (
+                  <Trash2 className='w-3 h-3' />
+                )}
+                Delete Record
+              </button>
+            </div>
           )}
         </div>
       </div>
@@ -348,20 +513,31 @@ const CardComponent: React.FC<CardProps> = ({
           </p>
         )}
 
-        <div className='flex flex-wrap gap-2 mt-auto'>
-          {tags.slice(0, 3).map((tag, index) => (
-            <span
-              key={index}
-              className='px-2.5 py-1 rounded-md text-xs font-medium bg-secondary/10 text-secondary border border-secondary/20'
-              suppressHydrationWarning
-            >
-              {tag}
-            </span>
-          ))}
-          {tags.length > 3 && (
-            <span className='px-2 py-1 text-xs text-muted-foreground'>
-              +{tags.length - 3}
-            </span>
+        <div className='flex flex-wrap items-center justify-between gap-2 mt-auto'>
+          <div className='flex flex-wrap gap-2'>
+            {tags.slice(0, 3).map((tag, index) => (
+              <span
+                key={index}
+                className='px-2.5 py-1 rounded-md text-xs font-medium bg-primary/10 text-primary border border-primary/20'
+                suppressHydrationWarning
+              >
+                {tag}
+              </span>
+            ))}
+            {tags.length > 3 && (
+              <span className='px-2 py-1 text-xs text-muted-foreground'>
+                +{tags.length - 3}
+              </span>
+            )}
+          </div>
+          {rawId && (
+            <div className='opacity-80 group-hover:opacity-100 transition-opacity'>
+              <ViewCounter
+                slug={rawId}
+                apiPath='/api/interview/view'
+                noIncrement={true}
+              />
+            </div>
           )}
         </div>
       </div>

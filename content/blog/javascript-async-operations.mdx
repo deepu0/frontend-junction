@@ -1,0 +1,145 @@
+---
+title: 'Asynchronous Operations in JavaScript: Callbacks, Promises, and Async/Await'
+description: "JavaScript is single-threaded but handles multiple tasks using asynchronous programming. Let's break down callbacks, promises, and async/await with examples."
+date: '2025-01-05'
+tags: ['JavaScript', 'async', 'promises', 'callbacks', 'fundamentals']
+published: true
+---
+
+JavaScript is single-threaded but handles multiple tasks using asynchronous programming. You'll often use callbacks, promises, and async/await to manage these tasks.
+
+Let's break down each concept with examples, common issues (gotchas), and how they work behind the scenes.
+
+## What Are Callbacks?
+
+A callback is a function passed to another function to be executed later. It's often used in tasks like fetching data or handling events.
+
+```javascript
+function fetchData(callback) {
+  setTimeout(() => {
+    callback('Data fetched!');
+  }, 1000);
+}
+
+fetchData((data) => {
+  console.log(data); // Output: Data fetched!
+});
+```
+
+Callbacks are just functions passed as arguments, executed after some operation finishes. Execution relies on the **Event Loop** and **Callback Queue**.
+
+### What's Wrong with Callbacks (Gotchas)
+
+**1. Callback Hell:** When callbacks are nested, the code becomes hard to read:
+
+```javascript
+setTimeout(() => {
+  console.log('Step 1');
+  setTimeout(() => {
+    console.log('Step 2');
+    setTimeout(() => {
+      console.log('Step 3');
+    }, 1000);
+  }, 1000);
+}, 1000);
+```
+
+**2. Error Handling:** Managing errors requires extra code at each level.
+
+## What Are Promises?
+
+A Promise represents the eventual completion (or failure) of an asynchronous operation.
+
+It has three states:
+
+- **Pending:** Operation is ongoing
+- **Fulfilled:** Operation succeeded
+- **Rejected:** Operation failed
+
+### What Happens Internally with Promises?
+
+1. **State Management:** A promise starts pending and transitions to fulfilled or rejected
+2. **Microtasks:** `.then()` and `.catch()` callbacks are queued in the Microtask Queue
+3. **Chaining:** `.then()` always returns a new promise
+
+```javascript
+fetchData()
+  .then((data) => process(data))
+  .then((processed) => save(processed))
+  .catch((error) => handleError(error));
+```
+
+## What Is Async/Await?
+
+`async/await` is syntactic sugar over promises, making asynchronous code look synchronous.
+
+```javascript
+const fetchData = () => {
+  return new Promise((resolve, reject) => {
+    setTimeout(() => {
+      resolve('Data fetched successfully');
+    }, 1000);
+  });
+};
+
+const getData = async () => {
+  try {
+    const data = await fetchData();
+    console.log(data);
+  } catch (error) {
+    console.error('Error:', error);
+  }
+};
+
+getData();
+```
+
+### How Async Functions Work
+
+- Declaring a function `async` automatically wraps it in a promise
+- `await` pauses execution until the promise resolves or rejects
+- `await` doesn't block the event loop—it schedules continuation in the Microtask Queue
+
+## Comparison: Callbacks vs Promises vs Async/Await
+
+### Callbacks
+
+**Pros:**
+
+- Simple to implement for basic operations
+- No need to understand Promises
+
+**Cons:**
+
+- Nested structure leads to hard-to-read code
+- No centralized error handling
+
+### Promises
+
+**Pros:**
+
+- Flat structure, more readable
+- Centralized error handling with `.catch()`
+- Modular and reusable
+
+**Cons:**
+
+- Chaining complexity with many `.then()` calls
+- Debugging can be tricky
+
+### Async/Await
+
+**Pros:**
+
+- Synchronous flow—easiest to understand
+- Centralized error handling with `try...catch`
+- Flexible debugging
+
+**Cons:**
+
+- Requires understanding Promises first
+- Forgetting `await` leads to unhandled promises
+
+---
+
+_Originally published on [LinkedIn](https://www.linkedin.com/pulse/asynchronous-operation-javascript-callbacks-promises-deepak-sharma-mdjyc)_

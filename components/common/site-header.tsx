@@ -9,6 +9,15 @@ import Profile from './profile';
 import { motion } from 'framer-motion';
 
 import { ModeToggle } from '@/components/mode-toggle';
+import { Menu } from 'lucide-react';
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from '@/components/ui/sheet';
+import { Button } from '@/components/ui/button';
 
 export function SiteHeader() {
   const { user } = useAuth();
@@ -16,8 +25,9 @@ export function SiteHeader() {
 
   const navItems = [
     { name: 'Explore', href: '/interview-experience' },
+    { name: 'Blog', href: '/blog' },
     { name: 'Jobs', href: '/jobs', disabled: true },
-    { name: 'Mentorship', href: '/mentorship', disabled: true },
+    { name: 'Mentorship', href: 'https://topmate.io/deepak_sharma' },
   ];
 
   return (
@@ -33,13 +43,14 @@ export function SiteHeader() {
             </span>
           </Link>
 
-          <nav className='hidden md:flex items-center gap-6'>
+          <nav className='hidden md:flex items-center gap-4'>
             {navItems.map((item) => (
               <Link
                 key={item.href}
                 href={item.href}
+                target={item.href.startsWith('http') ? '_blank' : undefined}
                 className={cn(
-                  'text-sm font-medium transition-colors hover:text-primary',
+                  'text-sm font-medium transition-colors hover:text-primary whitespace-nowrap',
                   pathname === item.href
                     ? 'text-foreground'
                     : 'text-muted-foreground',
@@ -59,8 +70,56 @@ export function SiteHeader() {
         </div>
 
         <div className='flex items-center gap-4'>
-          <ModeToggle />
-          {user ? <Profile /> : <Login path={pathname} />}
+          <div className='hidden md:flex items-center gap-4 mr-2'>
+            <ModeToggle />
+            {user ? <Profile /> : <Login path={pathname} />}
+          </div>
+
+          <Sheet>
+            <SheetTrigger asChild>
+              <Button
+                variant='ghost'
+                className='px-0 text-base hover:bg-transparent focus-visible:bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 md:hidden'
+              >
+                <Menu className='h-6 w-6' />
+                <span className='sr-only'>Toggle Menu</span>
+              </Button>
+            </SheetTrigger>
+            <SheetContent side='left' className='pr-0'>
+              <SheetHeader>
+                <SheetTitle className='text-left font-bold'>Menu</SheetTitle>
+              </SheetHeader>
+              <nav className='flex flex-col gap-4 mt-8'>
+                {navItems.map((item) => (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    target={item.href.startsWith('http') ? '_blank' : undefined}
+                    className={cn(
+                      'text-lg font-medium transition-colors hover:text-primary',
+                      pathname === item.href
+                        ? 'text-foreground font-bold'
+                        : 'text-muted-foreground',
+                      item.disabled && 'opacity-50 cursor-not-allowed'
+                    )}
+                  >
+                    {item.name}
+                    {item.disabled && (
+                      <span className='ml-1.5 rounded bg-primary/10 px-1.5 py-0.5 text-[10px] font-semibold text-primary'>
+                        SOON
+                      </span>
+                    )}
+                  </Link>
+                ))}
+              </nav>
+            </SheetContent>
+          </Sheet>
+
+          {/* Mobile Tools (visible only on mobile) */}
+          <div className='flex md:hidden items-center gap-2'>
+            <ModeToggle />
+            {user ? <Profile /> : <Login path={pathname} />}
+          </div>
         </div>
       </div>
     </header>

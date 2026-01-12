@@ -4,6 +4,7 @@ import { useSearchParams } from 'next/navigation';
 import CardComponent from './common/card';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FaSearch, FaFilter, FaSortAmountDown } from 'react-icons/fa';
+import { useAuth } from './session-provider';
 
 interface IExperienceProps {
   interviewData: any[];
@@ -12,14 +13,17 @@ interface IExperienceProps {
 const FAMOUS_COMPANIES = ['Google', 'Amazon', 'Meta', 'Netflix', 'Microsoft'];
 
 const InterviewExperiences = ({ interviewData = [] }: IExperienceProps) => {
+  const { user } = useAuth();
   const searchParams = useSearchParams();
   const initialSearch = searchParams.get('search') || '';
 
   const [searchQuery, setSearchQuery] = useState(initialSearch);
-  const [activeFilter, setActiveFilter] = useState<'all' | 'community' | 'web'>(
-    'all'
-  );
+  const [activeFilter, setActiveFilter] = useState<
+    'all' | 'community' | 'web' | 'pending'
+  >('all');
   const [selectedCompanies, setSelectedCompanies] = useState<string[]>([]);
+
+  const isAdmin = user?.role === 'admin';
 
   // Update searchQuery when URL parameter changes
   useEffect(() => {
@@ -41,7 +45,17 @@ const InterviewExperiences = ({ interviewData = [] }: IExperienceProps) => {
   const filteredData = useMemo(() => {
     let data = [...interviewData];
 
-    // Filter by Source
+    // 1. Filter out pending posts for non-admins
+    if (!isAdmin) {
+      // Hide ONLY if status is explicitly 'pending'. Show everything else (accepted, approved, null, legacy).
+      data = data.filter((item) => item.status !== 'pending');
+    } else if (activeFilter === 'pending') {
+      // If admin specifically selects Pending, show ONLY pending
+      data = data.filter((item) => item.status === 'pending');
+    }
+    // If admin is on All/Community/Web, they see EVERYTHING including pending.
+
+    // 2. Source Filtering
     if (activeFilter === 'community') {
       data = data.filter(
         (item) => item.type === 'user' || item.type === 'legacy'
@@ -50,7 +64,7 @@ const InterviewExperiences = ({ interviewData = [] }: IExperienceProps) => {
       data = data.filter((item) => item.type === 'scraped');
     }
 
-    // Filter by Company (Multi-select)
+    // 3. Company Filtering
     if (selectedCompanies.length > 0) {
       data = data.filter(
         (item) => item.company && selectedCompanies.includes(item.company)
@@ -112,19 +126,21 @@ const InterviewExperiences = ({ interviewData = [] }: IExperienceProps) => {
 
             {/* Main Filter Tabs */}
             <div className='flex items-center gap-2 p-1 bg-muted rounded-xl bg-background/50 border border-border'>
-              {['all', 'community', 'web'].map((filter) => (
-                <button
-                  key={filter}
-                  onClick={() => setActiveFilter(filter as any)}
-                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                    activeFilter === filter
-                      ? 'bg-primary text-primary-foreground shadow-sm'
-                      : 'text-muted-foreground hover:text-foreground hover:bg-muted'
-                  }`}
-                >
-                  {filter.charAt(0).toUpperCase() + filter.slice(1)}
-                </button>
-              ))}
+              {['all', 'community', 'web', ...(isAdmin ? ['pending'] : [])].map(
+                (filter) => (
+                  <button
+                    key={filter}
+                    onClick={() => setActiveFilter(filter as any)}
+                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                      activeFilter === filter
+                        ? 'bg-primary text-primary-foreground shadow-sm'
+                        : 'text-muted-foreground hover:text-foreground hover:bg-muted'
+                    }`}
+                  >
+                    {filter.charAt(0).toUpperCase() + filter.slice(1)}
+                  </button>
+                )
+              )}
             </div>
           </div>
 
@@ -218,7 +234,7 @@ const InterviewExperiences = ({ interviewData = [] }: IExperienceProps) => {
               exit={{ opacity: 0, scale: 0.9 }}
               transition={{ duration: 0.2 }}
             >
-              <CardComponent {...interview} />
+              <CardComponent {...interview} isAdmin={isAdmin} />
             </motion.div>
           ))}
         </AnimatePresence>
