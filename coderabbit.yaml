@@ -1,22 +1,22 @@
 # CodeRabbit Configuration File
 # Documentation: https://docs.coderabbit.ai/guides/configure-coderabbit
 
-language: "en-US"
+language: 'en-US'
 early_access: false
 reviews:
-  profile: "chill"
+  profile: 'chill'
   request_changes_workflow: false
   high_level_summary: true
   auto_review:
     enabled: true
     ignore_title_keywords:
-      - "WIP"
-      - "Do not merge"
+      - 'WIP'
+      - 'Do not merge'
     drafts: false
   tools:
     ast-grep:
       enabled: true
       rule_dirs:
-        - "rules"
+        - 'rules'
 chat:
   auto_reply: true
