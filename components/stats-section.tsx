@@ -18,16 +18,12 @@ export default function StatsSection() {
       label: 'Community Members',
       value: `${stats.members}${stats.members > 50 ? '+' : ''}`,
     },
-    {
-      label: 'Offer Success Rate',
-      value: stats.successRate,
-    },
   ];
 
   return (
     <section className='py-12 border-y border-border/40 bg-muted/20'>
       <div className='container mx-auto px-4'>
-        <div className='grid grid-cols-2 md:grid-cols-4 gap-8'>
+        <div className='grid grid-cols-1 md:grid-cols-3 gap-8'>
           {statsDisplay.map((s, i) => (
             <motion.div
               key={i}

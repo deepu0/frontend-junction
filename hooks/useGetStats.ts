@@ -7,7 +7,6 @@ export interface Stats {
   stories: number;
   companies: number;
   members: number;
-  successRate: string;
 }
 
 export default function useGetStats() {
@@ -15,7 +14,6 @@ export default function useGetStats() {
     stories: 0,
     companies: 0,
     members: 0,
-    successRate: '85%',
   });
   const [isLoading, setIsLoading] = useState(true);
   const supabase = getSupabaseBrowserClient();
@@ -23,7 +21,7 @@ export default function useGetStats() {
   useEffect(() => {
     async function fetchStats() {
       try {
-        const response = await fetch('/api/admin/stats');
+        const response = await fetch('/api/public/stats');
         if (!response.ok) throw new Error('Failed to fetch stats');
         const data = await response.json();
 
@@ -31,7 +29,6 @@ export default function useGetStats() {
           stories: data.stories || 0,
           companies: data.companies || 0,
           members: data.members || 0,
-          successRate: data.successRate || '85%',
         });
       } catch (error) {
         console.error('[useGetStats] Error:', error);
