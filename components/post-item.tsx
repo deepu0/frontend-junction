@@ -42,7 +42,10 @@ export function PostItem({
           {tags?.map((tag) => <Tag tag={tag} key={tag} />)}
         </div>
         <h2 className='text-2xl font-bold leading-tight'>
-          <Link href={'/' + slug} className='hover:text-primary transition-colors'>
+          <Link
+            href={'/' + slug}
+            className='hover:text-primary transition-colors'
+          >
             {title}
           </Link>
         </h2>
@@ -65,7 +68,10 @@ export function PostItem({
           />
           <Link
             href={'/' + slug}
-            className={cn(buttonVariants({ variant: 'link' }), 'py-0 h-auto px-0')}
+            className={cn(
+              buttonVariants({ variant: 'link' }),
+              'py-0 h-auto px-0'
+            )}
           >
             Read more →
           </Link>

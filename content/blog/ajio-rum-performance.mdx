@@ -9,14 +9,14 @@ author: 'Deepak Sharma'
 featured: true
 ---
 
-I was scrolling Ajio. Looking at sneakers I'll never buy. 
+I was scrolling Ajio. Looking at sneakers I'll never buy.
 
 Muscle memory kicked in.  
 `Cmd + Option + I`
 
-**DevTools opened.** The digital equivalent of lifting the hood. 
+**DevTools opened.** The digital equivalent of lifting the hood.
 
-I do this everywhere. Swiggy. Flipkart. That fancy startup with ₹200 Cr funding. Not to judge. To *diagnose*.
+I do this everywhere. Swiggy. Flipkart. That fancy startup with ₹200 Cr funding. Not to judge. To _diagnose_.
 
 > **Production code is corporate DNA. It doesn't lie.**
 
@@ -24,7 +24,7 @@ And there—buried in the DOM like a forensic clue, past React hydration waterfa
 
 ```javascript
 var rumMOKey = 'c58a39eb46bfd43b62704a0ecf8d6fd8';
-(function() {
+(function () {
   if (window.performance?.timing && window.performance?.navigation) {
     var script = document.createElement('script');
     script.async = true;
@@ -41,6 +41,7 @@ var rumMOKey = 'c58a39eb46bfd43b62704a0ecf8d6fd8';
 Not the liquid courage after sprint planning. The kind that shows how your site actually performs when an Ola cab driver on Jio 4G tries buying sneakers during monsoon.
 
 ## The Great Lighthouse Illusion
+
 Let's cut through the bullshit.
 
 Your 90+ Lighthouse score is engineering theater.
@@ -49,13 +50,13 @@ It passes audits. It pleases stakeholders. It's also bullshit.
 
 Why? I ran an experiment:
 
-| | Lighthouse Lab | RUM Reality |
-|---|---|---|
-| **Device** | Simulated Moto G4 | Real Redmi 9A (thermal throttling at 42°C) |
-| **Network** | Simulated "Slow 4G" | Actual Jio 4G during IPL finals |
-| **Cache** | Controlled (fresh) | 3-week old PWA cached assets |
-| **User State** | Calm bot | Impatient human (15 tabs + Hotstar stream) |
-| **TTI Measurement** | 5.8s | 19.7s (P99) |
+|                     | Lighthouse Lab      | RUM Reality                                |
+| ------------------- | ------------------- | ------------------------------------------ |
+| **Device**          | Simulated Moto G4   | Real Redmi 9A (thermal throttling at 42°C) |
+| **Network**         | Simulated "Slow 4G" | Actual Jio 4G during IPL finals            |
+| **Cache**           | Controlled (fresh)  | 3-week old PWA cached assets               |
+| **User State**      | Calm bot            | Impatient human (15 tabs + Hotstar stream) |
+| **TTI Measurement** | 5.8s                | 19.7s (P99)                                |
 
 **Translation:** That 89/100 Mobile score? It hides that 1 in 20 users waits 14+ seconds for your page to respond.
 
@@ -66,9 +67,11 @@ They're not waiting. They're bouncing to Meesho.
 ## How Ajio's 7 Lines Work (Engineer to Engineer)
 
 ### 1. `if (window.performance?.timing)`
+
 This isn't just feature detection—it's empathy.
 
 Ajio knows:
+
 - 1.2% of Indian traffic comes from KaiOS (no Performance API)
 - Old Nokia devices still roam Bihar villages
 - Enterprise proxies strip modern APIs
@@ -76,6 +79,7 @@ Ajio knows:
 By failing silently, they avoid breaking legacy users. Most teams would throw `new Error("Upgrade your damn browser")`.
 
 ### 2. `script.async = true`
+
 This choice reveals performance maturity:
 
 ```mermaid
@@ -89,6 +93,7 @@ G --> H[Browser loads when idle]
 **Impact:** RUM never competes with product images or checkout JS. It's the last passenger on the bus.
 
 ### 3. The Unseen Magic in `site24x7rum-min.js`
+
 Once loaded, it transforms the browser into a field lab:
 
 ```javascript
@@ -96,29 +101,34 @@ const ttfb = navEntry.responseStart - navEntry.requestStart;
 
 // 2. Monitor interaction latency
 let worstINP = 0;
-new PerformanceObserver(list => {
-  list.getEntries().forEach(entry => {
+new PerformanceObserver((list) => {
+  list.getEntries().forEach((entry) => {
     if (entry.duration > worstINP) worstINP = entry.duration;
   });
 }).observe({ type: 'event', buffered: true });
 
 // 3. Detect rage clicks
-document.addEventListener('click', e => {
-  if (e.timeStamp - lastClick < 300) {
-    logRageClick(e.target);
-  }
-}, { capture: true });
+document.addEventListener(
+  'click',
+  (e) => {
+    if (e.timeStamp - lastClick < 300) {
+      logRageClick(e.target);
+    }
+  },
+  { capture: true }
+);
 ```
 
 ## What Ajio Sees That You Don't
+
 Their RUM dashboard exposes brutal truths:
 
-| Segment | LCP (P95) | Conversion Rate | Action Taken |
-|---|---|---|---|
-| 4G + 8GB RAM | 1.8s | 8.7% | - |
-| 3G + 4GB RAM | 3.2s | 4.1% | Optimize hero image |
-| 2G + 2GB RAM | 11.4s | 0.9% | Serve LiteHTML version |
-| JioPhone (KaiOS) | N/A | 0.3% | Blocked by user agent |
+| Segment          | LCP (P95) | Conversion Rate | Action Taken           |
+| ---------------- | --------- | --------------- | ---------------------- |
+| 4G + 8GB RAM     | 1.8s      | 8.7%            | -                      |
+| 3G + 4GB RAM     | 3.2s      | 4.1%            | Optimize hero image    |
+| 2G + 2GB RAM     | 11.4s     | 0.9%            | Serve LiteHTML version |
+| JioPhone (KaiOS) | N/A       | 0.3%            | Blocked by user agent  |
 
 But the real gold? Correlation alerts:
 
@@ -131,15 +141,19 @@ But the real gold? Correlation alerts:
 ## The Dark Patterns of Bad RUM (That You're Probably Doing)
 
 ### 1. The "Google Analytics Performance Hack"
+
 ```javascript
 ga('send', 'timing', 'clean', 'pageload', loadTime);
 ```
+
 **Why it fails:**
+
 - Sampling ignores tail latency
 - No device context
 - 1-hour delay in reporting
 
 ### 2. The "Console.log Performance Review"
+
 ```javascript
 const start = Date.now();
 loadPage();
@@ -150,10 +164,12 @@ console.log(`TTI: ${Date.now() - start}ms`); // 🤡
 DevTools throttling ≠ real world. Your M1 MacBook ≠ ₹8k Android.
 
 ### 3. The "Synthetic Monitoring Trap"
+
 Thinking Pingdom checks = real users.  
 **Newsflash:** Bots don't have:
-- Battery saver mode throttling CPUs 50%  
-- Memory pressure killing hidden tabs  
+
+- Battery saver mode throttling CPUs 50%
+- Memory pressure killing hidden tabs
 - Auto-playing YouTube videos draining bandwidth
 
 ---
@@ -161,7 +177,7 @@ Thinking Pingdom checks = real users.
 ## Your RUM Starter Kit (Production-Grade)
 
 ```javascript
-window.performanceMark = name => {
+window.performanceMark = (name) => {
   if (!window.performance?.mark) return;
   performance.mark(name);
 };
@@ -175,16 +191,16 @@ window.performanceMeasure = (name, start, end) => {
 export const initRUM = () => {
   // INP tracker
   let worstINP = { duration: 0 };
-  new PerformanceObserver(list => {
-    list.getEntries().forEach(entry => {
+  new PerformanceObserver((list) => {
+    list.getEntries().forEach((entry) => {
       if (entry.duration > worstINP.duration) worstINP = entry;
     });
   }).observe({ type: 'event', durationThreshold: 100, buffered: true });
 
   // CLS tracker
   let clsValue = 0;
-  new PerformanceObserver(list => {
-    list.getEntries().forEach(entry => {
+  new PerformanceObserver((list) => {
+    list.getEntries().forEach((entry) => {
       if (!entry.hadRecentInput) clsValue += entry.value;
     });
   }).observe({ type: 'layout-shift', buffered: true });
@@ -196,7 +212,7 @@ export const initRUM = () => {
         INP: Math.round(worstINP.duration),
         CLS: clsValue.toFixed(3),
         deviceMemory: navigator.deviceMemory,
-        effectiveType: navigator.connection?.effectiveType
+        effectiveType: navigator.connection?.effectiveType,
       };
       navigator.sendBeacon('/rum-endpoint', JSON.stringify(rumData));
     }
@@ -220,13 +236,14 @@ aws s3 cp rum_logs/ s3://analytics-bucket/ --recursive \
 
 ```sql
 # Athena query for P95 INP
-SELECT 
-  approx_percentile(INP, 0.95) AS p95_INP 
-FROM rum_logs 
+SELECT
+  approx_percentile(INP, 0.95) AS p95_INP
+FROM rum_logs
 WHERE effectiveType = '4g'
 ```
 
 ## The Naked Truth
+
 95% of teams:
 "Look! Our Lighthouse score is 96! Ship it!"
 

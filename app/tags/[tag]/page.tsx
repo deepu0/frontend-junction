@@ -42,18 +42,23 @@ export default function TagPage({ params }: TagPageProps) {
         <h1 className='inline-block font-black text-4xl lg:text-5xl capitalize'>
           {title}
         </h1>
-        <p className='text-xl text-muted-foreground'>
-          Posts about {title}
-        </p>
+        <p className='text-xl text-muted-foreground'>Posts about {title}</p>
       </div>
 
       <div className='mb-8'>
         <Card className='border-0 shadow-none bg-transparent'>
           <CardContent className='flex flex-wrap justify-center gap-2 p-0'>
-            <div className="flex flex-wrap justify-center gap-2">
-              {sortedTags?.slice(0, 10).map((t) => (
-                <Tag tag={t} key={t} count={tags[t]} current={slug(t) === tag} />
-              ))}
+            <div className='flex flex-wrap justify-center gap-2'>
+              {sortedTags
+                ?.slice(0, 10)
+                .map((t) => (
+                  <Tag
+                    tag={t}
+                    key={t}
+                    count={tags[t]}
+                    current={slug(t) === tag}
+                  />
+                ))}
             </div>
           </CardContent>
         </Card>

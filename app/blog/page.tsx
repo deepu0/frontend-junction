@@ -45,10 +45,10 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
       <div className='mb-8'>
         <Card className='border-0 shadow-none bg-transparent'>
           <CardContent className='flex flex-wrapjustify-center gap-2 p-0'>
-            <div className="flex flex-wrap justify-center gap-2">
-              {sortedTags?.slice(0, 10).map((tag) => (
-                <Tag tag={tag} key={tag} count={tags[tag]} />
-              ))}
+            <div className='flex flex-wrap justify-center gap-2'>
+              {sortedTags
+                ?.slice(0, 10)
+                .map((tag) => <Tag tag={tag} key={tag} count={tags[tag]} />)}
             </div>
           </CardContent>
         </Card>
