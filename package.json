@@ -84,7 +84,7 @@
     "knip": "^5.80.2",
     "prettier": "^3.2.5",
     "rehype-autolink-headings": "^7.1.0",
-    "rehype-pretty-code": "^0.13.0",
+    "rehype-pretty-code": "^0.14.1",
     "rehype-slug": "^6.0.0",
     "shiki": "^3.21.0",
     "size-limit": "^12.0.0",
