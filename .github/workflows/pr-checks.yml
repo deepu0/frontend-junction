@@ -54,6 +54,10 @@ jobs:
         run: npm run check:size
 
       - name: Lighthouse CI
-        run: npm run test:lighthouse
+        run: |
+          ls -R .next
+          npm run test:lighthouse
         env:
           LHCI_GITHUB_APP_TOKEN: ${{ secrets.LHCI_GITHUB_APP_TOKEN }}
+          NEXT_PUBLIC_SUPABASE_URL: http://localhost:8000
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: dummy-key-for-lhci
