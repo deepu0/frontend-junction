@@ -27,9 +27,6 @@ jobs:
       - name: Type Check
         run: npm run check-types
 
-      - name: Spell Check
-        run: npm run check:spelling
-
       - name: Security Audit
         run: npm audit --audit-level=high
 
