@@ -176,7 +176,7 @@ const TextEditor: React.FC<Props> = (props: Props) => {
 
   useEffect(() => {
     onChangeHandler(editorText);
-  }, [editorText]);
+  }, [editorText, onChangeHandler]);
 
   return (
     <ReactQuill

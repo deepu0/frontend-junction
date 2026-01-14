@@ -67,6 +67,7 @@ export default function FooterComponent() {
                 target='_blank'
                 rel='noopener noreferrer'
                 className='text-muted-foreground hover:text-white transition-colors'
+                aria-label='Follow us on GitHub'
               >
                 <FaGithub size={20} />
               </a>
@@ -75,6 +76,7 @@ export default function FooterComponent() {
                 target='_blank'
                 rel='noopener noreferrer'
                 className='text-muted-foreground hover:text-[#1DA1F2] transition-colors'
+                aria-label='Follow us on Twitter'
               >
                 <FaTwitter size={20} />
               </a>
@@ -83,6 +85,7 @@ export default function FooterComponent() {
                 target='_blank'
                 rel='noopener noreferrer'
                 className='text-muted-foreground hover:text-[#0A66C2] transition-colors'
+                aria-label='Follow us on LinkedIn'
               >
                 <FaLinkedin size={20} />
               </a>

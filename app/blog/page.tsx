@@ -15,13 +15,14 @@ export const metadata: Metadata = {
 const POSTS_PER_PAGE = 6; // Changed to 6 for better grid (2x3)
 
 interface BlogPageProps {
-  searchParams: {
+  searchParams: Promise<{
     page?: string;
-  };
+  }>;
 }
 
 export default async function BlogPage({ searchParams }: BlogPageProps) {
-  const currentPage = Number(searchParams?.page) || 1;
+  const { page } = await searchParams;
+  const currentPage = Number(page) || 1;
   const sortedPosts = sortPosts(posts.filter((post) => post.published));
   const totalPages = Math.ceil(sortedPosts.length / POSTS_PER_PAGE);
 

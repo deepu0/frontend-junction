@@ -8,6 +8,7 @@ import HeroSection from './hero-section';
 import StatsSection from './stats-section';
 import FeaturesSection from './features-section';
 import BlogCtaSection from './blog-cta-section';
+import Link from 'next/link';
 
 // NOTE: We are replacing WhyChooseComponent with FeaturesSection as it is more "Hub" aligned.
 // We are keeping company slider and latest experiences.
@@ -154,7 +155,7 @@ const LandingPage: React.FC<IHomeProps> = (props: IHomeProps) => {
             transition={{ delay: 0.8 }}
             className='mt-10 text-center md:hidden'
           >
-            <a
+            <Link
               href='/interview-experience'
               className='inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-primary/10 hover:bg-primary text-primary hover:text-white font-semibold transition-all duration-300 border border-primary/20 hover:border-primary group active:scale-95'
             >
@@ -172,7 +173,7 @@ const LandingPage: React.FC<IHomeProps> = (props: IHomeProps) => {
                   d='M13 7l5 5m0 0l-5 5m5-5H6'
                 />
               </svg>
-            </a>
+            </Link>
           </motion.div>
         </motion.div>
       </section>

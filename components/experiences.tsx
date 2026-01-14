@@ -85,7 +85,7 @@ const InterviewExperiences = ({ interviewData = [] }: IExperienceProps) => {
     }
 
     return data;
-  }, [interviewData, searchQuery, activeFilter, selectedCompanies]);
+  }, [interviewData, searchQuery, activeFilter, selectedCompanies, isAdmin]);
 
   const toggleCompany = (company: string) => {
     setSelectedCompanies((prev) =>

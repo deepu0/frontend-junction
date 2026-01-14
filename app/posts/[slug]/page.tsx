@@ -20,8 +20,12 @@ export const generateStaticParams = async () => {
   }));
 };
 
-export async function generateMetadata({ params }: any): Promise<Metadata> {
-  const slug = params.slug;
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}): Promise<Metadata> {
+  const { slug } = await params;
 
   const { data: post } = getPostContent(slug);
 
@@ -59,8 +63,8 @@ export async function generateMetadata({ params }: any): Promise<Metadata> {
   };
 }
 
-const PostPage = (props: any) => {
-  const slug = props.params.slug;
+const PostPage = async (props: { params: Promise<{ slug: string }> }) => {
+  const { slug } = await props.params;
   const post = getPostContent(slug);
   const h2Style: React.CSSProperties = {
     color: '#ff5733',

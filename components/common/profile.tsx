@@ -30,7 +30,7 @@ export default function Profile() {
 
   return (
     <Popover>
-      <PopoverTrigger>
+      <PopoverTrigger aria-label='Open user profile menu'>
         <Image
           src={user?.image_url!}
           alt={user?.display_name!}

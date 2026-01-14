@@ -10,12 +10,12 @@ import { Tag } from '@/components/tag';
 import ViewCounter from '@/components/view-counter';
 import { ShareButtons } from '@/components/share-buttons';
 interface PostPageProps {
-  params: {
+  params: Promise<{
     slug: string[];
-  };
+  }>;
 }
 
-async function getPostFromParams(params: PostPageProps['params']) {
+async function getPostFromParams(params: { slug: string[] }) {
   const slug = params?.slug?.join('/');
   const post = posts.find((post) => post.slugAsParams === slug);
 
@@ -25,7 +25,8 @@ async function getPostFromParams(params: PostPageProps['params']) {
 export async function generateMetadata({
   params,
 }: PostPageProps): Promise<Metadata> {
-  const post = await getPostFromParams(params);
+  const resolvedParams = await params;
+  const post = await getPostFromParams(resolvedParams);
 
   if (!post) {
     return {};
@@ -67,14 +68,13 @@ export async function generateMetadata({
   };
 }
 
-export async function generateStaticParams(): Promise<
-  PostPageProps['params'][]
-> {
+export async function generateStaticParams(): Promise<{ slug: string[] }[]> {
   return posts.map((post) => ({ slug: post.slugAsParams.split('/') }));
 }
 
 export default async function PostPage({ params }: PostPageProps) {
-  const post = await getPostFromParams(params);
+  const resolvedParams = await params;
+  const post = await getPostFromParams(resolvedParams);
 
   if (!post || !post.published) {
     notFound();

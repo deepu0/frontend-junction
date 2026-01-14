@@ -190,6 +190,7 @@ const FloatingLogo: React.FC<{
       href={company.url}
       target='_blank'
       rel='noopener noreferrer'
+      aria-label={`Visit ${company.name} website`}
       initial={{ opacity: 0, scale: 0 }}
       whileInView={{ opacity: 1, scale: 1 }}
       viewport={{ once: true }}

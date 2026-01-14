@@ -3,9 +3,10 @@ import { supabase } from '@/lib/supabase';
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: { slug: string[] } }
+  { params }: { params: Promise<{ slug: string[] }> }
 ) {
-  const slug = params.slug.join('/');
+  const { slug: slugSegments } = await params;
+  const slug = slugSegments.join('/');
 
   if (!slug) {
     return NextResponse.json({ error: 'Slug is required' }, { status: 400 });
@@ -26,9 +27,10 @@ export async function GET(
 
 export async function POST(
   req: NextRequest,
-  { params }: { params: { slug: string[] } }
+  { params }: { params: Promise<{ slug: string[] }> }
 ) {
-  const slug = params.slug.join('/');
+  const { slug: slugSegments } = await params;
+  const slug = slugSegments.join('/');
 
   if (!slug) {
     return NextResponse.json({ error: 'Slug is required' }, { status: 400 });

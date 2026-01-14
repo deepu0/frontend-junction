@@ -26,7 +26,11 @@
     "radix",
     "zod",
     "framer",
-    "slugger"
+    "slugger",
+    "leetcode",
+    "tgme",
+    "listicle",
+    "cheatsheet"
   ],
   "ignorePaths": [
     "node_modules",

@@ -59,8 +59,9 @@ const Carriage = memo(
                 alt={logo.name}
                 fill
                 className='object-contain p-0.5'
-                sizes='(max-width: 640px) 32px, (max-width: 768px) 36px, 56px'
-                loading='lazy'
+                sizes='(max-width: 640px) 48px, (max-width: 768px) 56px, 64px'
+                loading={index < 5 ? 'eager' : 'lazy'}
+                priority={index < 5}
                 quality={85}
               />
             </div>
