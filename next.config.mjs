@@ -4,7 +4,7 @@ import { build } from 'velite';
 /** @type {import('next').NextConfig} */
 export default {
   // other next config here...
-  outputFileTracingRoot: path.resolve('..', '..'),
+  outputFileTracingRoot: path.resolve(process.cwd()),
   webpack: (config) => {
     config.plugins.push(new VeliteWebpackPlugin());
     return config;
