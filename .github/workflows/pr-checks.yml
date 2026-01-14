@@ -18,6 +18,9 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Generate Velite Content
+        run: npx velite build
+
       - name: Lint
         run: npm run lint
 
