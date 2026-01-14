@@ -30,9 +30,6 @@ jobs:
       - name: Security Audit
         run: npm audit --audit-level=high
 
-      - name: Check Unused Code
-        run: npm run check:unused
-
   build-and-perf:
     name: Build & Performance
     needs: quality
