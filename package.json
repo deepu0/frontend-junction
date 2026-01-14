@@ -34,7 +34,7 @@
     "@supabase/auth-helpers-nextjs": "^0.9.0",
     "@supabase/auth-helpers-react": "^0.4.2",
     "@supabase/auth-ui-react": "^0.4.7",
-    "@supabase/ssr": "^0.1.0",
+    "@supabase/ssr": "^0.8.0",
     "@supabase/supabase-js": "^2.39.7",
     "@vercel/analytics": "^1.6.1",
     "autoprefixer": "10.4.15",
@@ -50,7 +50,7 @@
     "next": "15.x",
     "next-themes": "^0.2.1",
     "node-html-parser": "^7.0.1",
-    "postcss": "8.4.30",
+    "postcss": "^8.5.6",
     "quill-blot-formatter": "^1.0.5",
     "react": "19.x",
     "react-confetti": "^6.1.0",
@@ -67,15 +67,15 @@
     "zod": "^3.22.4"
   },
   "devDependencies": {
-    "eslint": "8.49.0",
-    "eslint-config-next": "15.x",
-    "@types/node": "22.x",
-    "@types/react": "19.x",
-    "@types/react-dom": "19.x",
     "@lhci/cli": "^0.15.1",
     "@size-limit/preset-app": "^12.0.0",
     "@tailwindcss/typography": "^0.5.19",
+    "@types/node": "22.x",
+    "@types/react": "19.x",
+    "@types/react-dom": "19.x",
     "dotenv": "^17.2.3",
+    "eslint": "8.49.0",
+    "eslint-config-next": "15.x",
     "eslint-config-prettier": "^9.1.0",
     "husky": "^9.0.11",
     "knip": "^5.80.2",
@@ -85,7 +85,7 @@
     "rehype-slug": "^6.0.0",
     "shiki": "^3.21.0",
     "size-limit": "^12.0.0",
-    "velite": "0.1.0-beta.11",
+    "velite": "^0.3.1",
     "webpack": "^5.91.0"
   }
 }

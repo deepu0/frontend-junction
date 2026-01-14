@@ -182,13 +182,13 @@ export default function HeroSection() {
         ]);
 
         const combined = [
-          ...(d1?.map((i) => ({
+          ...(d1?.map((i: any) => ({
             ...i,
             type: 'legacy',
             company: i.company_name,
           })) || []),
-          ...(d2?.map((i) => ({ ...i, type: 'user' })) || []),
-          ...(d3?.map((i) => ({ ...i, type: 'scraped' })) || []),
+          ...(d2?.map((i: any) => ({ ...i, type: 'user' })) || []),
+          ...(d3?.map((i: any) => ({ ...i, type: 'scraped' })) || []),
         ].slice(0, 5);
 
         setResults(combined);
