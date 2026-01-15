@@ -1,0 +1,931 @@
+---
+title: 'The React Standard: Writing React Code That Survives Scale'
+description: 'Engineering constraints and patterns that keep React codebases stable as teams and features grow'
+author: 'Deepak Sharma'
+date: '2024-01-15'
+tags: ['react', 'typescript', 'architecture', 'best-practices', 'frontend']
+readingTime: '15 min'
+published: true
+---
+
+# The React Standard: Writing React Code That Survives Scale
+
+## Introduction
+
+Most React codebases don't fail because of React itself. They fail because of **accumulated entropy**:
+
+| Symptom                  | Root Cause                   | Long-term Impact             |
+| ------------------------ | ---------------------------- | ---------------------------- |
+| Logic is unclear         | Poor naming conventions      | Onboarding takes weeks       |
+| Contracts are implicit   | Missing TypeScript/PropTypes | Runtime errors in production |
+| Patterns drift over time | No enforced standards        | Every file looks different   |
+| Readability collapses    | Clever over clear code       | Fear of refactoring          |
+
+<Callout type='info'>
+  This document isn't about style preferences or tabs vs. spaces. It's about
+  **engineering constraints** that keep codebases stable as teams and features
+  scale.
+</Callout>
+
+What follows are practical rules, anti-patterns, and real examples you've probably written yourself—I know I have.
+
+---
+
+## 1. Readability Is Reliability
+
+> "Code is read 10x more often than it is written. Optimize for the reader, not the writer."
+
+### The Problem
+
+```tsx
+// ❌ Clever but brittle
+const u = (d) => d.filter((x) => x.a).map((x) => x.n);
+```
+
+What does this do? Who knows. Good luck debugging at 2 AM.
+This forces every reader to:
+
+🔍 Decode cryptic variable names
+🧠 Infer intent from context
+🎭 Mentally simulate the logic
+⏰ Waste 5 minutes on what should take 5 seconds
+
+### The Solution
+
+```tsx
+// ✅ Explicit and stable
+interface User {
+  id: string;
+  name: string;
+  isActive: boolean;
+}
+
+const getActiveUserNames = (users: User[]): string[] => {
+  return users.filter((user) => user.isActive).map((user) => user.name);
+};
+```
+
+### Why This Matters
+
+| Metric              | Clever Code               | Explicit Code    |
+| ------------------- | ------------------------- | ---------------- |
+| Code review time    | 15+ minutes               | 2-3 minutes      |
+| Bug discovery       | Production                | PR review        |
+| Refactor confidence | Low (fear)                | High (clarity)   |
+| Onboarding new devs | Tribal knowledge required | Self-documenting |
+
+**The Rule:** If you need a comment to explain _what_ code does, rewrite the code. Comments should explain _why_, not _what_.
+
+---
+
+## 2. Booleans Must Ask Questions
+
+A boolean should read like a yes/no question when used in conditionals.
+
+### The Problem
+
+```tsx
+// ❌ Ambiguous naming
+const valid = true; // Valid what?
+const user = false; // Is this a boolean? An object? A flag?
+const data = true; // What about data?
+const loading = false; // Loading what? Is loading done or not started?
+```
+
+### The Solution
+
+```tsx
+// ✅ Intent encoded in the name
+const isValid = true;
+const hasUser = false;
+const shouldRender = true;
+const isLoading = false;
+const canSubmit = true;
+const didFetch = false;
+```
+
+### Prefix Guide
+
+| Prefix | Use Case              | Example                               |
+| ------ | --------------------- | ------------------------------------- |
+| is     | Current state         | isLoading, isVisible, isAuthenticated |
+| has    | Possession/existence  | hasError, hasPermission, hasChildren  |
+| should | Conditional behavior  | shouldRedirect, shouldValidate        |
+| can    | Capability/permission | canEdit, canDelete, canSubmit         |
+| did    | Past action           | didMount, didFetch, didSubmit         |
+| will   | Future action         | willUpdate, willUnmount               |
+
+### The Litmus Test
+
+```tsx
+// If it reads naturally in an if-statement, you're good
+if (shouldRender) { ... }        // ✅ "If should render"
+if (hasPermission) { ... }       // ✅ "If has permission"
+if (isAuthenticated) { ... }     // ✅ "If is authenticated"
+
+if (render) { ... }              // ❌ "If render" — verb or boolean?
+if (permission) { ... }          // ❌ "If permission" — what about it?
+```
+
+---
+
+## 3. Event Props vs. Event Handlers
+
+React components have interfaces (props) and implementations (handlers). Mixing them creates confusion and bugs.
+
+### The Convention
+
+| Props (Interface) | Handlers (Implementation) |
+| ----------------- | ------------------------- |
+| "What can happen" | "What actually happens"   |
+| onClick           | handleClick               |
+| onSubmit          | handleSubmit              |
+| onChange          | handleChange              |
+| onUserSelect      | handleUserSelect          |
+
+### In Practice
+
+```tsx
+// ✅ Clear separation of concerns
+
+// Parent Component (knows WHAT to do)
+const UserDashboard = () => {
+  const handleSaveProfile = async (userData: UserData) => {
+    await api.updateUser(userData);
+    toast.success('Profile saved!');
+    analytics.track('profile_updated');
+  };
+
+  const handleDeleteAccount = async () => {
+    if (confirm('Are you sure?')) {
+      await api.deleteUser();
+      router.push('/goodbye');
+    }
+  };
+
+  return (
+    <ProfileForm
+      onSave={handleSaveProfile} // Interface: "you can save"
+      onDelete={handleDeleteAccount} // Interface: "you can delete"
+    />
+  );
+};
+
+// Child Component (knows HOW to render)
+interface ProfileFormProps {
+  onSave: (data: UserData) => void;
+  onDelete: () => void;
+}
+
+const ProfileForm = ({ onSave, onDelete }: ProfileFormProps) => {
+  const handleSubmit = (e: FormEvent) => {
+    e.preventDefault();
+    const formData = extractFormData(e.target);
+    onSave(formData); // Delegate to parent
+  };
+
+  return (
+    <form onSubmit={handleSubmit}>
+      {/* form fields */}
+      <button type='submit'>Save</button>
+      <button type='button' onClick={onDelete}>
+        Delete Account
+      </button>
+    </form>
+  );
+};
+```
+
+### Why This Scales
+
+- **Reusability:** ProfileForm can be used anywhere with different save behaviors
+- **Testing:** Mock onSave prop easily in tests
+- **Debugging:** Clear ownership of logic
+- **Refactoring:** Change implementation without touching interface
+
+---
+
+## 4. Destructure Props at the Boundary
+
+Props are dependencies. They should be visible immediately at the function signature.
+
+### The Problem
+
+```tsx
+// ❌ Hidden dependencies — must read entire component to understand inputs
+const UserCard = (props) => {
+  return (
+    <div className={props.className}>
+      <img src={props.user.avatar} alt={props.user.name} />
+      <h2>{props.user.name}</h2>
+      {props.showEmail && <p>{props.user.email}</p>}
+      {props.onEdit && <button onClick={props.onEdit}>Edit</button>}
+    </div>
+  );
+};
+```
+
+### The Solution
+
+```tsx
+// ✅ Self-documenting interface
+interface UserCardProps {
+  user: User;
+  showEmail?: boolean;
+  className?: string;
+  onEdit?: () => void;
+}
+
+const UserCard = ({
+  user,
+  showEmail = false,
+  className = '',
+  onEdit,
+}: UserCardProps) => {
+  return (
+    <div className={className}>
+      <img src={user.avatar} alt={user.name} />
+      <h2>{user.name}</h2>
+      {showEmail && <p>{user.email}</p>}
+      {onEdit && <button onClick={onEdit}>Edit</button>}
+    </div>
+  );
+};
+```
+
+### Advanced Pattern: Prop Grouping
+
+```tsx
+// For components with many props, group logically
+interface DataTableProps {
+  // Data
+  data: Row[];
+  columns: Column[];
+
+  // Pagination
+  page?: number;
+  pageSize?: number;
+  onPageChange?: (page: number) => void;
+
+  // Selection
+  selectedIds?: string[];
+  onSelectionChange?: (ids: string[]) => void;
+
+  // Appearance
+  className?: string;
+  isCompact?: boolean;
+}
+
+const DataTable = ({
+  // Data
+  data,
+  columns,
+
+  // Pagination
+  page = 1,
+  pageSize = 10,
+  onPageChange,
+
+  // Selection
+  selectedIds = [],
+  onSelectionChange,
+
+  // Appearance
+  className,
+  isCompact = false,
+}: DataTableProps) => {
+  // Implementation
+};
+```
+
+---
+
+## 5. Escape Ternary Hell with Early Returns
+
+Nested ternaries are a code review red flag. They destroy scannability and hide logic branches.
+
+### The Problem
+
+```tsx
+// ❌ Ternary pyramid of doom
+return isLoading ? (
+  <Spinner />
+) : isError ? (
+  <ErrorBanner message={error.message} />
+) : !isAuthenticated ? (
+  <LoginPrompt />
+) : !hasPermission ? (
+  <AccessDenied />
+) : data?.length === 0 ? (
+  <EmptyState />
+) : (
+  <DataView data={data} />
+);
+
+// Quick: What renders when isLoading=false, isError=false,
+// isAuthenticated=true, hasPermission=false?
+// Exactly. Nobody can parse this quickly.
+```
+
+### The Solution
+
+```tsx
+// ✅ Linear, explicit, and debuggable
+const Dashboard = () => {
+  const { data, isLoading, isError, error } = useData();
+  const { isAuthenticated, hasPermission } = useAuth();
+
+  if (isLoading) {
+    return <Spinner />;
+  }
+
+  if (isError) {
+    return <ErrorBanner message={error.message} />;
+  }
+
+  if (!isAuthenticated) {
+    return <LoginPrompt />;
+  }
+
+  if (!hasPermission) {
+    return <AccessDenied />;
+  }
+
+  if (!data || data.length === 0) {
+    return <EmptyState />;
+  }
+
+  // Happy path — the main render
+  return <DataView data={data} />;
+};
+```
+
+### When Ternaries ARE Okay
+
+```tsx
+// ✅ Simple, single-level ternaries are fine
+const Button = ({ isLoading, children }) => (
+  <button disabled={isLoading}>{isLoading ? <Spinner /> : children}</button>
+);
+
+// ✅ Conditional className
+<div className={isActive ? 'active' : 'inactive'} />;
+
+// ✅ Nullish coalescing for defaults
+const displayName = user.nickname ?? user.name ?? 'Anonymous';
+```
+
+**The Rule:** One level of ternary = usually fine. Two levels = refactor. Three+ levels = code smell.
+
+---
+
+## 6. The Laws of Hooks Are Non-Negotiable
+
+Hooks depend on call order, not names. React tracks hooks by the order they're called in each render.
+
+### The Problem
+
+```tsx
+// ❌ Conditional hook — this WILL break
+const UserProfile = ({ userId }) => {
+  if (!userId) {
+    return <div>No user selected</div>;
+  }
+
+  // 🚨 This hook only runs when userId exists
+  // React loses track of hook order between renders
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    fetchUser(userId).then(setUser);
+  }, [userId]);
+
+  return <Profile user={user} />;
+};
+```
+
+### The Solution
+
+```tsx
+// ✅ Hooks ALWAYS run, conditions go INSIDE
+const UserProfile = ({ userId }) => {
+  const [user, setUser] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    // Condition inside the hook
+    if (!userId) {
+      setUser(null);
+      return;
+    }
+
+    setIsLoading(true);
+    fetchUser(userId)
+      .then(setUser)
+      .finally(() => setIsLoading(false));
+  }, [userId]);
+
+  // Early returns AFTER all hooks
+  if (!userId) {
+    return <div>No user selected</div>;
+  }
+
+  if (isLoading) {
+    return <Spinner />;
+  }
+
+  return <Profile user={user} />;
+};
+```
+
+### Hook Rules Cheat Sheet
+
+```tsx
+// ✅ DO
+- Call hooks at the top level
+- Call hooks in the same order every render
+- Call hooks only in React functions (components or custom hooks)
+- Put conditions INSIDE hooks
+
+// ❌ DON'T
+- Call hooks inside loops
+- Call hooks inside conditions
+- Call hooks inside nested functions
+- Call hooks in regular JavaScript functions
+```
+
+---
+
+## 7. Never Lie to the Dependency Array
+
+The dependency array is a contract with React. Breaking it causes stale closures and impossible bugs.
+
+### The Problem
+
+```tsx
+// ❌ Lying to React
+const SearchResults = ({ query, filters }) => {
+  const [results, setResults] = useState([]);
+
+  useEffect(() => {
+    // Uses query AND filters, but only declares query
+    fetchResults(query, filters).then(setResults);
+  }, [query]); // 🚨 Lie: filters is missing
+
+  // Bug: Changing filters doesn't trigger a new fetch
+  // You'll see stale results and tear your hair out
+};
+```
+
+### The Solution
+
+```tsx
+// ✅ Honest dependency tracking
+const SearchResults = ({ query, filters }) => {
+  const [results, setResults] = useState([]);
+
+  useEffect(() => {
+    fetchResults(query, filters).then(setResults);
+  }, [query, filters]); // All dependencies declared
+
+  return <ResultsList results={results} />;
+};
+```
+
+### "But It Causes Too Many Re-renders!"
+
+If your honest dependency array causes performance issues, fix the root cause:
+
+```tsx
+// Problem: filters object is recreated every render
+const Parent = () => {
+  // ❌ New object reference every render
+  const filters = { status: 'active', sort: 'date' };
+  return <SearchResults filters={filters} />;
+};
+
+// Solution 1: Memoize in parent
+const Parent = () => {
+  const filters = useMemo(
+    () => ({
+      status: 'active',
+      sort: 'date',
+    }),
+    []
+  ); // Stable reference
+
+  return <SearchResults filters={filters} />;
+};
+
+// Solution 2: Lift individual values
+const SearchResults = ({ status, sort }) => {
+  useEffect(() => {
+    fetchResults({ status, sort });
+  }, [status, sort]); // Primitives are easy to compare
+};
+```
+
+**Never do this:** `// eslint-disable-next-line react-hooks/exhaustive-deps`
+If you're tempted to disable this rule, you're hiding a bug, not fixing it.
+
+---
+
+## 8. Extract Logic into Custom Hooks
+
+Components answer: "What does it look like?"
+Hooks answer: "How does it work?"
+
+### The Problem
+
+```tsx
+// ❌ Component doing too much
+const ShoppingCart = () => {
+  const [items, setItems] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [couponCode, setCouponCode] = useState('');
+  const [discount, setDiscount] = useState(0);
+
+  useEffect(() => {
+    setIsLoading(true);
+    fetch('/api/cart')
+      .then((r) => {
+        if (!r.ok) throw new Error('Failed to load cart');
+        return r.json();
+      })
+      .then((data) => {
+        setItems(data.items);
+        setError(null);
+      })
+      .catch((err) => setError(err.message))
+      .finally(() => setIsLoading(false));
+  }, []);
+
+  useEffect(() => {
+    if (!couponCode) {
+      setDiscount(0);
+      return;
+    }
+
+    fetch(`/api/coupons/validate?code=${couponCode}`)
+      .then((r) => r.json())
+      .then((data) => setDiscount(data.discount))
+      .catch(() => setDiscount(0));
+  }, [couponCode]);
+
+  const addItem = async (productId) => {
+    const response = await fetch('/api/cart/add', {
+      method: 'POST',
+      body: JSON.stringify({ productId }),
+    });
+    const updated = await response.json();
+    setItems(updated.items);
+  };
+
+  const removeItem = async (itemId) => {
+    // ... similar logic
+  };
+
+  const total = items.reduce((sum, item) => sum + item.price, 0);
+  const finalTotal = total - total * discount;
+
+  if (isLoading) return <Spinner />;
+  if (error) return <Error message={error} />;
+
+  return (
+    <div>
+      <CartItems items={items} onRemove={removeItem} />
+      <CouponInput value={couponCode} onChange={setCouponCode} />
+      <CartTotal total={finalTotal} discount={discount} />
+      <CheckoutButton total={finalTotal} />
+    </div>
+  );
+};
+```
+
+### The Solution
+
+```tsx
+// ✅ Custom hook handles all cart logic
+const useCart = () => {
+  const [items, setItems] = useState<CartItem[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    setIsLoading(true);
+    fetch('/api/cart')
+      .then((r) => {
+        if (!r.ok) throw new Error('Failed to load cart');
+        return r.json();
+      })
+      .then((data) => {
+        setItems(data.items);
+        setError(null);
+      })
+      .catch((err) => setError(err.message))
+      .finally(() => setIsLoading(false));
+  }, []);
+
+  const addItem = useCallback(async (productId: string) => {
+    const response = await fetch('/api/cart/add', {
+      method: 'POST',
+      body: JSON.stringify({ productId }),
+    });
+    const updated = await response.json();
+    setItems(updated.items);
+  }, []);
+
+  const removeItem = useCallback(async (itemId: string) => {
+    const response = await fetch('/api/cart/remove', {
+      method: 'POST',
+      body: JSON.stringify({ itemId }),
+    });
+    const updated = await response.json();
+    setItems(updated.items);
+  }, []);
+
+  const total = useMemo(
+    () => items.reduce((sum, item) => sum + item.price, 0),
+    [items]
+  );
+
+  return { items, isLoading, error, addItem, removeItem, total };
+};
+
+const useCoupon = (cartTotal: number) => {
+  const [code, setCode] = useState('');
+  const [discount, setDiscount] = useState(0);
+  const [isValidating, setIsValidating] = useState(false);
+
+  useEffect(() => {
+    if (!code) {
+      setDiscount(0);
+      return;
+    }
+
+    setIsValidating(true);
+    const timeoutId = setTimeout(() => {
+      fetch(`/api/coupons/validate?code=${code}`)
+        .then((r) => r.json())
+        .then((data) => setDiscount(data.discount))
+        .catch(() => setDiscount(0))
+        .finally(() => setIsValidating(false));
+    }, 500); // Debounce
+
+    return () => clearTimeout(timeoutId);
+  }, [code]);
+
+  const finalTotal = cartTotal - cartTotal * discount;
+
+  return { code, setCode, discount, finalTotal, isValidating };
+};
+
+// ✅ Component is now purely presentational
+const ShoppingCart = () => {
+  const { items, isLoading, error, removeItem, total } = useCart();
+  const { code, setCode, discount, finalTotal } = useCoupon(total);
+
+  if (isLoading) return <Spinner />;
+  if (error) return <Error message={error} />;
+
+  return (
+    <div>
+      <CartItems items={items} onRemove={removeItem} />
+      <CouponInput value={code} onChange={setCode} />
+      <CartTotal total={finalTotal} discount={discount} />
+      <CheckoutButton total={finalTotal} />
+    </div>
+  );
+};
+```
+
+### Benefits
+
+| Aspect             | Before                | After                   |
+| ------------------ | --------------------- | ----------------------- |
+| Lines in component | ~80                   | ~15                     |
+| Testability        | Must render component | Test hooks in isolation |
+| Reusability        | Copy-paste            | Import hook             |
+| Readability        | Scroll and hunt       | Glance and understand   |
+
+---
+
+## 9. Memoization: A Scalpel, Not a Sledgehammer
+
+useMemo, useCallback, and React.memo are optimization tools, not defaults.
+
+### When TO Memoize
+
+```tsx
+// ✅ Expensive calculation
+const sortedAndFilteredData = useMemo(() => {
+  return data
+    .filter((item) => item.status === filter)
+    .sort((a, b) => b.date - a.date)
+    .slice(0, 1000);
+}, [data, filter]);
+
+// ✅ Referential equality for child optimization
+const MemoizedChild = React.memo(ExpensiveChild);
+
+const Parent = () => {
+  // Without useCallback, handleClick is new every render
+  // This would defeat React.memo on MemoizedChild
+  const handleClick = useCallback((id: string) => {
+    setSelected(id);
+  }, []);
+
+  return <MemoizedChild onClick={handleClick} />;
+};
+
+// ✅ Dependency in other hooks
+const fetchData = useCallback(async () => {
+  const response = await fetch(`/api/data?id=${id}`);
+  return response.json();
+}, [id]);
+
+useEffect(() => {
+  fetchData().then(setData);
+}, [fetchData]); // Now this only runs when id changes
+```
+
+### When NOT to Memoize
+
+```tsx
+// ❌ Premature optimization
+const name = useMemo(() => `${firstName} ${lastName}`, [firstName, lastName]);
+// String concatenation is trivially fast
+
+// ❌ New object/array that doesn't matter
+const style = useMemo(() => ({ color: 'red' }), []);
+// Unless this is passed to a memoized child, who cares?
+
+// ❌ Handler that's not passed to memoized children
+const handleClick = useCallback(() => {
+  doSomething();
+}, []);
+// If the child isn't memoized, this useCallback is pure overhead
+```
+
+### The Decision Framework
+
+Should I memoize this?
+
+- Is it an expensive calculation (>1ms)?
+  - YES → useMemo ✅
+- Is it passed to a React.memo child?
+  - YES → useCallback/useMemo ✅
+- Is it a dependency in another hook?
+  - YES → useCallback ✅
+- None of the above?
+  - DON'T memoize ❌
+
+**Profile first, optimize second.** React DevTools Profiler will show you what's actually slow. Don't guess.
+
+---
+
+## 10. Architecture: Co-location Beats Layering
+
+How you organize files determines how confidently you can change code.
+
+### The Problem: Layer-Based Structure
+
+```
+src/
+├── components/
+│   ├── UserProfile.tsx
+│   ├── UserAvatar.tsx
+├── hooks/
+│   ├── useUser.ts
+├── utils/
+│   ├── userHelpers.ts
+├── types/
+│   ├── user.ts
+└── tests/
+    ├── UserProfile.test.tsx
+```
+
+**Problems:**
+
+- Deleting a feature requires hunting across 5+ directories
+- Related code is scattered
+- Easy to miss files during refactors
+
+### The Solution: Feature-Based Structure
+
+```
+src/
+├── features/
+│   ├── user/
+│   │   ├── components/
+│   │   ├── hooks/
+│   │   ├── utils/
+│   │   ├── types.ts
+│   │   ├── api.ts
+│   │   └── index.ts          # Public API
+```
+
+### The Index File Pattern
+
+```tsx
+// features/user/index.ts
+// This is the PUBLIC API of the user feature
+
+// Components
+export { UserProfile } from './components/UserProfile';
+export { UserAvatar } from './components/UserAvatar';
+
+// Hooks
+export { useUser } from './hooks/useUser';
+
+// Types
+export type { User } from './types';
+```
+
+---
+
+## 11. Named Exports Over Default Exports
+
+This seems minor but has compounding benefits at scale.
+
+### The Problem with Defaults
+
+```tsx
+// Button.tsx
+export default function Button() { ... }
+
+// Usage - anything goes
+import Button from './Button';      // ✅ Original name
+import MyButton from './Button';    // 😕 Different name
+```
+
+### The Solution
+
+```tsx
+// Button.tsx
+export const Button = () => { ... };
+
+// Usage - consistent everywhere
+import { Button } from './Button';  // Always Button
+```
+
+### Benefits at Scale
+
+| Aspect              | Default Export        | Named Export        |
+| ------------------- | --------------------- | ------------------- |
+| Find all usages     | Search multiple names | Search one name     |
+| Refactor rename     | Manual hunt           | IDE handles it      |
+| Import autocomplete | Generic suggestions   | Precise suggestions |
+
+---
+
+## 12. Bonus: TypeScript Patterns That Scale
+
+Discriminated Unions for State
+
+```tsx
+// ❌ Impossible states are possible
+interface DataState {
+  data: User[] | null;
+  isLoading: boolean;
+  error: string | null;
+}
+
+// ✅ Impossible states are impossible
+type DataState =
+  | { status: 'idle' }
+  | { status: 'loading' }
+  | { status: 'error'; error: string }
+  | { status: 'success'; data: User[] };
+
+const UserList = () => {
+  const [state, setState] = useState<DataState>({ status: 'idle' });
+
+  // TypeScript narrows automatically
+  switch (state.status) {
+    case 'idle':
+      return <button onClick={fetch}>Load Users</button>;
+    case 'loading':
+      return <Spinner />;
+    case 'error':
+      return <Error message={state.error} />;
+    case 'success':
+      return <List users={state.data} />;
+  }
+};
+```
+
+### Conclusion
+
+These aren't arbitrary rules. Each one exists because someone, somewhere, shipped a bug to production that could have been prevented.
+
+React is simple. Scaling React is hard. The difference is discipline:
+
+- Readable code survives team changes
+- Honest code survives refactors
+- Modular code survives feature growth
+
+Write React like someone will inherit your code in 6 months with no context—because they will.
+
+**Remember:** The best React code isn't clever. It's boring, predictable, and obviously correct. That's the standard.
