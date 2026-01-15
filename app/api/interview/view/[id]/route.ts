@@ -8,10 +8,10 @@ const supabaseAdminKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
-  const id = params.id;
-  const cookieStore = cookies();
+  const { id } = await params;
+  const cookieStore = await cookies();
   const supabase = createServerClient(
     supabaseUrl,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
@@ -43,10 +43,10 @@ export async function GET(
 
 export async function POST(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
-  const id = params.id;
-  const cookieStore = cookies();
+  const { id } = await params;
+  const cookieStore = await cookies();
   const supabase = createServerClient(
     supabaseUrl,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,

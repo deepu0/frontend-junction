@@ -2,12 +2,12 @@ import { useSharedStates } from '@/form/contexts';
 import { useEffect, useRef } from 'react';
 
 export function useHandleScroll() {
-  const timerIdRef = useRef<NodeJS.Timeout>();
+  const timerIdRef = useRef<NodeJS.Timeout>(null);
   const { setQuestionNum, handleOkClick, setErrorMsg } = useSharedStates();
 
   useEffect(() => {
     function handleScroll(event: WheelEvent) {
-      clearTimeout(timerIdRef.current);
+      clearTimeout(timerIdRef.current as any);
 
       timerIdRef.current = setTimeout(() => {
         if (event.deltaY > 0) {

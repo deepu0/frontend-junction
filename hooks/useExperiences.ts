@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import useGetExperiences from './useGetExperiences';
+import getExperiences from './getExperiences';
 
 export function useExperiences() {
   const [experiences, setExperiences] = useState<any[]>([]);
@@ -12,7 +12,7 @@ export function useExperiences() {
     async function fetchData() {
       try {
         setIsLoading(true);
-        const data = await useGetExperiences();
+        const data = await getExperiences();
         setExperiences(data as any[]);
       } catch (err) {
         setError(err);

@@ -1,6 +1,19 @@
 {
   "$schema": "https://unpkg.com/knip@latest/schema.json",
-  "project": ["**/*.{ts,tsx}"],
-  "ignore": ["components/ui/**"],
-  "ignoreDependencies": []
+  "project": ["**/*.{ts,tsx}", "velite.config.ts"],
+  "entry": [
+    "app/layout.tsx",
+    "app/page.tsx",
+    "velite.config.ts",
+    "scripts/*.ts"
+  ],
+  "ignore": [],
+  "ignoreDependencies": [
+    "rehype-slug",
+    "rehype-pretty-code",
+    "rehype-autolink-headings",
+    "shiki",
+    "dotenv",
+    "@babel/preset-react"
+  ]
 }

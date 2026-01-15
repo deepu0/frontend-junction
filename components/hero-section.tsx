@@ -50,7 +50,11 @@ const HeroContent = memo(
               <div className='absolute inset-0 bg-primary/20 blur-xl rounded-full opacity-0 group-hover:opacity-100 transition-opacity' />
               <div className='relative flex items-center bg-background/80 backdrop-blur-md border border-border rounded-full p-1.5 sm:p-2 shadow-2xl ring-1 ring-primary/5 focus-within:ring-primary/50 transition-all'>
                 <FaSearch className='ml-3 sm:ml-4 text-muted-foreground w-3.5 h-3.5 sm:w-4 sm:h-4' />
+                <label htmlFor='hero-search' className='sr-only'>
+                  Search for companies or roles
+                </label>
                 <input
+                  id='hero-search'
                   type='text'
                   placeholder='Search companies, roles...'
                   className='flex-1 bg-transparent border-none focus:outline-none px-2 sm:px-4 py-2 sm:py-3 text-sm sm:text-base text-foreground placeholder:text-muted-foreground min-w-0'
@@ -178,13 +182,13 @@ export default function HeroSection() {
         ]);
 
         const combined = [
-          ...(d1?.map((i) => ({
+          ...(d1?.map((i: any) => ({
             ...i,
             type: 'legacy',
             company: i.company_name,
           })) || []),
-          ...(d2?.map((i) => ({ ...i, type: 'user' })) || []),
-          ...(d3?.map((i) => ({ ...i, type: 'scraped' })) || []),
+          ...(d2?.map((i: any) => ({ ...i, type: 'user' })) || []),
+          ...(d3?.map((i: any) => ({ ...i, type: 'scraped' })) || []),
         ].slice(0, 5);
 
         setResults(combined);

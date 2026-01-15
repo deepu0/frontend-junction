@@ -1,5 +1,5 @@
 import InterviewExperiences from '@/components/experiences';
-import useGetExperiences from '@/hooks/useGetExperiences';
+import getExperiences from '@/hooks/getExperiences';
 import type { Metadata } from 'next';
 import { Suspense } from 'react';
 import Loading from '../loading';
@@ -24,7 +24,7 @@ export const metadata: Metadata = {
 };
 
 export default async function Interview() {
-  const data = await useGetExperiences();
+  const data = await getExperiences();
 
   return (
     <main className='flex min-h-screen flex-col items-center justify-between p-4 mt-10'>

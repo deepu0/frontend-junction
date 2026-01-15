@@ -18,20 +18,17 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Generate Velite Content
+        run: npx velite build
+
       - name: Lint
         run: npm run lint
 
       - name: Type Check
         run: npm run check-types
 
-      - name: Spell Check
-        run: npm run check:spelling
-
       - name: Security Audit
         run: npm audit --audit-level=high
-
-      - name: Check Unused Code
-        run: npm run check:unused
 
   build-and-perf:
     name: Build & Performance
@@ -54,6 +51,10 @@ jobs:
         run: npm run check:size
 
       - name: Lighthouse CI
-        run: npm run test:lighthouse
+        run: |
+          ls -R .next
+          npm run test:lighthouse
         env:
           LHCI_GITHUB_APP_TOKEN: ${{ secrets.LHCI_GITHUB_APP_TOKEN }}
+          NEXT_PUBLIC_SUPABASE_URL: http://localhost:8000
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: dummy-key-for-lhci

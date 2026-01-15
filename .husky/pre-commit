@@ -1,4 +1,4 @@
-. "$(dirname "$0")/_/husky.sh"
+
 
 echo 'Styling,testing and building the project before commiting.\n'
 

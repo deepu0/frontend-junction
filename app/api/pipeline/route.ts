@@ -15,7 +15,7 @@ export async function GET(request: Request) {
   const token = searchParams.get('token');
   const cronSecret = process.env.CRON_SECRET;
 
-  const cookieStore = cookies();
+  const cookieStore = await cookies();
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
@@ -64,7 +64,7 @@ export async function GET(request: Request) {
         // schema: original_url TEXT UNIQUE NOT NULL
 
         // For user-facing operations (respects RLS, checks auth)
-        const cookieStore = cookies();
+        const cookieStore = await cookies();
         const supabase = createServerClient(
           process.env.NEXT_PUBLIC_SUPABASE_URL!,
           process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,

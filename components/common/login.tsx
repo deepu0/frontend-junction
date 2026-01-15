@@ -46,7 +46,7 @@ export default function Login({ path = '' }: ILoginProps) {
       <img
         style={{ height: '20px' }}
         src='/companies/google.svg'
-        alt='google'
+        alt='Google logo'
       />
     </Button>
   );

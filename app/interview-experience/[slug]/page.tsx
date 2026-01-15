@@ -10,11 +10,12 @@ export const dynamic = 'force-dynamic';
 export const revalidate = 60; // ISR
 
 interface Props {
-  params: { slug: string };
+  params: Promise<{ slug: string }>;
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const experience = await getExperienceBySlug(params.slug);
+  const { slug } = await params;
+  const experience = await getExperienceBySlug(slug);
   if (!experience) return { title: 'Not Found' };
 
   return {
@@ -30,7 +31,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default async function ExperienceSlugPage({ params }: Props) {
-  const experience = await getExperienceBySlug(params.slug);
+  const { slug } = await params;
+  const experience = await getExperienceBySlug(slug);
 
   if (!experience) {
     notFound();

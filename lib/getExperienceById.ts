@@ -7,7 +7,7 @@ export async function getExperienceById(id: string) {
 
   if (!url) return null;
 
-  const cookieStore = cookies();
+  const cookieStore = await cookies();
   const supabase = createServerClient(url, key, {
     cookies: {
       get(name: string) {

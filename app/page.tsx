@@ -1,6 +1,6 @@
 import LandingPage from '@/components/home';
 import useGetCompanies from '@/hooks/useGetCompanies';
-import useGetExperiences from '@/hooks/useGetExperiences';
+import getExperiences from '@/hooks/getExperiences';
 import { posts } from '#site/content';
 import type { Metadata } from 'next';
 import { unstable_cache } from 'next/cache';
@@ -52,7 +52,7 @@ export const metadata: Metadata = {
 // Cached data fetchers for instant page loads
 const getCachedExperiences = unstable_cache(
   async () => {
-    const experiences = await useGetExperiences();
+    const experiences = await getExperiences();
     // Only return first 6 for homepage - reduces payload
     return experiences?.slice(0, 6) || [];
   },

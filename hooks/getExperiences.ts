@@ -3,7 +3,7 @@ import { supabase } from '@/lib/supabase';
 
 export const revalidate = 60;
 
-export default async function useGetExperiences() {
+export default async function getExperiences() {
   try {
     const { data, error } = await supabase
       .from('experiences')
