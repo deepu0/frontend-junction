@@ -84,10 +84,21 @@ const config = {
 export default config;
 
 function addVariablesForColors({ addBase, theme }: any) {
-  let allColors = theme('colors');
-  let newVars = Object.fromEntries(
-    Object.entries(allColors).map(([key, val]) => [`--${key}`, val])
-  );
+  const allColors = theme('colors');
+
+  const flattenColors = (colors: any, prefix = '') => {
+    return Object.entries(colors).reduce((acc: any, [key, val]) => {
+      const newPrefix = prefix ? `${prefix}-${key}` : `--${key}`;
+      if (typeof val === 'string') {
+        acc[newPrefix] = val;
+      } else if (typeof val === 'object' && val !== null) {
+        Object.assign(acc, flattenColors(val, newPrefix));
+      }
+      return acc;
+    }, {});
+  };
+
+  const newVars = flattenColors(allColors);
 
   addBase({
     ':root': newVars,
