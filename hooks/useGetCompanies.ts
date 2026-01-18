@@ -1,9 +1,9 @@
-import React from 'react';
+import { cache } from 'react';
 import { supabase } from '@/lib/supabase';
 
 export const revalidate = 60;
 
-export default async function useGetCompanies() {
+const useGetCompanies = cache(async () => {
   try {
     const { data, error } = await supabase
       .from('company')
@@ -11,11 +11,14 @@ export default async function useGetCompanies() {
     if (error) throw error;
     return transformData(data) || [];
   } catch (err) {
-    console.log(err);
-  } finally {
-    // Completed fetch
+    if (process.env.NODE_ENV === 'development') {
+      console.error('Failed to fetch companies:', err);
+    }
+    return [];
   }
-}
+});
+
+export default useGetCompanies;
 
 const transformData = (data: any) => {
   if (data.length > 0) {

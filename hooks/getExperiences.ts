@@ -1,31 +1,36 @@
-import React from 'react';
+import { cache } from 'react';
 import { supabase } from '@/lib/supabase';
 
 export const revalidate = 60;
 
-export default async function getExperiences() {
+const getExperiences = cache(async () => {
   try {
-    const { data, error } = await supabase
-      .from('experiences')
-      .select(
-        'id, title, summary, role, status, location, original_link,verification_status,detail_experience,user_id, created_at, company_name'
-      )
-      .order('created_at', { ascending: false })
-      .eq('verification_status', 'approved');
+    // Parallelize all three database queries for faster execution
+    const [
+      { data, error },
+      { data: dataNew, error: errorNew },
+      { data: scrapedData, error: scrapedError },
+    ] = await Promise.all([
+      supabase
+        .from('experiences')
+        .select(
+          'id, title, summary, role, status, location, original_link,verification_status,detail_experience,user_id, created_at, company_name'
+        )
+        .order('created_at', { ascending: false })
+        .eq('verification_status', 'approved'),
 
-    const { data: dataNew, error: errorNew } = await supabase
-      .from('new_interview')
-      .select('*')
-      .order('created_at', { ascending: false });
-    // We fetch all here, but we will filter in the component or handle guest vs admin better.
-    // To ensure legacy behavior for guests, we can also add a secondary check.
+      supabase
+        .from('new_interview')
+        .select('*')
+        .order('created_at', { ascending: false }),
 
-    const { data: scrapedData, error: scrapedError } = await supabase
-      .from('scraped_experiences')
-      .select('*, slug, company, metadata')
-      .order('published_at', { ascending: false })
-      .eq('status', 'approved')
-      .limit(200);
+      supabase
+        .from('scraped_experiences')
+        .select('*, slug, company, metadata')
+        .order('published_at', { ascending: false })
+        .eq('status', 'approved')
+        .limit(200),
+    ]);
 
     if (error) throw error;
     if (errorNew) throw errorNew;
@@ -44,10 +49,14 @@ export default async function getExperiences() {
       return dateB - dateA;
     });
   } catch (err) {
-    console.log(err);
+    if (process.env.NODE_ENV === 'development') {
+      console.error('Failed to fetch experiences:', err);
+    }
     return [];
   }
-}
+});
+
+export default getExperiences;
 
 // ... getLink helper remains the same ...
 const getLink = (item: any, type: string) => {

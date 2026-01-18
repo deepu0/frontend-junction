@@ -1,5 +1,5 @@
 'use client';
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect, useCallback } from 'react';
 import { useSearchParams } from 'next/navigation';
 import CardComponent from './common/card';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -87,13 +87,13 @@ const InterviewExperiences = ({ interviewData = [] }: IExperienceProps) => {
     return data;
   }, [interviewData, searchQuery, activeFilter, selectedCompanies, isAdmin]);
 
-  const toggleCompany = (company: string) => {
+  const toggleCompany = useCallback((company: string) => {
     setSelectedCompanies((prev) =>
       prev.includes(company)
         ? prev.filter((c) => c !== company)
         : [...prev, company]
     );
-  };
+  }, []);
 
   return (
     <div className='w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'>

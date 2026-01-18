@@ -48,7 +48,9 @@ const LandingPage: React.FC<IHomeProps> = (props: IHomeProps) => {
       <FeaturesSection />
 
       {/* BLOG CTA */}
-      {latestPosts.length > 0 && <BlogCtaSection latestPosts={latestPosts} />}
+      {latestPosts.length > 0 ? (
+        <BlogCtaSection latestPosts={latestPosts} />
+      ) : null}
 
       {/* LATEST EXPERIENCES */}
       <section className='py-20 container mx-auto px-4 relative'>
