@@ -1,0 +1,291 @@
+---
+title: "I Thought My Waitlist Went Viral. Turns Out I Got Bot-Spammed."
+description: "How my Curated Frontend Jobs Portal waitlist got hit with 300+ fake signups in one hour and how I fixed it in 30 minutes using Cloudflare Turnstile."
+date: "2026-02-17"
+tags: ["security", "nextjs", "supabase", "cloudflare", "buildinpublic"]
+published: true
+author: "Curated Frontend"
+featured: true
+readingTime: "8 min"
+---
+
+# I Thought My Waitlist Went Viral. Turns Out I Got Bot-Spammed.
+
+I've been building **Curated Frontend Jobs Portal** — a niche job board for frontend developers.
+
+Put up a simple waitlist page. One email input. One submit button. Shared the link.
+
+We crossed **800+ genuine signups** and I was pumped. 🎉
+
+Then one morning, I saw **300+ new signups in a single hour.**
+
+My first thought?
+
+> "Did I go viral?! Is this actually happening?!"
+
+**Nope.**
+
+---
+
+## What I Found
+
+Opened my Supabase dashboard and saw this:
+
+```
+user_n4mmb76s_1771308900732@example.com
+user_mxzuqadc_1771308955328@example.com
+user_mx3k0azo_1771308955369@example.com
+user_n3wyvdw6_1771308933318@example.com
+user_n2el3pni_1771308933318@example.com
+user_my8nee4l_1771308933335@example.com
+```
+
+Multiple entries **PER SECOND**. All `@example.com`. All bot-generated.
+
+Someone wrote a simple script and hammered my open API endpoint. That's it. That's all it took.
+
+The timestamps told the whole story:
+- 06:15:02.790497
+- 06:15:02.830184 ← 40ms later
+- 06:15:02.796825 ← same second
+- 06:15:02.914693 ← same second
+
+No human fills a form 4 times in one second. This was a bot.
+
+---
+
+## What Went Wrong
+
+My waitlist page had:
+
+- ✅ A clean UI
+- ✅ A working Supabase backend
+- ✅ A deployed live link
+- ❌ No rate limiting
+- ❌ No CAPTCHA
+- ❌ No email validation
+- ❌ No bot protection whatsoever
+
+I basically left the front door wide open and put up a sign that said **"Free database writes! Come one, come all!"** 🚪
+
+---
+
+## The Attacker's Script
+
+The bot was probably something as simple as this:
+
+```javascript
+const generateFakeEmail = () => {
+  const random = Math.random().toString(36).substring(2, 10);
+  const timestamp = Date.now();
+  return `user_${random}_${timestamp}@example.com`;
+};
+
+for (let i = 0; i < 1000; i++) {
+  fetch('https://your-api-endpoint.com/signup', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email: generateFakeEmail() }),
+  });
+}
+```
+
+5 lines of code. That's all it took to flood my database with hundreds of fake signups.
+
+---
+
+## How I Fixed It in 30 Minutes
+
+### 1. Installed Cloudflare Turnstile (Free CAPTCHA Alternative)
+
+```bash
+npm install react-turnstile
+```
+
+### 2. Added Keys to Environment
+
+```env
+NEXT_PUBLIC_TURNSTILE_SITE_KEY=your_site_key
+TURNSTILE_SECRET_KEY=your_secret_key
+```
+
+### 3. Added Turnstile Widget to the Form
+
+```jsx
+import { Turnstile } from 'react-turnstile';
+import { useState } from 'react';
+
+export default function WaitlistForm() {
+  const [email, setEmail] = useState('');
+  const [token, setToken] = useState('');
+  const [status, setStatus] = useState('');
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    if (!token) {
+      setStatus('Please wait for verification ⏳');
+      return;
+    }
+
+    const res = await fetch('/api/signup', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, token }),
+    });
+
+    const data = await res.json();
+
+    if (res.ok) {
+      setStatus('You are on the waitlist! 🎉');
+      setEmail('');
+    } else {
+      setStatus(data.error || 'Something went wrong ❌');
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <input
+        type="email"
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
+        placeholder="Enter your email"
+        required
+      />
+
+      <Turnstile
+        sitekey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY}
+        onVerify={(token) => setToken(token)}
+        onExpire={() => setToken('')}
+      />
+
+      <button type="submit" disabled={!token}>
+        Join Waitlist
+      </button>
+
+      {status && <p>{status}</p>}
+    </form>
+  );
+}
+```
+
+### 4. Added Server-Side Token Verification
+
+```javascript
+export async function POST(req) {
+  const { email, token } = await req.json();
+
+  if (!email || !token) {
+    return Response.json(
+      { error: 'Email and verification required' },
+      { status: 400 }
+    );
+  }
+
+  // Verify Turnstile token
+  const verify = await fetch(
+    'https://challenges.cloudflare.com/turnstile/v0/siteverify',
+    {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        secret: process.env.TURNSTILE_SECRET_KEY,
+        response: token,
+      }),
+    }
+  );
+
+  const result = await verify.json();
+
+  if (!result.success) {
+    return Response.json(
+      { error: 'Bot detected 🤖' },
+      { status: 400 }
+    );
+  }
+
+  // Block fake email domains
+  const blockedDomains = [
+    'example.com',
+    'test.com',
+    'mailinator.com',
+    'tempmail.com',
+  ];
+
+  const domain = email.split('@')[1].toLowerCase();
+  if (blockedDomains.includes(domain)) {
+    return Response.json(
+      { error: 'Please use a real email' },
+      { status: 400 }
+    );
+  }
+
+  // Safe to save to Supabase now ✅
+}
+```
+
+### 5. Cleaned Up Bot Data in Supabase
+
+```sql
+DELETE FROM waitlist WHERE email LIKE '%@example.com';
+```
+
+Gone. All of it. 🧹
+
+---
+
+## Before vs After
+
+| Feature | Before | After |
+|---------|--------|-------|
+| Protection | None 😢 | Cloudflare Turnstile 🛡️ |
+| Bot signups | 300+ in 1 hour | 0 |
+| Email validation | None | Domain blocking |
+| Server verification | None | Token verification |
+
+---
+
+## The Lesson
+
+If you're going out on the internet, be ready. Nobody is going to spare you.
+
+Doesn't matter if you're a solo builder shipping v1 or a big company. Bots don't care. They find open endpoints and exploit them.
+
+A simple email input without protection is an open invitation.
+
+**Your waitlist security checklist:**
+
+- ✅ Add Cloudflare Turnstile (free + 20 min setup)
+- ✅ Block fake/disposable email domains
+- ✅ Verify tokens server-side
+- ✅ Add unique email constraint in DB
+- ✅ Never trust the frontend
+- ✅ Add protection BEFORE sharing the link
+
+---
+
+## Why Cloudflare Turnstile?
+
+| Feature | Turnstile | reCAPTCHA | hCaptcha |
+|---------|-----------|-----------|----------|
+| Free | ✅ | ✅ | ✅ |
+| Privacy friendly | ✅✅✅ | ❌ | ✅ |
+| No annoying puzzles | ✅ | ❌ | ❌ |
+| User experience | ✅✅✅ | ❌ | ❌ |
+
+No "select all traffic lights" nonsense. Most users won't even notice it's there.
+
+---
+
+## Final Thoughts
+
+This was a real experience while building Curated Frontend Jobs Portal → frontendjobseveryday.vercel.app
+
+Building in public means sharing the Ls too. Not just the wins.
+
+I'll keep sharing more real experiences like this as I build. Security isn't something you "add later." It's day one stuff.
+
+20 minutes of setup could save you from a database full of garbage.
+
+Learn from my mistake. Protect your forms. Ship safe. 🚀
