@@ -26,7 +26,7 @@ export function SiteHeader() {
   const navItems = [
     { name: 'Explore', href: '/interview-experience' },
     { name: 'Blog', href: '/blog' },
-    { name: 'Jobs', href: '/jobs', disabled: true },
+    { name: 'Jobs', href: 'https://onlyfrontendjobs.com' },
     { name: 'Mentorship', href: 'https://topmate.io/deepak_sharma' },
   ];
 
@@ -51,21 +51,19 @@ export function SiteHeader() {
                 key={item.href}
                 href={item.href}
                 target={item.href.startsWith('http') ? '_blank' : undefined}
+                rel={
+                  item.href.startsWith('http')
+                    ? 'noopener noreferrer'
+                    : undefined
+                }
                 className={cn(
                   'text-sm font-medium transition-colors hover:text-primary whitespace-nowrap',
                   pathname === item.href
                     ? 'text-foreground'
-                    : 'text-muted-foreground',
-                  item.disabled &&
-                    'pointer-events-none opacity-50 cursor-not-allowed'
+                    : 'text-muted-foreground'
                 )}
               >
                 {item.name}
-                {item.disabled && (
-                  <span className='ml-1.5 rounded bg-primary/10 px-1.5 py-0.5 text-[10px] font-semibold text-primary'>
-                    SOON
-                  </span>
-                )}
               </Link>
             ))}
           </nav>
@@ -98,20 +96,19 @@ export function SiteHeader() {
                     href={item.href}
                     onClick={() => setOpen(false)}
                     target={item.href.startsWith('http') ? '_blank' : undefined}
+                    rel={
+                      item.href.startsWith('http')
+                        ? 'noopener noreferrer'
+                        : undefined
+                    }
                     className={cn(
                       'text-lg font-medium transition-colors hover:text-primary',
                       pathname === item.href
                         ? 'text-foreground font-bold'
-                        : 'text-muted-foreground',
-                      item.disabled && 'opacity-50 cursor-not-allowed'
+                        : 'text-muted-foreground'
                     )}
                   >
                     {item.name}
-                    {item.disabled && (
-                      <span className='ml-1.5 rounded bg-primary/10 px-1.5 py-0.5 text-[10px] font-semibold text-primary'>
-                        SOON
-                      </span>
-                    )}
                   </Link>
                 ))}
                 <div className='pt-4 mt-4 border-t border-border md:hidden'>
