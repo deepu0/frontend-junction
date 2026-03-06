@@ -1,0 +1,112 @@
+---
+title: 'React Hooks Deep Dive: Modern Patterns for 2026'
+description: 'A practical guide to React hooks in 2026, covering performance optimization, custom hook patterns, and best practices for building scalable applications.'
+date: '2026-03-06'
+tags: ["React","Hooks"]
+published: true
+image: './images/blog_react-hooks-deep-dive-modern-patterns-for-2026.png'
+---
+
+React hooks have matured significantly since their introduction, and by 2026, the ecosystem has settled into clear patterns and best practices. Whether you're building a new application or refactoring legacy code, understanding these modern approaches will help you write cleaner, more performant React code.
+
+## The Evolution of State Management
+
+Gone are the days of reaching for Redux for every state management need. Modern React applications leverage a combination of built-in hooks and lightweight solutions. The `useReducer` hook, combined with context, provides a powerful yet simple state management pattern that scales well for medium-sized applications.
+
+```jsx
+const initialState = { count: 0, step: 1 };
+
+function reducer(state, action) {
+  switch (action.type) {
+    case 'increment':
+      return { ...state, count: state.count + state.step };
+    case 'decrement':
+      return { ...state, count: state.count - state.step };
+    case 'setStep':
+      return { ...state, step: action.payload };
+    default:
+      throw new Error(`Unknown action: ${action.type}`);
+  }
+}
+
+function Counter() {
+  const [state, dispatch] = useReducer(reducer, initialState);
+  return (
+    <div>
+      <p>Count: {state.count}</p>
+      <button onClick={() => dispatch({ type: 'increment' })}>+</button>
+      <button onClick={() => dispatch({ type: 'decrement' })}>-</button>
+    </div>
+  );
+}
+```
+
+For global state, the modern approach favours Zustand or Jotai over heavier alternatives, offering minimal boilerplate and excellent TypeScript support.
+
+## Performance Optimization in 2026
+
+Performance optimization has become more sophisticated. The key principle remains the same: prevent unnecessary re-renders. However, the tools have evolved. The `useMemo` and `useCallback` hooks are now used judiciously, with the React team recommending they be reserved for expensive computations and referential equality checks, not applied indiscriminately.
+
+```jsx
+function ExpensiveList({ items, onItemClick }) {
+  const sortedItems = useMemo(() => {
+    return [...items].sort((a, b) => a.priority - b.priority);
+  }, [items]);
+
+  const handleClick = useCallback((id) => {
+    onItemClick(id);
+  }, [onItemClick]);
+
+  return (
+    <ul>
+      {sortedItems.map(item => (
+        <ListItem key={item.id} item={item} onClick={handleClick} />
+      ))}
+    </ul>
+  );
+}
+```
+
+The React Compiler (introduced in 2024) now handles many optimizations automatically, reducing the need for manual memoization. However, understanding when to still apply these hooks remains valuable for complex scenarios.
+
+## Custom Hook Patterns
+
+Custom hooks have become the primary abstraction mechanism in modern React. Well-designed hooks encapsulate both logic and state, making code reusable across components. The best custom hooks follow a few key principles: they return a stable API, handle their own cleanup, and remain focused on a single responsibility.
+
+```jsx
+function useLocalStorage(key, initialValue) {
+  const [value, setValue] = useState(() => {
+    const stored = localStorage.getItem(key);
+    return stored !== null ? JSON.parse(stored) : initialValue;
+  });
+
+  useEffect(() => {
+    localStorage.setItem(key, JSON.stringify(value));
+  }, [key, value]);
+
+  return [value, setValue];
+}
+
+// Usage
+function Settings() {
+  const [theme, setTheme] = useLocalStorage('theme', 'light');
+  return (
+    <select value={theme} onChange={(e) => setTheme(e.target.value)}>
+      <option value="light">Light</option>
+      <option value="dark">Dark</option>
+    </select>
+  );
+}
+```
+
+## Handling Side Effects Gracefully
+
+The `useEffect` hook remains one of the most misunderstood. In 2026, best practices have crystallised around a few key patterns. Always include all dependencies in the dependency array, use cleanup functions for subscriptions and timers, and consider `useSyncExternalStore` for external data sources.
+
+For data fetching, React Query (now TanStack Query) has become the de facto standard, abstracting away the complexity of loading states, error handling, and caching. Direct `useEffect` data fetching is now considered an anti-pattern for anything beyond the simplest use cases.
+
+## Avoiding Common Pitfalls
+
+Several anti-patterns persist even in 2026. Over-fetching in `useEffect` leads to waterfall requests—instead, use suspense or parallel fetching. Stale closures in event handlers remain problematic; the solution is typically `useRef` for mutable values that shouldn't trigger re-renders. And conditional hooks—calling hooks inside conditionals, loops, or nested functions—continue to trip up developers new to React's rules.
+
+React hooks have transformed how we build user interfaces. By following these modern patterns—leveraging appropriate state management solutions, optimising thoughtfully, and building reusable custom hooks—you'll write React code that's both maintainable and performant. The ecosystem has matured, and the path forward is clearer than ever.
