@@ -26,7 +26,10 @@ export function SiteHeader() {
   const navItems = [
     { name: 'Explore', href: '/interview-experience' },
     { name: 'Blog', href: '/blog' },
-    { name: 'Jobs', href: 'https://onlyfrontendjobs.com' },
+    {
+      name: 'Jobs',
+      href: 'https://onlyfrontendjobs.com?utm_source=frontend-junction&utm_medium=nav&utm_campaign=jobs-promotion',
+    },
     { name: 'Mentorship', href: 'https://topmate.io/deepak_sharma' },
   ];
 
