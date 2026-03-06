@@ -1,6 +1,5 @@
 import './globals.css';
 import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
 import { cn } from '@/lib/utils';
 import { SiteHeader } from '@/components/common/site-header';
 import { ThemeProvider } from '@/components/common/theme-provider';
@@ -13,8 +12,6 @@ import {
   WebsiteSchema,
 } from '@/components/structured-data';
 import { Analytics } from '@vercel/analytics/next';
-
-const inter = Inter({ subsets: ['latin'], display: 'swap' });
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://www.frontend-junction.com'),
@@ -94,6 +91,7 @@ export const metadata: Metadata = {
 };
 
 import { MobileStickyCta } from '@/components/common/mobile-sticky-cta';
+import { AnnouncementBanner } from '@/components/common/announcement-banner';
 
 export default function RootLayout({
   children,
@@ -106,6 +104,17 @@ export default function RootLayout({
         {/* Structured Data */}
         <OrganizationSchema />
         <WebsiteSchema />
+        <link rel='preconnect' href='https://fonts.googleapis.com' />
+        <link
+          rel='preconnect'
+          href='https://fonts.gstatic.com'
+          crossOrigin='anonymous'
+        />
+        {/* eslint-disable-next-line @next/next/no-page-custom-font */}
+        <link
+          href='https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap'
+          rel='stylesheet'
+        />
       </head>
       {process.env.NEXT_GOOGLE_ANALYTICS && (
         <Script
@@ -127,7 +136,7 @@ export default function RootLayout({
           }}
         />
       )}
-      <body className={inter.className}>
+      <body className={cn('font-sans antialiased')}>
         {/* Skip to main content - Accessibility */}
         <a
           href='#main-content'
@@ -144,6 +153,7 @@ export default function RootLayout({
           <Toaster />
           <LoadingProvider>
             <AuthProvider>
+              <AnnouncementBanner />
               <SiteHeader />
               <main id='main-content'>{children}</main>
               <MobileStickyCta />

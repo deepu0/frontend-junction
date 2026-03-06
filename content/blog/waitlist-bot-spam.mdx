@@ -1,12 +1,12 @@
 ---
-title: "I Thought My Waitlist Went Viral. Turns Out I Got Bot-Spammed."
-description: "How my Curated Frontend Jobs Portal waitlist got hit with 300+ fake signups in one hour and how I fixed it in 30 minutes using Cloudflare Turnstile."
-date: "2026-02-17"
-tags: ["security", "nextjs", "supabase", "cloudflare", "buildinpublic"]
+title: 'I Thought My Waitlist Went Viral. Turns Out I Got Bot-Spammed.'
+description: 'How my Curated Frontend Jobs Portal waitlist got hit with 300+ fake signups in one hour and how I fixed it in 30 minutes using Cloudflare Turnstile.'
+date: '2026-02-17'
+tags: ['security', 'nextjs', 'supabase', 'cloudflare', 'buildinpublic']
 published: true
-author: "Curated Frontend"
+author: 'Curated Frontend'
 featured: true
-readingTime: "8 min"
+readingTime: '8 min'
 ---
 
 # I Thought My Waitlist Went Viral. Turns Out I Got Bot-Spammed.
@@ -45,6 +45,7 @@ Multiple entries **PER SECOND**. All `@example.com`. All bot-generated.
 Someone wrote a simple script and hammered my open API endpoint. That's it. That's all it took.
 
 The timestamps told the whole story:
+
 - 06:15:02.790497
 - 06:15:02.830184 ← 40ms later
 - 06:15:02.796825 ← same second
@@ -147,10 +148,10 @@ export default function WaitlistForm() {
   return (
     <form onSubmit={handleSubmit}>
       <input
-        type="email"
+        type='email'
         value={email}
         onChange={(e) => setEmail(e.target.value)}
-        placeholder="Enter your email"
+        placeholder='Enter your email'
         required
       />
 
@@ -160,7 +161,7 @@ export default function WaitlistForm() {
         onExpire={() => setToken('')}
       />
 
-      <button type="submit" disabled={!token}>
+      <button type='submit' disabled={!token}>
         Join Waitlist
       </button>
 
@@ -199,10 +200,7 @@ export async function POST(req) {
   const result = await verify.json();
 
   if (!result.success) {
-    return Response.json(
-      { error: 'Bot detected 🤖' },
-      { status: 400 }
-    );
+    return Response.json({ error: 'Bot detected 🤖' }, { status: 400 });
   }
 
   // Block fake email domains
@@ -215,10 +213,7 @@ export async function POST(req) {
 
   const domain = email.split('@')[1].toLowerCase();
   if (blockedDomains.includes(domain)) {
-    return Response.json(
-      { error: 'Please use a real email' },
-      { status: 400 }
-    );
+    return Response.json({ error: 'Please use a real email' }, { status: 400 });
   }
 
   // Safe to save to Supabase now ✅
@@ -237,12 +232,12 @@ Gone. All of it. 🧹
 
 ## Before vs After
 
-| Feature | Before | After |
-|---------|--------|-------|
-| Protection | None 😢 | Cloudflare Turnstile 🛡️ |
-| Bot signups | 300+ in 1 hour | 0 |
-| Email validation | None | Domain blocking |
-| Server verification | None | Token verification |
+| Feature             | Before         | After                   |
+| ------------------- | -------------- | ----------------------- |
+| Protection          | None 😢        | Cloudflare Turnstile 🛡️ |
+| Bot signups         | 300+ in 1 hour | 0                       |
+| Email validation    | None           | Domain blocking         |
+| Server verification | None           | Token verification      |
 
 ---
 
@@ -267,12 +262,12 @@ A simple email input without protection is an open invitation.
 
 ## Why Cloudflare Turnstile?
 
-| Feature | Turnstile | reCAPTCHA | hCaptcha |
-|---------|-----------|-----------|----------|
-| Free | ✅ | ✅ | ✅ |
-| Privacy friendly | ✅✅✅ | ❌ | ✅ |
-| No annoying puzzles | ✅ | ❌ | ❌ |
-| User experience | ✅✅✅ | ❌ | ❌ |
+| Feature             | Turnstile | reCAPTCHA | hCaptcha |
+| ------------------- | --------- | --------- | -------- |
+| Free                | ✅        | ✅        | ✅       |
+| Privacy friendly    | ✅✅✅    | ❌        | ✅       |
+| No annoying puzzles | ✅        | ❌        | ❌       |
+| User experience     | ✅✅✅    | ❌        | ❌       |
 
 No "select all traffic lights" nonsense. Most users won't even notice it's there.
 
