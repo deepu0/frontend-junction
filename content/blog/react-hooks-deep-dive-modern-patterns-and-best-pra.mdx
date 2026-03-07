@@ -2,7 +2,7 @@
 title: 'React Hooks Deep Dive: Modern Patterns and Best Practices in 2026'
 description: 'Master React hooks with practical patterns, performance optimization techniques, and modern best practices for building robust frontend applications.'
 date: '2026-03-06'
-tags: ["React","Hooks"]
+tags: ['React', 'Hooks']
 published: true
 image: './images/blog_react-hooks-deep-dive-modern-patterns-and-best-pra.png'
 ---
@@ -20,11 +20,11 @@ function UserProfile({ userId }) {
 
   useEffect(() => {
     const controller = new AbortController();
-    
+
     async function fetchUser() {
       try {
         const response = await fetch(`/api/users/${userId}`, {
-          signal: controller.signal
+          signal: controller.signal,
         });
         const data = await response.json();
         setUser(data);
@@ -36,7 +36,7 @@ function UserProfile({ userId }) {
         setLoading(false);
       }
     }
-    
+
     fetchUser();
     return () => controller.abort();
   }, [userId]);
@@ -55,7 +55,7 @@ Performance optimization with hooks requires a deliberate approach. The most imp
 ```javascript
 function ExpensiveList({ items, filter }) {
   const filteredItems = useMemo(() => {
-    return items.filter(item => 
+    return items.filter((item) =>
       item.name.toLowerCase().includes(filter.toLowerCase())
     );
   }, [items, filter]);
@@ -64,12 +64,7 @@ function ExpensiveList({ items, filter }) {
     console.log('Item clicked:', itemId);
   }, []);
 
-  return (
-    <VirtualList 
-      items={filteredItems}
-      onItemClick={handleItemClick}
-    />
-  );
+  return <VirtualList items={filteredItems} onItemClick={handleItemClick} />;
 }
 ```
 
@@ -91,17 +86,19 @@ function useLocalStorage(key, initialValue) {
     }
   });
 
-  const setValue = useCallback((value) => {
-    try {
-      const valueToStore = value instanceof Function 
-        ? value(storedValue) 
-        : value;
-      setStoredValue(valueToStore);
-      window.localStorage.setItem(key, JSON.stringify(valueToStore));
-    } catch (error) {
-      console.error('Error saving to localStorage:', error);
-    }
-  }, [key, storedValue]);
+  const setValue = useCallback(
+    (value) => {
+      try {
+        const valueToStore =
+          value instanceof Function ? value(storedValue) : value;
+        setStoredValue(valueToStore);
+        window.localStorage.setItem(key, JSON.stringify(valueToStore));
+      } catch (error) {
+        console.error('Error saving to localStorage:', error);
+      }
+    },
+    [key, storedValue]
+  );
 
   return [storedValue, setValue];
 }

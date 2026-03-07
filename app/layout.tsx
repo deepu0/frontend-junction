@@ -101,6 +101,13 @@ export default function RootLayout({
   return (
     <html lang='en' suppressHydrationWarning>
       <head>
+        <Script
+          id='google-adsense'
+          strategy='beforeInteractive'
+          async
+          src='https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4467873688771542'
+          crossOrigin='anonymous'
+        />
         {/* Structured Data */}
         <OrganizationSchema />
         <WebsiteSchema />
