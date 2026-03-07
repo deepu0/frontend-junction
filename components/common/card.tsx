@@ -6,6 +6,9 @@ import Link from 'next/link';
 interface CardProps {
   id?: string;
   rawId?: string;
+  type?: 'user' | 'scraped' | 'legacy';
+  onDelete?: () => void;
+  onApprove?: () => void;
   title: string;
   imageSrc?: string;
   description: string;
@@ -229,7 +232,7 @@ const COMPANY_WEBSITES: Record<string, string> = {
   zscaler: 'https://www.zscaler.com',
 };
 
-import { supabase } from '@/lib/supabase';
+import { deleteExperience, approveExperience } from '@/actions/admin';
 import { toast } from '../ui/use-toast';
 import { Loader2, Wand2, CheckCircle2, Trash2 } from 'lucide-react';
 
@@ -239,6 +242,7 @@ const LOGO_DEV_PUBLIC_KEY =
 const CardComponent: React.FC<CardProps> = ({
   id,
   rawId,
+  type = 'user',
   title,
   imageSrc,
   description: initialDescription,
@@ -252,6 +256,8 @@ const CardComponent: React.FC<CardProps> = ({
   isAdmin,
   isExclusive,
   blogLink,
+  onDelete,
+  onApprove,
 }) => {
   const [isProcessing, setIsProcessing] = React.useState(false);
   const [description, setDescription] = React.useState(initialDescription);
@@ -267,13 +273,13 @@ const CardComponent: React.FC<CardProps> = ({
       });
       const data = await res.json();
       if (data.summary) {
-        // Update DB
-        const { error } = await supabase
-          .from('new_interview')
-          .update({ description: data.summary })
-          .eq('id', rawId);
-
-        if (error) throw error;
+        // Update DB via server action
+        const { updateExperienceDescription } = await import('@/actions/admin');
+        const updateResult = await updateExperienceDescription(
+          rawId!,
+          data.summary
+        );
+        if (!updateResult.success) throw new Error(updateResult.error);
         setDescription(data.summary);
         toast({
           title: 'AI Summary Generated!',
@@ -292,16 +298,13 @@ const CardComponent: React.FC<CardProps> = ({
   };
 
   const handleApprove = async () => {
-    if (isProcessing) return;
+    if (isProcessing || !rawId) return;
     setIsProcessing(true);
     try {
-      const { error } = await supabase
-        .from('new_interview')
-        .update({ approval_status: 'accepted' })
-        .eq('id', rawId);
-
-      if (error) throw error;
+      const result = await approveExperience(rawId);
+      if (!result.success) throw new Error(result.error);
       setCurrentStatus('accepted');
+      onApprove?.();
       toast({
         title: 'Post Approved!',
         description: 'It is now live on the feed.',
@@ -318,26 +321,31 @@ const CardComponent: React.FC<CardProps> = ({
   };
 
   const handleDelete = async () => {
+    if (isProcessing) return;
+    if (!rawId) {
+      console.error('[handleDelete] rawId is missing, type:', type);
+      toast({
+        title: 'Delete Failed',
+        description: 'Cannot delete: missing record ID.',
+        variant: 'destructive',
+      });
+      return;
+    }
     if (
       !window.confirm(
         'Are you sure you want to delete this experience? This action cannot be undone.'
       )
     )
       return;
-    if (isProcessing) return;
     setIsProcessing(true);
     try {
-      const { error } = await supabase
-        .from('new_interview')
-        .delete()
-        .eq('id', rawId);
-
-      if (error) throw error;
+      const result = await deleteExperience(rawId, type);
+      if (!result.success) throw new Error(result.error);
+      onDelete?.();
       toast({
         title: 'Post Deleted',
         description: 'Experience has been removed from the database.',
       });
-      window.location.reload();
     } catch (err: any) {
       toast({
         title: 'Delete Failed',

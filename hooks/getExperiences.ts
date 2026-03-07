@@ -76,6 +76,7 @@ const transformScrapedData = (data: any) => {
   if (data && data.length > 0) {
     return data.map((item: any) => ({
       id: `scraped-${item.id}`,
+      rawId: item.id,
       title: item.title,
       imageSrc: '',
       description:
@@ -123,6 +124,7 @@ const transformData = (data: any) => {
       .filter((data: any) => data.verification_status === 'approved')
       .map((experience: any) => ({
         id: `exp-${experience.id}`,
+        rawId: experience.id,
         title: experience.title,
         imageSrc: '',
         description: experience?.summary || experience?.detail_experience || '',

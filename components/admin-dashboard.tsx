@@ -25,11 +25,31 @@ interface Experience {
   [key: string]: any;
 }
 
-export default function AdminDashboard() {
-  const { user, isLoading: authLoading } = useAuth();
-  const { experiences, isLoading: dataLoading } = useExperiences();
+interface AdminDashboardProps {
+  isAdminOverride?: boolean;
+}
 
-  const isAdmin = user?.role === 'admin';
+export default function AdminDashboard({
+  isAdminOverride = false,
+}: AdminDashboardProps) {
+  const { user, isLoading: authLoading } = useAuth();
+  const { experiences: initialExperiences, isLoading: dataLoading } =
+    useExperiences();
+  const [experiences, setExperiences] = React.useState<Experience[]>([]);
+
+  React.useEffect(() => {
+    if (initialExperiences.length > 0) setExperiences(initialExperiences);
+  }, [initialExperiences]);
+
+  const removeExperience = (id: string) =>
+    setExperiences((prev) => prev.filter((e) => e.id !== id));
+
+  const markApproved = (id: string) =>
+    setExperiences((prev) =>
+      prev.map((e) => (e.id === id ? { ...e, status: 'accepted' } : e))
+    );
+
+  const isAdmin = isAdminOverride || user?.role === 'admin';
 
   const stats = useMemo(() => {
     const total = experiences.length;
@@ -185,7 +205,12 @@ export default function AdminDashboard() {
                       animate={{ opacity: 1, scale: 1 }}
                       exit={{ opacity: 0, scale: 0.9 }}
                     >
-                      <CardComponent {...post} isAdmin={true} />
+                      <CardComponent
+                        {...post}
+                        isAdmin={true}
+                        onDelete={() => removeExperience(post.id)}
+                        onApprove={() => markApproved(post.id)}
+                      />
                     </motion.div>
                   ))}
                 </AnimatePresence>
@@ -197,7 +222,12 @@ export default function AdminDashboard() {
             <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
               {experiences.map((post: Experience) => (
                 <div key={post.id}>
-                  <CardComponent {...post} isAdmin={true} />
+                  <CardComponent
+                    {...post}
+                    isAdmin={true}
+                    onDelete={() => removeExperience(post.id)}
+                    onApprove={() => markApproved(post.id)}
+                  />
                 </div>
               ))}
             </div>
