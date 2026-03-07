@@ -10,7 +10,24 @@ export default {
     return config;
   },
   images: {
-    domains: ['lh3.googleusercontent.com', 'img.logo.dev'],
+    minimumCacheTTL: 2678400,
+    remotePatterns: [
+      { protocol: 'https', hostname: 'lh3.googleusercontent.com' },
+      { protocol: 'https', hostname: 'img.logo.dev' },
+    ],
+  },
+  async headers() {
+    return [
+      {
+        source: '/companies/:path*',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=2678400, stale-while-revalidate=86400',
+          },
+        ],
+      },
+    ];
   },
 };
 

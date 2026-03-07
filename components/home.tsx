@@ -1,14 +1,20 @@
 'use client';
 import React from 'react';
-import CardComponent from './common/card';
-import FooterComponent from './common/footer';
+import dynamic from 'next/dynamic';
 import { interviewData } from '@/constants/experiences';
 import { motion } from 'framer-motion';
 import HeroSection from './hero-section';
-import StatsSection from './stats-section';
-import FeaturesSection from './features-section';
-import BlogCtaSection from './blog-cta-section';
+import FooterComponent from './common/footer';
 import Link from 'next/link';
+
+const CardComponent = dynamic(() => import('./common/card'), { ssr: false });
+const StatsSection = dynamic(() => import('./stats-section'), { ssr: false });
+const FeaturesSection = dynamic(() => import('./features-section'), {
+  ssr: false,
+});
+const BlogCtaSection = dynamic(() => import('./blog-cta-section'), {
+  ssr: false,
+});
 
 // NOTE: We are replacing WhyChooseComponent with FeaturesSection as it is more "Hub" aligned.
 // We are keeping company slider and latest experiences.
@@ -83,29 +89,33 @@ const LandingPage: React.FC<IHomeProps> = (props: IHomeProps) => {
                 Latest interview experiences added by the community.
               </p>
             </div>
-            <motion.a
-              href='/interview-experience'
+            <motion.div
               initial={{ opacity: 0, x: 20 }}
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
               transition={{ delay: 0.3 }}
-              className='hidden md:inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-primary/10 hover:bg-primary text-primary hover:text-white font-semibold transition-all duration-300 border border-primary/20 hover:border-primary group active:scale-95'
             >
-              <span>View All</span>
-              <svg
-                className='w-4 h-4 group-hover:translate-x-1 transition-transform'
-                fill='none'
-                stroke='currentColor'
-                viewBox='0 0 24 24'
+              <Link
+                href='/interview-experience'
+                prefetch={false}
+                className='hidden md:inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-primary/10 hover:bg-primary text-primary hover:text-white font-semibold transition-all duration-300 border border-primary/20 hover:border-primary group active:scale-95'
               >
-                <path
-                  strokeLinecap='round'
-                  strokeLinejoin='round'
-                  strokeWidth={2}
-                  d='M13 7l5 5m0 0l-5 5m5-5H6'
-                />
-              </svg>
-            </motion.a>
+                <span>View All</span>
+                <svg
+                  className='w-4 h-4 group-hover:translate-x-1 transition-transform'
+                  fill='none'
+                  stroke='currentColor'
+                  viewBox='0 0 24 24'
+                >
+                  <path
+                    strokeLinecap='round'
+                    strokeLinejoin='round'
+                    strokeWidth={2}
+                    d='M13 7l5 5m0 0l-5 5m5-5H6'
+                  />
+                </svg>
+              </Link>
+            </motion.div>
           </div>
 
           {/* Cards Grid with stagger */}
@@ -157,6 +167,7 @@ const LandingPage: React.FC<IHomeProps> = (props: IHomeProps) => {
           >
             <Link
               href='/interview-experience'
+              prefetch={false}
               className='inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-primary/10 hover:bg-primary text-primary hover:text-white font-semibold transition-all duration-300 border border-primary/20 hover:border-primary group active:scale-95'
             >
               <span>View All Experiences</span>

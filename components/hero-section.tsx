@@ -119,7 +119,7 @@ const HeroContent = memo(
 
           {/* CTA */}
           <div className='flex flex-col sm:flex-row items-center justify-center gap-4 pb-16'>
-            <Link href='/interview-experience'>
+            <Link href='/interview-experience' prefetch={false}>
               <button className='px-8 py-3.5 rounded-full bg-white/10 hover:bg-white/20 border border-white/10 text-white font-medium transition-all backdrop-blur-sm active:scale-95 duration-200'>
                 Browse Experiences
               </button>

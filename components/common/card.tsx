@@ -232,7 +232,6 @@ const COMPANY_WEBSITES: Record<string, string> = {
 import { supabase } from '@/lib/supabase';
 import { toast } from '../ui/use-toast';
 import { Loader2, Wand2, CheckCircle2, Trash2 } from 'lucide-react';
-import ViewCounter from '../view-counter';
 
 const LOGO_DEV_PUBLIC_KEY =
   process.env.NEXT_PUBLIC_LOGO_DEV_KEY || 'pk_eMJii9ItQ0uGS-ofYW9kQQ';
@@ -401,8 +400,10 @@ const CardComponent: React.FC<CardProps> = ({
                   src={logoUrl}
                   alt={company || 'Company'}
                   fill
+                  sizes='56px'
+                  loading='eager'
                   className='object-contain p-0.5'
-                  unoptimized={logoUrl.includes('clearbit.com')}
+                  unoptimized={logoUrl.includes('logo.dev')}
                 />
               </div>
             </a>
@@ -537,15 +538,6 @@ const CardComponent: React.FC<CardProps> = ({
               </span>
             )}
           </div>
-          {rawId && (
-            <div className='opacity-80 group-hover:opacity-100 transition-opacity'>
-              <ViewCounter
-                slug={rawId}
-                apiPath='/api/interview/view'
-                noIncrement={true}
-              />
-            </div>
-          )}
         </div>
       </div>
 

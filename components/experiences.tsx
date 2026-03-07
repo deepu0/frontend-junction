@@ -78,6 +78,37 @@ export default function InterviewExperiences({
     initialData.length < initialTotalCount
   );
 
+  // Skip the very first render — SSR already provides correct initial data
+  const hasMountedRef = useRef(false);
+  // Track latest request to discard stale responses from rapid filter changes
+  const requestCounterRef = useRef(0);
+  // Keep current filter values accessible to pagination effect without adding them as deps
+  const filtersRef = useRef({
+    searchQuery,
+    activeFilter,
+    selectedCompanies,
+    selectedYear,
+    sortBy,
+    isAdmin,
+  });
+  useEffect(() => {
+    filtersRef.current = {
+      searchQuery,
+      activeFilter,
+      selectedCompanies,
+      selectedYear,
+      sortBy,
+      isAdmin,
+    };
+  }, [
+    searchQuery,
+    activeFilter,
+    selectedCompanies,
+    selectedYear,
+    sortBy,
+    isAdmin,
+  ]);
+
   // Update URL function (so shares preserve filters)
   const updateURLParams = useCallback(() => {
     const params = new URLSearchParams();
@@ -106,11 +137,19 @@ export default function InterviewExperiences({
 
   // 1. Fetch data on filter change (debounce search slightly)
   useEffect(() => {
-    updateURLParams();
+    // On first mount, SSR data is already correct — skip refetch
+    if (!hasMountedRef.current) {
+      hasMountedRef.current = true;
+      return;
+    }
 
-    const fetchFilters = async () => {
+    const currentRequest = ++requestCounterRef.current;
+
+    const debounceTimer = setTimeout(async () => {
+      updateURLParams();
+
       setIsLoading(true);
-      setPage(1); // Reset to page 1
+      setPage(1);
 
       const filters: ExperienceFilters = {
         page: 1,
@@ -124,15 +163,15 @@ export default function InterviewExperiences({
       };
 
       const result = await fetchPaginatedExperiences(filters);
+
+      // Discard if a newer request has been fired
+      if (currentRequest !== requestCounterRef.current) return;
+
       setData(result.data);
       setTotalCount(result.totalCount);
       setHasMore(result.data.length < result.totalCount);
       setIsLoading(false);
-    };
-
-    const debounceTimer = setTimeout(() => {
-      fetchFilters();
-    }, 300); // 300ms debounce for typing search
+    }, 300);
 
     return () => clearTimeout(debounceTimer);
   }, [
@@ -152,20 +191,24 @@ export default function InterviewExperiences({
     const fetchMoreData = async () => {
       setIsLoadingMore(true);
 
+      const currentFilters = filtersRef.current;
       const filters: ExperienceFilters = {
         page,
         limit: ITEMS_PER_PAGE,
-        search: searchQuery,
-        source: activeFilter,
-        companies: selectedCompanies,
-        year: selectedYear,
-        sortBy,
-        isAdmin,
+        search: currentFilters.searchQuery,
+        source: currentFilters.activeFilter,
+        companies: currentFilters.selectedCompanies,
+        year: currentFilters.selectedYear,
+        sortBy: currentFilters.sortBy,
+        isAdmin: currentFilters.isAdmin,
       };
 
       const result = await fetchPaginatedExperiences(filters);
-      setData((prev) => [...prev, ...result.data]);
-      setHasMore([...data, ...result.data].length < result.totalCount);
+      setData((prev) => {
+        const newData = [...prev, ...result.data];
+        setHasMore(newData.length < result.totalCount);
+        return newData;
+      });
       setIsLoadingMore(false);
     };
 
@@ -182,11 +225,11 @@ export default function InterviewExperiences({
       if (node) {
         observerRef.current = new IntersectionObserver(
           (entries) => {
-            if (entries[0].isIntersecting) {
+            if (entries[0].isIntersecting && !isLoadingMore && hasMore) {
               setPage((prev) => prev + 1);
             }
           },
-          { threshold: 0.1 }
+          { rootMargin: '400px', threshold: 0.1 }
         );
         observerRef.current.observe(node);
       }
@@ -223,13 +266,13 @@ export default function InterviewExperiences({
         </div>
 
         {/* Stats Bar */}
-        <div className='flex flex-wrap items-center justify-center gap-x-6 gap-y-2'>
+        <div className='flex items-center justify-center gap-4'>
           <div className='flex items-center gap-2 px-4 py-2 rounded-xl bg-primary/5 border border-primary/10'>
             <span className='text-2xl font-bold text-primary'>
               {totalCount}
             </span>
             <span className='text-sm text-muted-foreground'>
-              {isFiltered ? 'Matching Experiences' : 'Total Experiences'}
+              {isFiltered ? 'Matching' : 'Experiences'}
             </span>
           </div>
           <div className='flex items-center gap-2 px-4 py-2 rounded-xl bg-violet-500/5 border border-violet-500/10'>
@@ -238,14 +281,6 @@ export default function InterviewExperiences({
             </span>
             <span className='text-sm text-muted-foreground'>Companies</span>
           </div>
-          {availableYears.length > 0 && (
-            <div className='flex items-center gap-2 px-4 py-2 rounded-xl bg-emerald-500/5 border border-emerald-500/10'>
-              <span className='text-2xl font-bold text-emerald-600'>
-                {availableYears[0]}
-              </span>
-              <span className='text-sm text-muted-foreground'>Latest Year</span>
-            </div>
-          )}
         </div>
 
         {/* Controls Container */}
@@ -406,52 +441,43 @@ export default function InterviewExperiences({
         </div>
       </div>
 
-      {/* Loading Overlay for Filters */}
-      {isLoading && data.length > 0 && (
-        <div className='w-full flex justify-center py-4 text-sm text-muted-foreground animate-pulse'>
-          Updating results...
+      {/* Grid / Skeleton */}
+      {isLoading ? (
+        <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
+          {Array.from({ length: ITEMS_PER_PAGE }).map((_, i) => (
+            <CardSkeleton key={i} />
+          ))}
         </div>
+      ) : (
+        <motion.div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
+          <AnimatePresence mode='popLayout'>
+            {data.map((interview) => (
+              <motion.div
+                key={interview.id}
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.95 }}
+                transition={{ duration: 0.2 }}
+              >
+                <CardComponent {...interview} isAdmin={isAdmin} />
+              </motion.div>
+            ))}
+          </AnimatePresence>
+        </motion.div>
       )}
 
-      {/* Grid */}
-      <motion.div
-        layout
-        className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 ${isLoading ? 'opacity-50 pointer-events-none' : ''}`}
-      >
-        <AnimatePresence mode='popLayout'>
-          {data.map((interview) => (
-            <motion.div
-              key={interview.id}
-              layout
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.9 }}
-              transition={{ duration: 0.2 }}
-            >
-              <CardComponent {...interview} isAdmin={isAdmin} />
-            </motion.div>
-          ))}
-        </AnimatePresence>
-      </motion.div>
-
-      {/* Infinite Scroll Sentinel */}
+      {/* Infinite Scroll Sentinel + Skeleton */}
       {hasMore && !isLoading && (
-        <div className='w-full py-12 flex justify-center' ref={sentinelRef}>
-          <div className='flex items-center gap-3 text-muted-foreground animate-pulse'>
-            <div className='w-2 h-2 rounded-full bg-primary' />
-            <div
-              className='w-2 h-2 rounded-full bg-primary'
-              style={{ animationDelay: '0.2s' }}
-            />
-            <div
-              className='w-2 h-2 rounded-full bg-primary'
-              style={{ animationDelay: '0.4s' }}
-            />
-            <span className='text-sm font-medium ml-2'>
-              Fetching more brilliantly...
-            </span>
-          </div>
-        </div>
+        <>
+          <div className='w-full pt-8' ref={sentinelRef} />
+          {isLoadingMore && (
+            <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-6'>
+              {Array.from({ length: 3 }).map((_, i) => (
+                <CardSkeleton key={`more-${i}`} />
+              ))}
+            </div>
+          )}
+        </>
       )}
 
       {/* Empty State */}
@@ -473,6 +499,36 @@ export default function InterviewExperiences({
           </button>
         </div>
       )}
+    </div>
+  );
+}
+
+function CardSkeleton() {
+  return (
+    <div className='flex flex-col h-full rounded-2xl overflow-hidden border border-border bg-card animate-pulse'>
+      <div className='p-6 pb-2 flex items-start justify-between gap-4'>
+        <div className='w-14 h-14 rounded-xl bg-muted' />
+        <div className='flex flex-col items-end gap-2'>
+          <div className='w-16 h-4 rounded-full bg-muted' />
+        </div>
+      </div>
+      <div className='p-6 pt-2 flex-grow flex flex-col gap-3'>
+        <div className='h-5 w-3/4 rounded bg-muted' />
+        <div className='h-4 w-1/3 rounded bg-muted' />
+        <div className='space-y-2 mt-2'>
+          <div className='h-3 w-full rounded bg-muted' />
+          <div className='h-3 w-5/6 rounded bg-muted' />
+          <div className='h-3 w-2/3 rounded bg-muted' />
+        </div>
+        <div className='flex gap-2 mt-auto pt-4'>
+          <div className='h-6 w-16 rounded-md bg-muted' />
+          <div className='h-6 w-14 rounded-md bg-muted' />
+          <div className='h-6 w-20 rounded-md bg-muted' />
+        </div>
+      </div>
+      <div className='p-6 pt-0 mt-2'>
+        <div className='h-10 w-full rounded-xl bg-muted' />
+      </div>
     </div>
   );
 }
