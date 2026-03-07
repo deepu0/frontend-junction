@@ -1,5 +1,8 @@
 import InterviewExperiences from '@/components/experiences';
-import getExperiences from '@/hooks/getExperiences';
+import {
+  fetchPaginatedExperiences,
+  fetchCompanyAndYearStats,
+} from '@/actions/experiences';
 import type { Metadata } from 'next';
 import { Suspense } from 'react';
 import Loading from '../loading';
@@ -20,17 +23,37 @@ export const metadata: Metadata = {
     description:
       'Browse through real front-end interview experiences from candidates at various companies. Get insights, tips, and prepare better for your next interview.',
     siteName: 'Front-end Junction',
-    //images: [{ url: '/og-image.jpg' }],
   },
 };
 
-export default async function Interview() {
-  const data = await getExperiences();
+export default async function Interview(props: {
+  searchParams: Promise<{ [key: string]: string | undefined }>;
+}) {
+  const searchParams = await props.searchParams;
+
+  // Ensure we get initial data based on URL if loaded directly
+  const { data: initialData, totalCount } = await fetchPaginatedExperiences({
+    page: 1,
+    limit: 12,
+    search: searchParams?.search || '',
+    source: (searchParams?.source as any) || 'all',
+    companies: searchParams?.companies ? searchParams.companies.split(',') : [],
+    year: searchParams?.year || null,
+    sortBy: (searchParams?.sort as any) || 'newest',
+    isAdmin: false, // For safety, SSR initial props always non-admin. Client fetches admin on hydration.
+  });
+
+  const { companies, years } = await fetchCompanyAndYearStats();
 
   return (
     <main className='flex min-h-screen flex-col items-center justify-between p-4 mt-10'>
       <Suspense fallback={<Loading />}>
-        <InterviewExperiences interviewData={data} />
+        <InterviewExperiences
+          initialData={initialData}
+          initialTotalCount={totalCount}
+          availableCompanies={companies}
+          availableYears={years}
+        />
       </Suspense>
     </main>
   );

@@ -1,13 +1,21 @@
 'use client';
-import { useState, useMemo, useEffect } from 'react';
-import { useSearchParams } from 'next/navigation';
+
+import { useState, useCallback, useEffect, useRef } from 'react';
+import { useSearchParams, useRouter, usePathname } from 'next/navigation';
 import CardComponent from './common/card';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FaSearch, FaFilter, FaSortAmountDown } from 'react-icons/fa';
 import { useAuth } from './session-provider';
+import {
+  fetchPaginatedExperiences,
+  ExperienceFilters,
+} from '@/actions/experiences';
 
 interface IExperienceProps {
-  interviewData: any[];
+  initialData: any[];
+  initialTotalCount: number;
+  availableCompanies: string[];
+  availableYears: string[];
 }
 
 const FAMOUS_COMPANIES = [
@@ -24,128 +32,167 @@ const FAMOUS_COMPANIES = [
   'Adobe',
 ];
 
-const InterviewExperiences = ({ interviewData = [] }: IExperienceProps) => {
+const ITEMS_PER_PAGE = 12;
+
+export default function InterviewExperiences({
+  initialData = [],
+  initialTotalCount = 0,
+  availableCompanies = [],
+  availableYears = [],
+}: IExperienceProps) {
   const { user } = useAuth();
   const searchParams = useSearchParams();
-  const initialSearch = searchParams.get('search') || '';
-
-  const [searchQuery, setSearchQuery] = useState(initialSearch);
-  const [activeFilter, setActiveFilter] = useState<
-    'all' | 'community' | 'web' | 'pending'
-  >('all');
-  const [selectedCompanies, setSelectedCompanies] = useState<string[]>([]);
-  const [sortBy, setSortBy] = useState<'newest' | 'oldest'>('newest');
-  const [selectedYear, setSelectedYear] = useState<string | null>(null);
+  const router = useRouter();
+  const pathname = usePathname();
 
   const isAdmin = user?.role === 'admin';
-  const ITEMS_PER_PAGE = 12;
-  const [visibleCount, setVisibleCount] = useState(ITEMS_PER_PAGE);
 
-  // Update searchQuery when URL parameter changes
-  useEffect(() => {
-    const search = searchParams.get('search');
-    if (search !== null) {
-      setSearchQuery(search);
-    }
-  }, [searchParams]);
+  // State setup from URL or defaults
+  const [searchQuery, setSearchQuery] = useState(
+    searchParams.get('search') || ''
+  );
+  const [activeFilter, setActiveFilter] = useState<
+    'all' | 'community' | 'web' | 'pending'
+  >((searchParams.get('source') as any) || 'all');
 
-  // Reset infinite scroll when any filter changes
-  useEffect(() => {
-    setVisibleCount(ITEMS_PER_PAGE);
-  }, [searchQuery, activeFilter, selectedCompanies, selectedYear, sortBy]);
+  const compParam = searchParams.get('companies');
+  const initialSelectedCompanies = compParam ? compParam.split(',') : [];
+  const [selectedCompanies, setSelectedCompanies] = useState<string[]>(
+    initialSelectedCompanies
+  );
 
-  // Extract unique companies for dropdown
-  const allCompanies = useMemo(() => {
-    const companies = new Set<string>();
-    interviewData.forEach((item) => {
-      if (item.company) companies.add(item.company);
+  const [selectedYear, setSelectedYear] = useState<string | null>(
+    searchParams.get('year') || null
+  );
+  const [sortBy, setSortBy] = useState<'newest' | 'oldest'>(
+    (searchParams.get('sort') as any) || 'newest'
+  );
+
+  // Data state
+  const [data, setData] = useState<any[]>(initialData);
+  const [totalCount, setTotalCount] = useState<number>(initialTotalCount);
+  const [page, setPage] = useState(1);
+  const [isLoading, setIsLoading] = useState(false); // Initial load of filters
+  const [isLoadingMore, setIsLoadingMore] = useState(false); // Infinite scroll load
+  const [hasMore, setHasMore] = useState(
+    initialData.length < initialTotalCount
+  );
+
+  // Update URL function (so shares preserve filters)
+  const updateURLParams = useCallback(() => {
+    const params = new URLSearchParams();
+    if (searchQuery) params.set('search', searchQuery);
+    if (activeFilter !== 'all') params.set('source', activeFilter);
+    if (selectedCompanies.length > 0)
+      params.set('companies', selectedCompanies.join(','));
+    if (selectedYear) params.set('year', selectedYear);
+    if (sortBy !== 'newest') params.set('sort', sortBy);
+
+    const newQuery = params.toString();
+    router.replace(`${pathname}${newQuery ? `?${newQuery}` : ''}`, {
+      scroll: false,
     });
-    return Array.from(companies).sort();
-  }, [interviewData]);
-
-  // Extract unique years from data
-  const availableYears = useMemo(() => {
-    const years = new Set<string>();
-    interviewData.forEach((item) => {
-      if (item.date) {
-        const year = new Date(item.date).getFullYear().toString();
-        if (!isNaN(Number(year))) years.add(year);
-      }
-      // Also check title for year mentions like "2026"
-      const titleMatch = item.title?.match(/\b(202[3-9])\b/);
-      if (titleMatch) years.add(titleMatch[1]);
-    });
-    return Array.from(years).sort().reverse();
-  }, [interviewData]);
-
-  const filteredData = useMemo(() => {
-    let data = [...interviewData];
-
-    // 1. Filter out pending posts for non-admins
-    if (!isAdmin) {
-      data = data.filter((item) => item.status !== 'pending');
-    } else if (activeFilter === 'pending') {
-      data = data.filter((item) => item.status === 'pending');
-    }
-
-    // 2. Source Filtering
-    if (activeFilter === 'community') {
-      data = data.filter(
-        (item) => item.type === 'user' || item.type === 'legacy'
-      );
-    } else if (activeFilter === 'web') {
-      data = data.filter((item) => item.type === 'scraped');
-    }
-
-    // 3. Company Filtering
-    if (selectedCompanies.length > 0) {
-      data = data.filter(
-        (item) => item.company && selectedCompanies.includes(item.company)
-      );
-    }
-
-    // 4. Year Filtering
-    if (selectedYear) {
-      data = data.filter((item) => {
-        if (item.date) {
-          const year = new Date(item.date).getFullYear().toString();
-          if (year === selectedYear) return true;
-        }
-        if (item.title?.includes(selectedYear)) return true;
-        return false;
-      });
-    }
-
-    // 5. Search
-    if (searchQuery) {
-      const query = searchQuery.toLowerCase();
-      data = data.filter(
-        (item) =>
-          item.title.toLowerCase().includes(query) ||
-          (item.description &&
-            item.description.toLowerCase().includes(query)) ||
-          item.tags.some((tag: string) => tag.toLowerCase().includes(query)) ||
-          (item.company && item.company.toLowerCase().includes(query))
-      );
-    }
-
-    // 6. Sorting
-    data.sort((a, b) => {
-      const dateA = a.date ? new Date(a.date).getTime() : 0;
-      const dateB = b.date ? new Date(b.date).getTime() : 0;
-      return sortBy === 'newest' ? dateB - dateA : dateA - dateB;
-    });
-
-    return data;
   }, [
-    interviewData,
+    searchQuery,
+    activeFilter,
+    selectedCompanies,
+    selectedYear,
+    sortBy,
+    pathname,
+    router,
+  ]);
+
+  // --- Effects for Data Fetching --- //
+
+  // 1. Fetch data on filter change (debounce search slightly)
+  useEffect(() => {
+    updateURLParams();
+
+    const fetchFilters = async () => {
+      setIsLoading(true);
+      setPage(1); // Reset to page 1
+
+      const filters: ExperienceFilters = {
+        page: 1,
+        limit: ITEMS_PER_PAGE,
+        search: searchQuery,
+        source: activeFilter,
+        companies: selectedCompanies,
+        year: selectedYear,
+        sortBy,
+        isAdmin,
+      };
+
+      const result = await fetchPaginatedExperiences(filters);
+      setData(result.data);
+      setTotalCount(result.totalCount);
+      setHasMore(result.data.length < result.totalCount);
+      setIsLoading(false);
+    };
+
+    const debounceTimer = setTimeout(() => {
+      fetchFilters();
+    }, 300); // 300ms debounce for typing search
+
+    return () => clearTimeout(debounceTimer);
+  }, [
     searchQuery,
     activeFilter,
     selectedCompanies,
     selectedYear,
     sortBy,
     isAdmin,
+    updateURLParams,
   ]);
+
+  // 2. Fetch data on pagination (infinite scroll)
+  useEffect(() => {
+    if (page === 1) return; // Handled by filter fetch
+
+    const fetchMoreData = async () => {
+      setIsLoadingMore(true);
+
+      const filters: ExperienceFilters = {
+        page,
+        limit: ITEMS_PER_PAGE,
+        search: searchQuery,
+        source: activeFilter,
+        companies: selectedCompanies,
+        year: selectedYear,
+        sortBy,
+        isAdmin,
+      };
+
+      const result = await fetchPaginatedExperiences(filters);
+      setData((prev) => [...prev, ...result.data]);
+      setHasMore([...data, ...result.data].length < result.totalCount);
+      setIsLoadingMore(false);
+    };
+
+    fetchMoreData();
+  }, [page]); // only run when page increments
+
+  // Intersection Observer for infinite scrolling
+  const observerRef = useRef<IntersectionObserver | null>(null);
+  const sentinelRef = useCallback(
+    (node: HTMLDivElement | null) => {
+      if (isLoading || isLoadingMore || !hasMore) return;
+      if (observerRef.current) observerRef.current.disconnect();
+
+      if (node) {
+        observerRef.current = new IntersectionObserver(
+          (entries) => {
+            if (entries[0].isIntersecting) {
+              setPage((prev) => prev + 1);
+            }
+          },
+          { threshold: 0.1 }
+        );
+        observerRef.current.observe(node);
+      }
+    },
+    [isLoading, isLoadingMore, hasMore]
+  );
 
   const toggleCompany = (company: string) => {
     setSelectedCompanies((prev) =>
@@ -155,10 +202,6 @@ const InterviewExperiences = ({ interviewData = [] }: IExperienceProps) => {
     );
   };
 
-  const totalCount = interviewData.filter(
-    (item) => item.status !== 'pending'
-  ).length;
-  const companyCount = allCompanies.length;
   const isFiltered =
     searchQuery ||
     activeFilter !== 'all' ||
@@ -183,25 +226,15 @@ const InterviewExperiences = ({ interviewData = [] }: IExperienceProps) => {
         <div className='flex flex-wrap items-center justify-center gap-x-6 gap-y-2'>
           <div className='flex items-center gap-2 px-4 py-2 rounded-xl bg-primary/5 border border-primary/10'>
             <span className='text-2xl font-bold text-primary'>
-              {isFiltered ? filteredData.length : totalCount}
+              {totalCount}
             </span>
             <span className='text-sm text-muted-foreground'>
-              {isFiltered ? (
-                <>
-                  of{' '}
-                  <span className='font-semibold text-foreground'>
-                    {totalCount}
-                  </span>{' '}
-                  Experiences
-                </>
-              ) : (
-                'Experiences'
-              )}
+              {isFiltered ? 'Matching Experiences' : 'Total Experiences'}
             </span>
           </div>
           <div className='flex items-center gap-2 px-4 py-2 rounded-xl bg-violet-500/5 border border-violet-500/10'>
             <span className='text-2xl font-bold text-violet-600'>
-              {companyCount}+
+              {availableCompanies.length}+
             </span>
             <span className='text-sm text-muted-foreground'>Companies</span>
           </div>
@@ -223,7 +256,7 @@ const InterviewExperiences = ({ interviewData = [] }: IExperienceProps) => {
               <FaSearch className='absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-primary transition-colors' />
               <input
                 type='text'
-                placeholder='Search companies, roles, tags...'
+                placeholder='Search companies, titles, tags...'
                 className='w-full pl-10 pr-4 py-2.5 bg-background border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all text-foreground placeholder:text-muted-foreground'
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
@@ -269,7 +302,7 @@ const InterviewExperiences = ({ interviewData = [] }: IExperienceProps) => {
 
           {/* Year Filters */}
           {availableYears.length > 0 && (
-            <div className='flex flex-wrap items-center gap-3 pt-2 border-t border-border/50'>
+            <div className='hidden md:flex flex-wrap items-center gap-3 pt-2 border-t border-border/50'>
               <span className='text-xs font-medium text-muted-foreground uppercase tracking-wider mr-1'>
                 Year:
               </span>
@@ -302,7 +335,7 @@ const InterviewExperiences = ({ interviewData = [] }: IExperienceProps) => {
           )}
 
           {/* Company Filters */}
-          <div className='flex flex-wrap items-center gap-3 pt-2 border-t border-border/50'>
+          <div className='hidden md:flex flex-wrap items-center gap-3 pt-2 border-t border-border/50'>
             <span className='text-xs font-medium text-muted-foreground uppercase tracking-wider mr-1'>
               Companies:
             </span>
@@ -329,8 +362,8 @@ const InterviewExperiences = ({ interviewData = [] }: IExperienceProps) => {
                 }}
                 value=''
               >
-                <option value=''>+ More Companies</option>
-                {allCompanies
+                <option value=''>+ More</option>
+                {availableCompanies
                   .filter((c) => !FAMOUS_COMPANIES.includes(c))
                   .map((c) => (
                     <option
@@ -373,37 +406,20 @@ const InterviewExperiences = ({ interviewData = [] }: IExperienceProps) => {
         </div>
       </div>
 
-      {/* Results count when filtered */}
-      {isFiltered && (
-        <div className='mb-6 text-sm text-muted-foreground'>
-          Showing{' '}
-          <span className='font-semibold text-foreground'>
-            {filteredData.length}
-          </span>{' '}
-          {filteredData.length === 1 ? 'experience' : 'experiences'}
-          {searchQuery && (
-            <>
-              {' '}
-              for &quot;<span className='text-primary'>{searchQuery}</span>
-              &quot;
-            </>
-          )}
-          {selectedYear && (
-            <>
-              {' '}
-              in <span className='text-primary'>{selectedYear}</span>
-            </>
-          )}
+      {/* Loading Overlay for Filters */}
+      {isLoading && data.length > 0 && (
+        <div className='w-full flex justify-center py-4 text-sm text-muted-foreground animate-pulse'>
+          Updating results...
         </div>
       )}
 
       {/* Grid */}
       <motion.div
         layout
-        className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'
+        className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 ${isLoading ? 'opacity-50 pointer-events-none' : ''}`}
       >
         <AnimatePresence mode='popLayout'>
-          {filteredData.slice(0, visibleCount).map((interview) => (
+          {data.map((interview) => (
             <motion.div
               key={interview.id}
               layout
@@ -418,24 +434,9 @@ const InterviewExperiences = ({ interviewData = [] }: IExperienceProps) => {
         </AnimatePresence>
       </motion.div>
 
-      {/* Load More Sentinel */}
-      {visibleCount < filteredData.length && (
-        <div
-          className='w-full py-12 flex justify-center'
-          ref={(el) => {
-            if (el) {
-              const observer = new IntersectionObserver(
-                (entries) => {
-                  if (entries[0].isIntersecting) {
-                    setVisibleCount((prev) => prev + ITEMS_PER_PAGE);
-                  }
-                },
-                { threshold: 0.1 }
-              );
-              observer.observe(el);
-            }
-          }}
-        >
+      {/* Infinite Scroll Sentinel */}
+      {hasMore && !isLoading && (
+        <div className='w-full py-12 flex justify-center' ref={sentinelRef}>
           <div className='flex items-center gap-3 text-muted-foreground animate-pulse'>
             <div className='w-2 h-2 rounded-full bg-primary' />
             <div
@@ -447,13 +448,14 @@ const InterviewExperiences = ({ interviewData = [] }: IExperienceProps) => {
               style={{ animationDelay: '0.4s' }}
             />
             <span className='text-sm font-medium ml-2'>
-              Loading more brilliance...
+              Fetching more brilliantly...
             </span>
           </div>
         </div>
       )}
 
-      {filteredData.length === 0 && (
+      {/* Empty State */}
+      {!isLoading && data.length === 0 && (
         <div className='text-center py-20'>
           <p className='text-xl text-muted-foreground'>
             No experiences found matching your criteria.
@@ -473,6 +475,4 @@ const InterviewExperiences = ({ interviewData = [] }: IExperienceProps) => {
       )}
     </div>
   );
-};
-
-export default InterviewExperiences;
+}

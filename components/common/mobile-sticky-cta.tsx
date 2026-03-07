@@ -11,8 +11,8 @@ export function MobileStickyCta() {
   const pathname = usePathname();
 
   useEffect(() => {
-    // Only show on homepage or interview-experience listing
-    const targetPages = ['/', '/interview-experience'];
+    // Only show on homepage
+    const targetPages = ['/'];
     if (!targetPages.includes(pathname)) {
       setIsVisible(false);
       return;

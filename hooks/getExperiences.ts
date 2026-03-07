@@ -2,30 +2,49 @@ import { supabase } from '@/lib/supabase';
 
 export default async function getExperiences() {
   try {
-    const { data, error } = await supabase
-      .from('experiences')
-      .select(
-        'id, title, summary, role, status, location, original_link,verification_status,detail_experience,user_id, created_at, company_name'
-      )
-      .order('created_at', { ascending: false })
-      .eq('verification_status', 'approved');
+    // Run all 3 queries in parallel for faster page loads
+    const [experiencesResult, newInterviewResult, scrapedResult] =
+      await Promise.all([
+        supabase
+          .from('experiences')
+          .select(
+            'id, title, summary, status, verification_status, detail_experience, created_at, company_name'
+          )
+          .order('created_at', { ascending: false })
+          .eq('verification_status', 'approved'),
 
-    const { data: dataNew, error: errorNew } = await supabase
-      .from('new_interview')
-      .select('*')
-      .order('created_at', { ascending: false });
-    // We fetch all here, but we will filter in the component or handle guest vs admin better.
-    // To ensure legacy behavior for guests, we can also add a secondary check.
+        supabase
+          .from('new_interview')
+          .select(
+            'id, title, slug, company, description, tags, approval_status, blog_link, created_at'
+          )
+          .order('created_at', { ascending: false }),
 
-    const { data: scrapedData, error: scrapedError } = await supabase
-      .from('scraped_experiences')
-      .select('*, slug, company, metadata')
-      .order('published_at', { ascending: false })
-      .eq('status', 'approved');
+        supabase
+          .from('scraped_experiences')
+          .select(
+            'id, title, slug, company, summary, tags, source, author, status, published_at, scraped_at, metadata'
+          )
+          .order('published_at', { ascending: false })
+          .eq('status', 'approved'),
+      ]);
 
-    if (error) throw error;
-    if (errorNew) throw errorNew;
-    if (scrapedError) throw scrapedError;
+    const { data, error } = experiencesResult;
+    const { data: dataNew, error: errorNew } = newInterviewResult;
+    const { data: scrapedData, error: scrapedError } = scrapedResult;
+
+    if (error) {
+      console.error('experiences error:', error);
+      throw error;
+    }
+    if (errorNew) {
+      console.error('new_interview error:', errorNew);
+      throw errorNew;
+    }
+    if (scrapedError) {
+      console.error('scraped_experiences error:', scrapedError);
+      throw scrapedError;
+    }
 
     const allExperiences = [
       ...transformData(data),
@@ -40,12 +59,11 @@ export default async function getExperiences() {
       return dateB - dateA;
     });
   } catch (err) {
-    console.log(err);
+    console.error('getExperiences failed:', err);
     return [];
   }
 }
 
-// ... getLink helper remains the same ...
 const getLink = (item: any, type: string) => {
   if (item.slug) return `/interview-experience/${item.slug}`;
   if (type === 'scraped') return `/interview-experience/scraped-${item.id}`;
@@ -84,7 +102,7 @@ const transformNewData = (data: any) => {
       rawId: experience.id,
       title: experience.title,
       imageSrc: '',
-      description: experience?.description || experience?.summary || '',
+      description: experience?.description || '',
       tags: experience?.tags || [],
       status: experience?.approval_status || 'accepted',
       link: getLink(experience, 'user'),
@@ -93,7 +111,6 @@ const transformNewData = (data: any) => {
       slug: experience.slug,
       company: experience.company,
       source: 'Community',
-      isExclusive: experience.is_exclusive,
       blogLink: experience.blog_link,
     }));
   }
