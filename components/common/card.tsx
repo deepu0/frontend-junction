@@ -234,6 +234,9 @@ import { toast } from '../ui/use-toast';
 import { Loader2, Wand2, CheckCircle2, Trash2 } from 'lucide-react';
 import ViewCounter from '../view-counter';
 
+const LOGO_DEV_PUBLIC_KEY =
+  process.env.NEXT_PUBLIC_LOGO_DEV_KEY || 'pk_eMJii9ItQ0uGS-ofYW9kQQ';
+
 const CardComponent: React.FC<CardProps> = ({
   id,
   rawId,
@@ -354,15 +357,19 @@ const CardComponent: React.FC<CardProps> = ({
       if (LOCAL_LOGOS[lowerCompany]) return LOCAL_LOGOS[lowerCompany];
     }
 
-    // 2. Use Image Source if provided (Legacy)
+    // 2. Use Logo.dev if domain exists (User preferred service)
+    if (companyDomain) {
+      return `https://img.logo.dev/${companyDomain}?token=${LOGO_DEV_PUBLIC_KEY}`;
+    }
+
+    // 3. Use Image Source if provided (Legacy)
     if (imageSrc) return imageSrc;
 
-    // 3. Use Clearbit if domain exists
-    if (companyDomain) return `https://logo.clearbit.com/${companyDomain}`;
-
-    // 4. Fallback based on company name
-    if (company && !company.includes(' '))
-      return `https://logo.clearbit.com/${company.toLowerCase()}.com`;
+    // 4. Fallback based on company name (Clearbit as secondary fallback if logo.dev domain not confirmed)
+    if (company && !company.includes(' ')) {
+      const domain = `${company.toLowerCase().trim()}.com`;
+      return `https://img.logo.dev/${domain}?token=${LOGO_DEV_PUBLIC_KEY}`;
+    }
 
     return null;
   };
@@ -409,7 +416,7 @@ const CardComponent: React.FC<CardProps> = ({
         {/* Status / Source Badge / Admin Actions */}
         <div className='flex flex-col items-end gap-2'>
           <div className='flex gap-2'>
-            {currentStatus && (
+            {isAdmin && currentStatus && (
               <span
                 className={`px-2 py-0.5 rounded-full text-[10px] font-medium border uppercase tracking-wider ${
                   currentStatus === 'accepted' || currentStatus === 'approved'

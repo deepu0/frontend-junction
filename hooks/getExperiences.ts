@@ -1,8 +1,6 @@
 import React from 'react';
 import { supabase } from '@/lib/supabase';
 
-export const revalidate = 60;
-
 export default async function getExperiences() {
   try {
     const { data, error } = await supabase
@@ -24,8 +22,7 @@ export default async function getExperiences() {
       .from('scraped_experiences')
       .select('*, slug, company, metadata')
       .order('published_at', { ascending: false })
-      .eq('status', 'approved')
-      .limit(200);
+      .eq('status', 'approved');
 
     if (error) throw error;
     if (errorNew) throw errorNew;
