@@ -1,4 +1,3 @@
-import React from 'react';
 import { supabase } from '@/lib/supabase';
 
 export default async function getExperiences() {
