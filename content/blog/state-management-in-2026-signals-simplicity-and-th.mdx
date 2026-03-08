@@ -1,0 +1,81 @@
+---
+title: 'State Management in 2026: Signals, Simplicity, and the Death of Boilerplate'
+description: 'How modern state management has evolved beyond complex patterns—embracing signals, fine-grained reactivity, and server-state co-location for cleaner, faster apps.'
+date: '2026-03-08'
+tags: ["React","State"]
+published: true
+image: './images/blog_state-management-in-2026-signals-simplicity-and-th.png'
+---
+
+If you've been building frontend apps for a while, you probably remember the state management wars of the early 2020s. Redux vs. MobX vs. Zustand vs. Jotai vs. Recoil. Each new library promised to solve the complexity of the last. Fast forward to 2026, and the landscape has settled into something refreshingly simple. The industry has converged on a few key patterns that actually work—less boilerplate, more intuition, better performance.
+
+## The Rise of Signals
+
+Signals have become the default primitive for local and shared state. Popularised by SolidJS and later adopted by Angular and Preact, signals offer fine-grained reactivity without the mental overhead of dispatching actions or managing reducers.
+
+```tsx
+import { signal, computed, effect } from '@preact/signals';
+
+const count = signal(0);
+const doubled = computed(() => count.value * 2);
+
+effect(() => {
+  console.log(`Count is ${count.value}, doubled is ${doubled.value}`);
+});
+
+count.value++;
+```
+
+The beauty of signals is their simplicity: you read and write values directly, and dependent computations update automatically. No providers, no connect functions, no action creators. Just reactive primitives that compose naturally.
+
+## Server-State is a Separate Concern
+
+One of the biggest realisations of the past few years is that server data and client state are fundamentally different. Libraries like TanStack Query (formerly React Query) led the way, and in 2026, co-locating server-state management with your data-fetching layer is standard practice.
+
+```tsx
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+
+function UserProfile({ userId }) {
+  const { data: user, isLoading } = useQuery({
+    queryKey: ['user', userId],
+    fetcher: () => fetch(`/api/users/${userId}`).then(r => r.json()),
+  });
+
+  const queryClient = useQueryClient();
+  const updateName = useMutation({
+    mutationFn: (name) => fetch(`/api/users/${userId}`, { method: 'PATCH', body: JSON.stringify({ name }) }),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['user', userId] }),
+  });
+
+  if (isLoading) return <Spinner />;
+  return <Profile user={user} onNameChange={updateName.mutate} />;
+}
+```
+
+By treating server data as cached, async state rather than trying to shoehorn it into a global store, you eliminate an entire class of bugs around stale data and race conditions.
+
+## Component-Local State is Underrated
+
+The pendulum has swung back towards keeping state as close to where it's used as possible. Frameworks like React Server Components and the push for island architectures have made developers more intentional about what truly needs to be global.
+
+If a piece of state is only relevant to one component tree, keep it there. Use `useState`, signals, or even just URL params for ephemeral UI state like modals, tabs, and form inputs. Only elevate state when multiple disparate parts of your app genuinely need to read or write it.
+
+```tsx
+// Good: keep it local
+function SearchFilter({ onFilterChange }) {
+  const [query, setQuery] = useState('');
+  return <input value={query} onChange={(e) => setQuery(e.target.value)} />;
+}
+
+// Avoid: creating a global store for something only one component uses
+```
+
+## The URL as the Ultimate State Container
+
+One of the most powerful shifts has been treating the URL as the source of truth for navigational state. Search params, pagination, filters, and active tabs all belong in the URL. This gives users shareable links, enables browser history navigation, and makes state management practically free.
+
+Modern routers like TanStack Router and Next.js's App Router make this seamless with type-safe search param parsing and automatic state synchronisation.
+
+## Conclusion
+
+State management in 2026 isn't about choosing the right library—it's about choosing the right abstraction for the right problem. Use signals for reactive client state, co-locate server-state with your data layer, keep local state local, and lean on the URL for navigational state. The result is less code, fewer bugs, and apps that are easier to reason about. The wars are over, and simplicity won.
