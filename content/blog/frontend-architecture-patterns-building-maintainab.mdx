@@ -1,0 +1,146 @@
+---
+title: 'Frontend Architecture Patterns: Building Maintainable Applications in 2026'
+description: 'Explore modern frontend architecture patterns including feature-sliced design, component composition, and state management strategies that scale.'
+date: '2026-03-09'
+tags: ["Architecture","Patterns"]
+published: true
+image: './images/blog_frontend-architecture-patterns-building-maintainab.png'
+---
+
+As frontend applications grow in complexity, the architecture decisions you make early on can determine whether your codebase becomes a joy to work with or a maintenance nightmare. In 2026, with frameworks like React 19, Next.js 15, and new server component paradigms, the patterns we use have evolved significantly. Let's explore the most effective architecture patterns that help teams build maintainable, scalable frontend applications.
+
+## Feature-Sliced Design
+
+Feature-Sliced Design (FSD) has emerged as one of the most effective patterns for structuring large-scale applications. It organizes code into clear layers: app, processes, pages, widgets, features, entities, and shared. Each layer has a strict responsibility, and dependencies flow downward only.
+
+The key benefit is predictability. When you need to find or add functionality, you know exactly where it belongs:
+
+```typescript
+// src/features/auth/ui/LoginForm.tsx
+import { Button } from '@/shared/ui';
+import { useAuth } from '@/features/auth/model';
+
+export function LoginForm() {
+  const { login, isLoading } = useAuth();
+  
+  return (
+    <form onSubmit={login}>
+      {/* form fields */}
+      <Button loading={isLoading}>Sign In</Button>
+    </form>
+  );
+}
+```
+
+This separation makes onboarding new developers faster and reduces the cognitive load of navigating complex codebases.
+
+## Composition Over Inheritance
+
+The classic Gang of Four advice remains relevant, but modern React patterns have refined it further. Composition with hooks and render props provides more flexibility than component inheritance hierarchies.
+
+Instead of creating deep inheritance chains, compose behaviors through hooks:
+
+```typescript
+// Compose behaviors through custom hooks
+function useUserPermissions(user: User) {
+  const isAdmin = usePermission('admin');
+  const isEditor = usePermission('editor');
+  
+  return { isAdmin, isEditor, canEdit: isAdmin || isEditor };
+}
+
+function useDataFetching<T>(endpoint: string) {
+  const { data, error, isLoading } = useSWR(endpoint);
+  return { data, error, isLoading };
+}
+
+// Combine in components
+function Dashboard() {
+  const perms = useUserPermissions(currentUser);
+  const { data } = useDataFetching('/api/dashboard');
+  
+  return (
+    <DashboardLayout>
+      {perms.canEdit && <EditPanel />}
+      <DataView data={data} />
+    </DashboardLayout>
+  );
+}
+```
+
+This approach keeps components focused and makes behaviors testable in isolation.
+
+## Server Components as Architecture
+
+React Server Components (RSC) have fundamentally changed how we think about data flow. In 2026, the pattern of "server components for data, client components for interactivity" has become standard practice.
+
+```typescript
+// app/dashboard/page.tsx (Server Component)
+import { DashboardContent } from './DashboardContent';
+import { getUser } from '@/lib/auth';
+
+export default async function DashboardPage() {
+  const user = await getUser();
+  const stats = await fetchDashboardStats();
+  
+  return (
+    <DashboardContent 
+      initialData={{ user, stats }}
+    />
+  );
+}
+
+// app/dashboard/DashboardContent.tsx (Client Component)
+'use client';
+
+export function DashboardContent({ initialData }) {
+  const [isEditing, setIsEditing] = useState(false);
+  // Interactive logic stays here
+  
+  return <div>{/* render */}</div>;
+}
+```
+
+This pattern reduces client bundle sizes and improves initial load performance while maintaining rich interactivity where needed.
+
+## Container-Presenter Pattern (Modernised)
+
+The classic container-presenter pattern has evolved. Instead of literal container components, we now use hooks as containers and components as pure presenters:
+
+```typescript
+// Container logic extracted to a hook
+function useUserList() {
+  const [users, setUsers] = useState([]);
+  const [selectedId, setSelectedId] = useState(null);
+  
+  const selectedUser = users.find(u => u.id === selectedId);
+  
+  useEffect(() => {
+    fetchUsers().then(setUsers);
+  }, []);
+  
+  return { users, selectedUser, selectUser: setSelectedId };
+}
+
+// Presenter is purely visual
+function UserList({ users, selectedUser, onSelectUser }) {
+  return (
+    <ul>
+      {users.map(user => (
+        <UserCard 
+          key={user.id}
+          user={user}
+          isSelected={user.id === selectedUser?.id}
+          onClick={() => onSelectUser(user.id)}
+        />
+      ))}
+    </ul>
+  );
+}
+```
+
+This separation makes components trivially testable and allows logic reuse across different UI implementations.
+
+## Conclusion
+
+Effective frontend architecture in 2026 balances structure with flexibility. Feature-Sliced Design provides predictable organisation, composition patterns keep components focused, Server Components optimise data flow, and modern container-presenter patterns separate concerns cleanly. The best architecture is one your team can understand and maintain six months from now—choose patterns that fit your scale and team experience, and evolve them as your application grows.
