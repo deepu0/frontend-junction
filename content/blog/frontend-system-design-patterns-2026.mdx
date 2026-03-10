@@ -1,0 +1,124 @@
+---
+title: Top 10 Frontend System Design Patterns Every Senior Dev Must Know (2026)
+description: Master the core frontend architecture patterns asked in FAANG system design interviews. Learn to design scalable components, state management, and network layers.
+date: 2026-03-10
+image: ./images/frontend_system_design.png
+published: true
+tags:
+  [
+    'frontend system design',
+    'interview prep',
+    'architecture',
+    'react',
+    'senior frontend',
+  ]
+---
+
+If you are interviewing for an L5/Senior Frontend Engineer role at companies like Google, Meta, or Amazon in 2026, passing the LeetCode round is no longer enough. The defining factor between a mid-level and a senior engineer is the **Frontend System Design Round**.
+
+Unlike backend system design (which focuses heavily on databases, load balancers, and distributed systems), frontend system design focuses on **component architecture, state management, network optimization, and perceived performance**.
+
+Here are the top 10 foundational patterns you absolutely must master before your next interview, along with links to real interview experiences where these exact concepts were tested.
+
+---
+
+## 1. The Component-Level Caching Pattern
+
+When designing search bars (like an Autocomplete widget) or data tables, fetching data on every keystroke or page change is a recipe for disaster.
+
+**The Pattern:** Implement a localized cache (often an LRU Cache or a simple Map) at the component or hook level to store previously fetched results.
+
+- **Interview Scenario:** "Design an Autocomplete widget."
+- **Key Considerations:** Cache invalidation (when does the data go stale?), memory limits, and debouncing.
+- **Real World Proof:** This is heavily tested in [Amazon Frontend Interviews](/companies/amazon).
+
+## 2. Optimistic UI Updates
+
+Users hate waiting for spinners. Optimistic UI is when you update the user interface _before_ the server responds, assuming the request will succeed.
+
+**The Pattern:** Save the previous state, update the UI immediately upon user action, fire the network request, and if the request fails, rollback to the previous state and show an error toast.
+
+- **Interview Scenario:** "Design a Twitter-like Like Button" or "Design a Shopping Cart."
+- **Key Considerations:** Error handling, conflict resolution, and rollback mechanisms.
+
+## 3. The Pagination vs. Infinite Scroll Decision
+
+Every system design interview involving a feed (News Feed, Image Gallery, E-commerce Product List) will test your understanding of loading large datasets.
+
+**The Pattern:** You must articulate the trade-offs. Infinite Scroll (using the `IntersectionObserver` API) is great for engagement but terrible for footer access and SEO. Pagination is great for specific navigation but requires more user clicks.
+
+- **Advanced Tip:** Discuss **Windowing/Virtualization** (rendering only what is visible in the DOM) when dealing with Infinite Scroll to prevent DOM bloat and jank.
+- **Real World Proof:** Frequently asked in [Meta/Facebook Frontend Interviews](/companies/meta).
+
+## 4. The Data Normalization Pattern (State Shape)
+
+How you store your data internally dictates your application's performance. Storing data in deeply nested arrays leads to messy, slow updates.
+
+**The Pattern:** Normalize your state graph. Flatten complex JSON trees into key-value dictionaries (by ID) and maintain separate arrays for ordering, exactly like a relational database.
+
+- **Interview Scenario:** "Design a real-time collaborative document editor" or "Design a Kanban board (Trello)."
+- **Key Considerations:** Redux Toolkit explicitly uses this pattern (`createEntityAdapter`).
+
+## 5. The "Offline-First" Architecture
+
+Mobile network connections are flaky. Senior engineers design resilient applications.
+
+**The Pattern:** Utilize Service Workers and IndexedDB. Network requests go through the Service Worker. If the network is down, serve cached assets. Queue data mutations (POST/PUT requests) in IndexedDB and sync them in the background when the connection is restored using the Background Sync API.
+
+- **Interview Scenario:** "Design Google Docs" or "Design a chat application."
+
+## 6. The Long Polling vs. WebSockets vs. SSE Debate
+
+Real-time architecture is a staple of modern web apps. You need to know when to pull and when to push.
+
+**The Pattern:**
+
+- **Short Polling:** Easy, but wastes bandwidth.
+- **Long Polling:** Better, holds connection open until the server has data.
+- **Server-Sent Events (SSE):** One-way traffic (Server -> Client). Excellent for live sports scores or stock tickers.
+- **WebSockets:** Full bi-directional communication. Best for Chat apps or collaborative editors.
+
+- **Real World Proof:** Often appears in [Uber Frontend Interviews](/companies/uber).
+
+## 7. The Micro-Frontend (MFE) Architecture
+
+For massive, enterprise-scale applications maintained by dozens of teams, a monolith frontend becomes a bottleneck.
+
+**The Pattern:** Split the frontend into smaller, independently deployable applications. These are stitched together at runtime (e.g., using Webpack Module Federation or iframes as a legacy fallback).
+
+- **Interview Scenario:** "Design an E-commerce platform where Team A owns the Cart and Team B owns the Product Page."
+- **Key Considerations:** Shared state boundaries, CSS isolation, and duplicate dependency load times.
+
+## 8. Network Request Deduping and Batching
+
+If three different components on a dashboard independently request the user's profile data simultaneously, you shouldn't fire three identical API calls.
+
+**The Pattern:** Implement a data-fetching layer (like React Query or SWR) that automatically dedupes identical requests happening at the same time and caches the single response for all components.
+
+- **Interview Scenario:** "Design an analytics dashboard."
+
+## 9. Render Strategy Selection (CSR vs. SSR vs. SSG)
+
+You will always be asked about performance and infrastructure. The answer is usually choosing the right rendering strategy.
+
+**The Pattern:**
+
+- **CSR (Client-Side Rendering):** Best for highly interactive apps beneath a login wall (Dashboards). Fast subsequent navigations, poor initial load.
+- **SSR (Server-Side Rendering):** Great for personalized data that needs SEO (E-commerce product pages).
+- **SSG/ISR (Static Site Generation):** Unbeatable for highly cached, public data (Blogs, Marketing pages).
+
+## 10. The BFF (Backend-for-Frontend) Pattern
+
+When a frontend needs data from 6 different microservices, orchestrating those calls on the client is slow and complex.
+
+**The Pattern:** Create a lightweight middleware server (often a Node.js or edge layer) specifically tailored for your frontend. The BFF aggregates, filters, and formats the data into a single payload before sending it to the client.
+
+- **Interview Scenario:** "Design a Netflix homepage."
+
+---
+
+## Conclusion
+
+System design is rarely about finding the "perfect" answer; it is about articulating trade-offs. An interviewer wants to see that you understand the consequences of choosing WebSockets over Long Polling, or Client-Side Rendering over Server-Side Rendering.
+
+If you are preparing for these rounds, looking at past questions is the best strategy. **[Browse real Frontend Interview Experiences grouped by Company](/companies)** to see exactly what to expect in your upcoming loop.

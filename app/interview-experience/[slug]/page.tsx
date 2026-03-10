@@ -5,6 +5,7 @@ import { FaExternalLinkAlt, FaCalendar, FaUser } from 'react-icons/fa';
 import { Metadata } from 'next';
 import ReactMarkdown from 'react-markdown';
 import ViewCounter from '@/components/view-counter';
+import Script from 'next/script';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 60; // ISR
@@ -18,14 +19,55 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const experience = await getExperienceBySlug(slug);
   if (!experience) return { title: 'Not Found' };
 
+  const url = `https://www.frontend-junction.com/interview-experience/${slug}`;
+  const publishedTime = new Date(experience.date).toISOString();
+
+  // Extract potential company name from title for keywords
+  const titleWords = experience.title.split(' ');
+  const companyHint = titleWords[0]; // Often the first word is the company
+
   return {
     title: `${experience.title} | Frontend Junction`,
-    description: experience.summary?.substring(0, 160),
+    description:
+      experience.summary?.substring(0, 160) ||
+      `Read about the ${experience.title} interview experience on Frontend Junction.`,
+    keywords: [
+      ...(experience.tags || []),
+      'frontend interview',
+      'interview experience',
+      companyHint,
+      'software engineer interview',
+      'web development',
+    ].filter(Boolean),
+    alternates: {
+      canonical: url,
+    },
     openGraph: {
       title: experience.title,
-      description: experience.summary?.substring(0, 160),
+      description:
+        experience.summary?.substring(0, 160) ||
+        `Detailed overview of ${experience.title} frontend interview.`,
+      url,
       type: 'article',
+      publishedTime,
       authors: [experience.author as string],
+      siteName: 'Frontend Junction',
+      images: [
+        {
+          url: '/opengraph-image.jpeg',
+          width: 1200,
+          height: 630,
+          alt: experience.title,
+        },
+      ],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: experience.title,
+      description:
+        experience.summary?.substring(0, 160) ||
+        `Detailed overview of ${experience.title} frontend interview.`,
+      images: ['/opengraph-image.jpeg'],
     },
   };
 }
@@ -38,8 +80,73 @@ export default async function ExperienceSlugPage({ params }: Props) {
     notFound();
   }
 
+  const currentUrl = `https://www.frontend-junction.com/interview-experience/${slug}`;
+
+  // JSON-LD Structured Data
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'Article',
+    headline: experience.title,
+    description: experience.summary?.substring(0, 160),
+    image: 'https://www.frontend-junction.com/opengraph-image.jpeg',
+    datePublished: new Date(experience.date).toISOString(),
+    author: {
+      '@type': 'Person',
+      name: experience.author || 'Community Member',
+    },
+    publisher: {
+      '@type': 'Organization',
+      name: 'Frontend Junction',
+      logo: {
+        '@type': 'ImageObject',
+        url: 'https://www.frontend-junction.com/apple-touch-icon.png',
+      },
+    },
+    mainEntityOfPage: {
+      '@type': 'WebPage',
+      '@id': currentUrl,
+    },
+  };
+
+  const breadcrumbLd = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      {
+        '@type': 'ListItem',
+        position: 1,
+        name: 'Home',
+        item: 'https://www.frontend-junction.com/',
+      },
+      {
+        '@type': 'ListItem',
+        position: 2,
+        name: 'Interview Experiences',
+        item: 'https://www.frontend-junction.com/interview-experience',
+      },
+      {
+        '@type': 'ListItem',
+        position: 3,
+        name: experience.title,
+        item: currentUrl,
+      },
+    ],
+  };
+
   return (
     <div className='min-h-screen bg-background text-foreground pt-24 pb-16'>
+      {/* Inject Structured Data */}
+      <Script
+        id={`json-ld-article-${slug}`}
+        type='application/ld+json'
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+      <Script
+        id={`json-ld-breadcrumb-${slug}`}
+        type='application/ld+json'
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }}
+      />
+
       <div className='container mx-auto px-4 max-w-4xl'>
         {/* Back Link */}
         <Link

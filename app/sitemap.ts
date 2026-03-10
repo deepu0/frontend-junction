@@ -1,6 +1,7 @@
 import { MetadataRoute } from 'next';
 import { createClient } from '@supabase/supabase-js';
 import { posts } from '#site/content';
+import { getCompanies } from '@/lib/getCompanies';
 
 const BASE_URL = 'https://www.frontend-junction.com';
 
@@ -25,6 +26,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: 'weekly',
       priority: 0.8,
     },
+    {
+      url: `${BASE_URL}/companies`,
+      lastModified: new Date(),
+      changeFrequency: 'weekly',
+      priority: 0.8,
+    },
   ];
 
   // Blog posts from Velite (static at build time)
@@ -39,10 +46,22 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   // Fetch dynamic experience pages
   let experiencePages: MetadataRoute.Sitemap = [];
+  let companyPages: MetadataRoute.Sitemap = [];
 
   try {
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
     const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+    // Fetch Companies
+    const companies = await getCompanies();
+    if (companies && companies.length > 0) {
+      companyPages = companies.map((c) => ({
+        url: `${BASE_URL}/companies/${c.slug}`,
+        lastModified: new Date(),
+        changeFrequency: 'weekly' as const,
+        priority: 0.7,
+      }));
+    }
 
     if (supabaseUrl && supabaseKey) {
       const supabase = createClient(supabaseUrl, supabaseKey);
@@ -85,8 +104,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       }
     }
   } catch (error) {
-    console.error('[Sitemap] Error fetching experiences:', error);
+    console.error('[Sitemap] Error fetching data:', error);
   }
 
-  return [...staticPages, ...blogPages, ...experiencePages];
+  return [...staticPages, ...blogPages, ...experiencePages, ...companyPages];
 }
