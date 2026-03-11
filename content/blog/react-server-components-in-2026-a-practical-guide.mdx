@@ -1,0 +1,137 @@
+---
+title: 'React Server Components in 2026: A Practical Guide'
+description: 'Learn how to leverage React Server Components for better performance and user experience. This guide covers modern patterns and best practices for 2026.'
+date: '2026-03-11'
+tags: ["React","Next.js"]
+published: true
+image: './images/blog_react-server-components-in-2026-a-practical-guide.png'
+---
+
+React Server Components (RSC) have fundamentally changed how we build React applications. By moving component rendering to the server, we get smaller bundles, faster initial page loads, and access to server-only resources—all without sacrificing React's familiar component model.
+
+If you're still on the fence about RSC or want to make the most of them in 2026, this guide covers what matters most for practical frontend development.
+
+## What Actually Changed
+
+The biggest shift with RSC is mental: some components now render exclusively on the server while others (Client Components) ship JavaScript to the browser. The key insight is that this isn't an all-or-nothing choice—you can mix server and client components in the same app.
+
+Server Components run only on the server, never in the browser. They have zero JavaScript bundle impact and can directly access databases, file systems, and other server-only resources. Client Components ship JavaScript and handle interactivity—clicks, state, effects, browser APIs.
+
+## When to Use Each Component Type
+
+Here's a practical decision framework for 2026:
+
+**Use Server Components for:**
+- Data fetching (direct database or API calls)
+- Accessing backend resources (file system, microservices)
+- Keeping sensitive logic server-side (API keys, auth)
+- Large dependencies you don't want in the browser bundle
+- Static UI without interactivity
+
+**Use Client Components for:**
+- Interactive elements (onClick, onChange handlers)
+- Browser-only APIs (localStorage, geolocation)
+- React state and effects (useState, useEffect)
+- Custom hooks managing client-side state
+- Third-party components relying on client-side logic
+
+## The 'use client' Directive
+
+In Next.js 14+, you mark Client Components with the 'use client' directive. This tells React to render those components on the client (and server during SSR for hydration):
+
+```tsx
+'use client';
+
+import { useState } from 'react';
+
+export default function LikeButton({ initialCount }) {
+  const [count, setCount] = useState(initialCount);
+  
+  return (
+    <button onClick={() => setCount(c => c + 1)}>
+      ❤️ {count}
+    </button>
+  );
+}
+```
+
+Without 'use client', components default to Server Components. A Server Component can import and render Client Components—the boundary flows one direction.
+
+## Passing Data Between Server and Client
+
+This is where many developers get stuck. Server Components can't directly pass functions to Client Components because functions aren't serializable. Here's the pattern that works:
+
+```tsx
+// Server Component - fetches data
+async function ArticleList() {
+  const articles = await db.articles.findMany();
+  
+  return (
+    <div>
+      {articles.map(article => (
+        <ArticleCard 
+          key={article.id} 
+          title={article.title}
+          onShare={/* can't pass function! */}
+        />
+      ))}
+    </div>
+  );
+}
+```
+
+Instead, pass primitive values or wrap client logic in Client Components:
+
+```tsx
+// Client Component - handles sharing
+'use client';
+function ShareButton({ articleId }) {
+  const share = () => {
+    navigator.share({ url: `/articles/${articleId}` });
+  };
+  
+  return <button onClick={share}>Share</button>;
+}
+
+// Server Component - composes everything
+async function ArticleCard({ title, articleId }) {
+  return (
+    <div className="card">
+      <h2>{title}</h2>
+      <ShareButton articleId={articleId} />
+    </div>
+  );
+}
+```
+
+## Streaming and Suspense
+
+One of RSC's superpowers is streaming—showing UI immediately while data loads. Wrap slow sections in Suspense boundaries:
+
+```tsx
+import { Suspense } from 'react';
+
+async function Comments() {
+  const comments = await fetchComments(); // slow
+  return <CommentList data={comments} />;
+}
+
+export default function Page() {
+  return (
+    <main>
+      <Article />
+      <Suspense fallback={<CommentsSkeleton />}>
+        <Comments />
+      </Suspense>
+    </main>
+  );
+}
+```
+
+This gives users instant feedback. The article loads, then comments pop in when ready—no blocking, no loading spinners for the whole page.
+
+## Best Practices for 2026
+
+Keep your server-client boundary intentional. Push interactivity as low in the tree as possible—only mark leaf components with 'use client' rather than wrapping entire pages. Use streaming for any data that takes more than a few hundred milliseconds. And remember: Server Components can still be interactive via client islands, so don't default to client-side rendering for everything.
+
+The winning pattern is Server Components for data and layout, Client Components only where you need interactivity. This gives you the best of both worlds—fast initial loads with minimal JavaScript, plus rich client-side interactions where it counts.
