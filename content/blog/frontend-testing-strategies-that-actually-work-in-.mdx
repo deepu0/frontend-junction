@@ -1,0 +1,109 @@
+---
+title: 'Frontend Testing Strategies That Actually Work in 2026'
+description: 'A practical guide to building a frontend testing pyramid with Vitest, React Testing Library, and Playwright - with real code examples you can apply today.'
+date: '2026-03-12'
+tags: ["Testing","Quality"]
+published: true
+image: './images/blog_frontend-testing-strategies-that-actually-work-in-.png'
+---
+
+Testing frontend applications has evolved dramatically. Gone are the days when "it works on my machine" was acceptable. In 2026, modern frontend testing combines speed, reliability, and developer experience into a cohesive strategy that catches bugs before they reach production.
+
+## The Testing Pyramid Revisited
+
+The classic testing pyramid remains relevant, but the tools have changed. Rather than thinking in strict layers, think in **feedback loops** — how quickly can you know something is broken?
+
+- **Unit tests** (Vitest/Jest): Fastest feedback, test isolated logic
+- **Component tests** (React Testing Library): Test UI in isolation
+- **Integration tests** (Playwright): Test user flows across components
+- **E2E tests**: Full browser scenarios, slowest but most confidence
+
+The key insight: most teams over-invest in E2E tests and under-invest in component tests. Shift your energy left.
+
+## Unit Testing with Vitest
+
+Vitest has become the default choice for React projects in 2026. It's compatible with Jest's API but significantly faster, especially with Vite projects.
+
+```typescript
+// utils/formatPrice.test.ts
+import { describe, it, expect } from 'vitest'
+import { formatPrice } from './formatPrice'
+
+describe('formatPrice', () => {
+  it('formats USD by default', () => {
+    expect(formatPrice(1999)).toBe('$19.99')
+  })
+  
+  it('handles zero decimal currencies', () => {
+    expect(formatPrice(1000, { currency: 'JPY' })).toBe('¥1,000')
+  })
+})
+```
+
+Vitest's watch mode makes TDD practical — tests rerun instantly as you code.
+
+## Component Testing with React Testing Library
+
+Testing Library shifts the mindset from "does this component render?" to "does this component work for users?"
+
+```tsx
+// components/CartButton.test.tsx
+import { render, screen, fireEvent } from '@testing-library/react'
+import { CartButton } from './CartButton'
+
+test('shows item count and handles click', () => {
+  render(<CartButton items={3} onClick={() => {}} />)
+  
+  expect(screen.getByText('3 items')).toBeInTheDocument()
+  
+  fireEvent.click(screen.getByRole('button'))
+  // Assert callback was called
+})
+```
+
+Notice we're querying by accessible roles and text, not implementation details. This makes tests resilient to refactoring.
+
+## Integration Testing with Playwright
+
+For testing complete user flows, Playwright has become the gold standard. It handles async behavior gracefully and supports cross-browser testing.
+
+```typescript
+// tests/checkout flow.spec.ts
+import { test, expect } from '@playwright/test'
+
+test('complete checkout flow', async ({ page }) => {
+  await page.goto('/cart')
+  
+  // Add item to cart
+  await page.click('[data-testid="add-item"]')
+  
+  // Proceed to checkout
+  await page.click('text=Checkout')
+  await expect(page).toHaveURL(/checkout/)
+  
+  // Fill form
+  await page.fill('#email', 'test@example.com')
+  await page.click('text=Place Order')
+  
+  // Verify success
+  await expect(page.locator('text=Order confirmed')).toBeVisible()
+})
+```
+
+Playwright's auto-wait feature eliminates flaky tests caused by timing issues.
+
+## Modern Best Practices
+
+**Test behavior, not implementation** — Your tests should survive a redesign. Query by role, not class names.
+
+**Coverage is a metric, not a goal** — Aim for 70-80% coverage on business logic, focus tests on critical user paths.
+
+**Make tests maintainable** — Shared utilities for common setups, consistent naming, one expectation per test when possible.
+
+**Run tests in CI** — Every pull request should trigger your test suite. Use parallelization to keep CI fast.
+
+## The 2026 Outlook
+
+Visual regression testing (with tools like Chromatic) and accessibility testing (axe-core) are now essential, not optional. Component-driven development with Storybook has made isolated component testing the norm.
+
+The best testing strategy is one your team actually follows. Start small, build confidence, and iterate. Your users (and your sleep schedule) will thank you.
