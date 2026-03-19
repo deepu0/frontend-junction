@@ -1,0 +1,119 @@
+---
+title: 'Web Performance Metrics Every Frontend Developer Should Know in 2026'
+description: 'Learn the essential web performance metrics—Core Web Vitals and beyond—that impact user experience and SEO, with practical optimization techniques for modern frontend development.'
+date: '2026-03-19'
+tags: ["Performance","Web Vitals"]
+published: true
+image: './images/blog_web-performance-metrics-every-frontend-developer-s.png'
+---
+
+## Why Performance Metrics Matter
+
+Web performance isn't just a technical concern—it's a business imperative. In 2026, Google's Core Web Vitals remain a confirmed ranking factor, and research consistently shows that faster websites convert better. Pages with poor performance see higher bounce rates and lower engagement, directly impacting your bottom line.
+
+Understanding these metrics helps you make data-driven decisions rather than guessing what "feels" slow. Let's break down the essential performance metrics every frontend developer should monitor and optimise.
+
+## Core Web Vitals: The Big Three
+
+Google's Core Web Vitals are the standard for measuring real-world user experience. They consist of three metrics:
+
+### Largest Contentful Paint (LCP)
+
+LCP measures how long it takes for the largest content element (usually a hero image or heading) to become visible. Target: under 2.5 seconds.
+
+```javascript
+// Using Performance Observer to measure LCP
+const observer = new PerformanceObserver((entryList) => {
+  const entries = entryList.getEntries();
+  const lastEntry = entries[entries.length - 1];
+  console.log(`LCP: ${lastEntry.startTime}ms`);
+});
+
+observer.observe({ type: 'largest-contentful-paint', buffered: true });
+```
+
+Common LCP issues include slow server response times, render-blocking resources, and unoptimised images. Fix these by enabling compression, using a CDN, and adding `loading="eager"` to above-the-fold images.
+
+### Interaction to Next Paint (INP)
+
+INP measures responsiveness by tracking all user interactions (clicks, taps, keyboard input) and reporting the longest interaction latency. Target: under 200 milliseconds. INP replaced First Input Delay (FID) in 2024 as the standard metric.
+
+```javascript
+// Measuring INP in production
+const inpEntry = performance.getEntriesByType('interaction')[0];
+if (inpEntry) {
+  console.log(`INP: ${inpEntry.processingEnd - inpEntry.startTime}ms`);
+}
+```
+
+Long tasks are the usual suspect. Break up heavy JavaScript with `requestIdleCallback` or `setTimeout`:
+
+```javascript
+// Break up long tasks
+function processItems(items) {
+  const chunk = items.splice(0, 10);
+  chunk.forEach(item => doWork(item));
+  
+  if (items.length > 0) {
+    setTimeout(() => processItems(items), 0);
+  }
+}
+```
+
+### Cumulative Layout Shift (CLS)
+
+CLS measures visual stability—how much the page layout unexpectedly shifts. Target: under 0.1. The culprit is usually images or embeds without dimensions, or dynamically injected content.
+
+```html
+<!-- Always specify dimensions -->
+<img src="hero.jpg" width="800" height="400" alt="..." />
+
+<!-- Reserve space for dynamic content -->
+<div style="min-height: 200px;">
+  <!-- Lazy-loaded content goes here -->
+</div>
+```
+
+## Additional Metrics Worth Tracking
+
+While Core Web Vitals are essential, these supplementary metrics give you a complete picture:
+
+- **First Contentful Paint (FCP)**: Time until first content renders
+- **Time to First Byte (TTFB)**: Server response time
+- **Total Blocking Time (TBT)**: Sum of long task durations before page is interactive
+
+## Measuring Performance in 2026
+
+Modern tools make tracking these metrics straightforward:
+
+- **PageSpeed Insights**: Real user data + lab testing
+- **Google Search Console**: Monitors field data across your entire site
+- **Lighthouse CI**: Add to your CI/CD pipeline to catch regressions
+
+```yaml
+# Example Lighthouse CI config
+lighthouse:
+  ci:
+    collect:
+      numberOfRuns: 3
+      url: https://yoursite.com
+    assert:
+      assertions:
+        'categories:performance': ['error', { minScore: 0.9 }]
+        'lcp-lazy-loaded': 'on'
+        'cumulative-layout-shift': ['error', { maxNumericValue: 0.1 }]
+```
+
+## Practical Optimisation Checklist
+
+Here's a quick reference for improving your metrics:
+
+1. **LCP**: Optimise images (WebP/AVIF), preload critical resources, enable caching
+2. **INP**: Break up long tasks, defer non-critical JavaScript, use web workers for heavy computation
+3. **CLS**: Set explicit width/height on media, reserve space for ads/dynamic content, use font-display: swap
+
+## Conclusion
+
+Performance metrics aren't abstract numbers—they directly impact your users and business outcomes. Start by measuring your current scores with PageSpeed Insights, then systematically address the issues. The good news? Many optimisations benefit all three metrics simultaneously. A fast, stable, responsive site isn't just good for SEO—it's simply good engineering.
+
+Focus on the fundamentals: optimise your images, break up long tasks, and always reserve space for dynamic content. Your users (and your search rankings) will thank you.
