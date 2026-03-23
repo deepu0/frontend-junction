@@ -1,0 +1,117 @@
+---
+title: 'TypeScript Patterns for Bulletproof Frontend Code'
+description: 'Learn practical TypeScript patterns that help frontend developers write more maintainable, type-safe code with discriminated unions, template literal types, and the satisfies operator.'
+date: '2026-03-16'
+tags: ["TypeScript","Patterns"]
+published: true
+image: './images/blog_typescript-patterns-for-bulletproof-frontend-code.png'
+---
+
+TypeScript has evolved dramatically, and 2026 brings patterns that make frontend code significantly more robust. Here are three patterns I reach for daily that catch bugs at compile time rather than runtime.
+
+## Discriminated Unions for Type-Safe State
+
+Managing component state with switch statements is error-prone—missing a case compiles silently. Discriminated unions fix this by making impossible states unrepresentable.
+
+```typescript
+type LoadingState = { status: 'loading' };
+type SuccessState<T> = { status: 'success'; data: T };
+type ErrorState = { status: 'error'; error: Error };
+
+type AsyncState<T> = LoadingState | SuccessState<T> | ErrorState;
+
+function handleState<T>(state: AsyncState<T>) {
+  switch (state.status) {
+    case 'loading':
+      return 'Loading...';
+    case 'success':
+      return state.data; // TypeScript knows data exists
+    case 'error':
+      return state.error.message; // TypeScript knows error exists
+  }
+  // ✅ Exhaustiveness check—adding new status without handling is a compile error
+}
+```
+
+The discriminator (`status`) lets TypeScript narrow types automatically. Add a new state, and every switch breaks until you handle it.
+
+## Template Literal Types for APIs
+
+Modern APIs often use URL-based patterns. Template literal types let you type URLs at the boundaries and propagate types through your entire app.
+
+```typescript
+type APIEndpoint = `/api/${string}`;
+type UserEndpoint = `/api/users/${number}`;
+type PostEndpoint = `/api/posts/${string}`;
+
+function fetchData<T extends string>(url: T): Promise<unknown> {
+  return fetch(url).then(r => r.json());
+}
+
+// ✅ Works
+fetchData('/api/users/42');
+
+// ❌ Compile error
+fetchData('/random-url');
+```
+
+Combine with inference patterns to extract route parameters:
+
+```typescript
+type RouteParams<T extends string> = 
+  T extends `/api/users/${infer Id}` ? { userId: Id } :
+  T extends `/api/posts/${infer Id}` ? { postId: Id } :
+  never;
+```
+
+## The satisfies Operator
+
+The `satisfies` operator is underutilised. It validates your value matches a type while preserving the original type—giving you both inference and validation.
+
+```typescript
+const config = {
+  apiUrl: 'https://api.example.com',
+  timeout: 5000,
+} satisfies Record<string, string | number>;
+
+// config.apiUrl is inferred as 'https://api.example.com' (literal type)
+// vs using type annotation where it would be `string`
+```
+
+This matters for const contexts where literal types get widened:
+
+```typescript
+// Without satisfies — types widened, loses precision
+const colors: string[] = ['red', 'green', 'blue'];
+
+// With satisfies — literal types preserved
+const colors = ['red', 'green', 'blue'] satisfies readonly string[];
+```
+
+## Const Type Parameters (TS 5.0+)
+
+Type parameters can now be `const`, inferring as literal types by default:
+
+```typescript
+function route<const T extends string[]>(paths: T): T {
+  return paths;
+}
+
+const routes = route(['/users', '/posts', '/comments']);
+// routes is inferred as readonly ['/users', '/posts', '/comments']
+// NOT as string[]
+```
+
+This eliminates the need for `as const` in many scenarios and works beautifully with generics.
+
+## Putting It Together
+
+These patterns compound. A discriminated union with template literal types gives you runtime-safe routing. Combine with `satisfies` for config validation, and const type parameters for type-safe data structures—your codebase becomes self-documenting and break-resistant.
+
+Start with discriminated unions in your state management. Then explore where string literals appear in your app—URLs, events, action types—and bring template literal types to bear. Your future self will thank you when refactoring doesn't introduce silent bugs.
+
+## When to Use Each Pattern
+
+Use discriminated unions when you have finite states that need different handling. They're perfect for async data loading, form validation, and routing states. Use template literal types when you're dealing with string patterns that follow a schema—API routes, event names, CSS custom properties. Reach for `satisfies` when you want the compiler to verify your object matches an interface but you don't want to lose the specific literal types inferred. Const type parameters shine in generic functions where you want literal inference preserved across calls.
+
+These aren't exotic TypeScript features—they're daily tools that scale from small components to large codebases. The investment in learning them pays dividends in maintainability and confidence.
