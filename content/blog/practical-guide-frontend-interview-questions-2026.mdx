@@ -1,0 +1,191 @@
+---
+title: 'A Practical Guide to Frontend Interview Questions in 2026'
+description: 'Master the key frontend interview topics with real code examples and modern approaches that hiring managers look for this year.'
+date: '2026-03-29'
+tags: ["Career", "Interview"]
+published: true
+image: './images/blog_practical-guide-frontend-interview-questions-2026.png'
+---
+
+Preparing for frontend interviews can feel overwhelming. Between React patterns, CSS intricacies, and system design, where do you even start? This guide breaks down the topics that matter most in 2026 and shows you exactly what interviewers are really testing.
+
+## JavaScript Fundamentals: Beyond the Basics
+
+Modern frontend interviews expect you to understand JavaScript at a deeper level. It's not enough to know that `map` and `filter` exist—you need to understand how they work under the hood.
+
+```javascript
+// Interview classic: Implement your own map
+function customMap(array, callback) {
+  const result = [];
+  for (let i = 0; i < array.length; i++) {
+    result.push(callback(array[i], i, array));
+  }
+  return result;
+}
+
+// Understanding closures is equally critical
+function createCounter() {
+  let count = 0;
+  return {
+    increment: () => ++count,
+    getCount: () => count
+  };
+}
+
+const counter = createCounter();
+console.log(counter.increment()); // 1
+console.log(counter.increment()); // 2
+console.log(counter.getCount());  // 2
+```
+
+Interviewers often probe closures because they reveal whether you understand scope—a foundational concept that affects everything from event handlers to React hooks.
+
+## React: Component Patterns and Hooks
+
+React remains the most requested skill in frontend roles. In 2026, the focus has shifted from class components to functional patterns with hooks.
+
+```jsx
+// Custom hook: Debounced value (frequently asked)
+function useDebounce(value, delay) {
+  const [debouncedValue, setDebouncedValue] = useState(value);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedValue(value);
+    }, delay);
+
+    return () => clearTimeout(timer);
+  }, [value, delay]);
+
+  return debouncedValue;
+}
+
+// Component with proper memoization
+function SearchResults({ query, results }) {
+  const debouncedQuery = useDebounce(query, 300);
+  
+  const filteredResults = useMemo(() => 
+    results.filter(r => 
+      r.title.toLowerCase().includes(debouncedQuery.toLowerCase())
+    ), 
+    [results, debouncedQuery]
+  );
+
+  return (
+    <ul>
+      {filteredResults.map(item => (
+        <ListItem key={item.id} item={item} />
+      ))}
+    </ul>
+  );
+}
+```
+
+Expect questions around `useEffect` cleanup, when to use `useMemo` versus `useCallback`, and the differences between controlled and uncontrolled components.
+
+## State Management: Choosing the Right Tool
+
+Understanding when to use local state versus global state is crucial. Interviewers want to see that you can make architectural decisions, not just implement features.
+
+```javascript
+// Simple global state pattern without libraries
+const createStore = (initialState) => {
+  let state = initialState;
+  const listeners = new Set();
+
+  return {
+    getState: () => state,
+    setState: (fn) => {
+      state = fn(state);
+      listeners.forEach(listener => listener(state));
+    },
+    subscribe: (listener) => {
+      listeners.add(listener);
+      return () => listeners.delete(listener);
+    }
+  };
+};
+
+const store = createStore({ user: null, theme: 'light' });
+// Usage in React would connect this to context
+```
+
+Be prepared to explain when you'd reach for React Context versus Zustand or Redux, and why you might choose server state management with React Query over client-side solutions.
+
+## CSS and Layout: The Layout Trinity
+
+Flexbox, Grid, and Box Model questions appear in nearly every frontend interview. What hiring managers really want to know is whether you can build responsive, accessible layouts.
+
+```css
+/* Modern responsive card grid */
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.5rem;
+}
+
+/* Understanding stacking contexts */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000; /* Creates new stacking context */
+}
+
+.modal-content {
+  position: relative;
+  z-index: 1001; /* Above overlay despite lower DOM position */
+}
+
+/* Container queries (2026 best practice) */
+.card-container {
+  container-type: inline-size;
+}
+
+@container (min-width: 400px) {
+  .card {
+    flex-direction: row;
+  }
+}
+```
+
+Container queries represent a significant shift in responsive design—interviewers may ask about them as they indicate awareness of modern CSS capabilities.
+
+## Performance: Measuring What Matters
+
+Core Web Vitals remain central to frontend performance discussions. You should understand how to measure and improve metrics like Largest Contentful Paint (LCP) and First Input Delay (FID).
+
+```javascript
+// Measuring LCP with Performance API
+const observer = new PerformanceObserver((list) => {
+  const entries = list.getEntries();
+  const lastEntry = entries[entries.length - 1];
+  console.log('LCP:', lastEntry.renderTime || lastEntry.loadTime);
+});
+
+observer.observe({ type: 'largest-contentful-paint', buffered: true });
+
+// Lazy loading component pattern
+const LazyImage = ({ src, alt }) => {
+  const [isLoaded, setIsLoaded] = useState(false);
+  
+  return (
+    <img 
+      src={src} 
+      alt={alt}
+      loading="lazy"
+      onLoad={() => setIsLoaded(true)}
+      className={isLoaded ? 'loaded' : 'loading'}
+    />
+  );
+};
+```
+
+Know the difference between eager and lazy loading, how code splitting works in bundlers like Vite, and why reducing main thread work matters.
+
+## Putting It All Together
+
+The best interview preparation combines understanding concepts with practical application. Focus on building real projects rather than memorizing questions—strong candidates demonstrate problem-solving abilities, not just recall.
+
+Remember: interviewers are looking for engineers who can reason through problems, write clean code, and discuss trade-offs intelligently. The code examples above represent patterns you'll encounter, but your ability to explain *why* you would use each approach matters just as much as the code itself.
+
+Good luck with your preparation—invest in deep understanding over surface-level memorisation, and you'll stand out.
