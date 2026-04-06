@@ -1,0 +1,115 @@
+---
+title: 'TypeScript Advanced Patterns Every Developer Should Know'
+description: 'Level up your TypeScript skills with practical patterns like discriminated unions, template literal types, and const assertions that will make your code more type-safe and maintainable.'
+date: '2026-03-28'
+tags: ["TypeScript","Patterns"]
+published: true
+image: './images/blog_typescript-advanced-patterns-every-developer-shoul.png'
+---
+
+TypeScript has evolved dramatically, and staying current with its advanced type system can significantly improve your frontend development workflow. Whether you're building React applications or complex state machines, these patterns will help you write more robust, self-documenting code.
+
+## Discriminated Unions for Type-Safe State
+
+One of the most powerful patterns in TypeScript is the discriminated union. By adding a common property (the "discriminator") to each variant, you can dramatically narrow types and eliminate runtime errors.
+
+```typescript
+type LoadingState = { status: 'loading' };
+type SuccessState<T> = { status: 'success'; data: T };
+type ErrorState = { status: 'error'; error: Error };
+
+type AsyncState<T> = LoadingState | SuccessState<T> | ErrorState;
+
+function handleState<T>(state: AsyncState<T>) {
+  switch (state.status) {
+    case 'loading':
+      return 'Loading...';
+    case 'success':
+      return state.data; // TypeScript knows data exists here
+    case 'error':
+      return state.error.message; // TypeScript knows error exists here
+  }
+}
+```
+
+The key insight: TypeScript automatically narrows the type inside each branch. No more defensive checks or type assertions—this pattern scales beautifully for complex state machines.
+
+## Template Literal Types for Dynamic Strings
+
+Modern TypeScript lets you build powerful string types that were impossible just a few years ago. Template literal types enable you to create precise string constraints that catch bugs at compile time.
+
+```typescript
+type EventHandler = `on${Capitalize<string>}`;
+type CSSProperty = `${string}-${string}`;
+type RoutePath = `/api/${string}`;
+
+// Practical example: event handler validation
+type MouseEvents = {
+  onClick: () => void;
+  onMouseEnter: () => void;
+  onMouseLeave: () => void;
+};
+
+type ValidHandler = keyof MouseEvents;
+// Valid: 'onClick', 'onMouseEnter'
+// Invalid: 'onFocus' - caught at compile time!
+```
+
+This pattern shines in APIs where you need to validate string inputs against a known set of patterns. Combined with `infer`, you can extract and transform types from existing strings.
+
+## The `as const` Assertion
+
+The `as const` assertion is deceptively simple but incredibly powerful. It transforms a mutable object into a readonly immutable one with literal types throughout.
+
+```typescript
+// Without as const - wider types
+const colors = ['red', 'green', 'blue'];
+// Type: string[]
+
+// With as const - exact literal types
+const colors = ['red', 'green', 'blue'] as const;
+// Type: readonly ['red', 'green', 'blue']
+
+// Practical React example
+const routes = {
+  home: '/',
+  about: '/about',
+  blog: '/blog',
+} as const;
+
+type Route = typeof routes[keyof typeof routes];
+// Type: '/' | '/about' | '/blog'
+```
+
+This pattern is essential when you need exact string literals instead of generic types. It's perfect for creating type-safe constants, routing configurations, and enum alternatives.
+
+## Conditional Types for Flexible Utilities
+
+Conditional types let you build generic utilities that adapt based on the input type. They're the foundation of many built-in TypeScript utilities like `ReturnType` and `Pick`.
+
+```typescript
+// Extract the return type of a function
+type MyReturnType<T> = T extends (...args: any[]) => infer R ? R : never;
+
+// Make specific properties optional
+type PartialBy<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>;
+
+// Practical example
+interface User {
+  id: string;
+  name: string;
+  email: string;
+  password: string;
+}
+
+type PublicUser = PartialBy<User, 'id'> & { id?: never };
+// Result: { name: string; email: string; password?: string }
+```
+
+The `infer` keyword is your secret weapon—it lets you extract types from within other types without manually specifying them.
+
+## Conclusion
+
+These patterns represent the cutting edge of TypeScript's capabilities in 2026. They transform what could be runtime errors into compile-time catches, making your codebase more maintainable as it grows. Start with discriminated unions for state management—they offer the biggest immediate payoff—then gradually incorporate the others as your type needs become more sophisticated.
+
+The best TypeScript code doesn't just work; it tells a story through its types. These patterns help you write that story clearly.
