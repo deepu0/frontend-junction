@@ -1,0 +1,115 @@
+---
+title: 'CSS Features You Should Be Using in 2026'
+description: 'Explore the most impactful modern CSS features—container queries, cascade layers, color functions, and more—that are transforming how we build responsive, maintainable interfaces.'
+date: '2026-03-15'
+tags: ["CSS","Design"]
+published: true
+image: './images/blog_css-features-you-should-be-using-in-2026.png'
+---
+
+CSS has evolved dramatically over the past few years, and 2026 is the year these modern features become essential for every frontend developer. If you haven't explored container queries, cascade layers, or the new color functions, you're missing out on powerful tools that solve real-world problems. Let's dive into the features worth adding to your workflow today.
+
+## Container Queries: Component-Based Responsive Design
+
+Media queries have served us well for years, but they come with a fundamental limitation—they respond to the viewport, not the component's container. Container queries fix this by letting styles adapt based on available space.
+
+First, define a containment context on a parent:
+
+```css
+.card-container {
+  container-type: inline-size;
+  container-name: card;
+}
+
+@container card (min-width: 400px) {
+  .card {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+  }
+}
+```
+
+Now your component controls its own responsiveness. No more waiting for parent breakpoints or writing complex media queries for every possible layout.
+
+## Cascade Layers: Taming Specificity Wars
+
+Ever struggled with overriding styles from frameworks or design systems? Cascade layers (`@layer`) give you explicit control over the cascade without fighting specificity.
+
+```css
+@layer reset, base, components, utilities;
+
+@layer reset {
+  * { margin: 0; }
+}
+
+@layer utilities {
+  .text-center { text-align: center; }
+}
+
+/* Utilities always win within their layer order */
+```
+
+Layers resolve in the order they appear—reset first, utilities last. This means you can confidently override framework styles by placing them in a later layer.
+
+## Modern Color Functions
+
+CSS now gives us perceptually uniform colors and powerful color manipulation. The `oklch()` color space covers the entire sRGB gamut with consistent lightness, while `color-mix()` blends colors natively:
+
+```css
+:root {
+  --primary: oklch(65% 0.15 280);
+  --primary-hover: oklch(70% 0.15 280);
+}
+
+.button {
+  background: var(--primary);
+}
+
+.button:hover {
+  background: color-mix(in oklch, var(--primary), white 20%);
+}
+```
+
+No more guessing hex values or HSL adjustments. The `color-mix` function lets you programmatically lighten, darken, or shift hues.
+
+## CSS Nesting and Scope
+
+Native CSS nesting is now widely supported, offering a cleaner alternative to preprocessor nesting:
+
+```css
+.card {
+  & .title {
+    font-size: 1.5rem;
+  }
+  
+  &:hover {
+    transform: translateY(-2px);
+  }
+}
+```
+
+Pair this with the `:scope` pseudo-class for explicit scoping, giving you component-level isolation without JavaScript.
+
+## View Transitions for Smooth Animations
+
+The View Transitions API enables seamless page transitions with minimal code:
+
+```css
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 0.3s;
+}
+
+/* In your JavaScript */
+document.startViewTransition(() => {
+  updateContent();
+});
+```
+
+This captures the old and new states, crossfades them automatically, and handles the complexity of multi-page transitions.
+
+## Putting It Together
+
+These features aren't experimental anymore—they're well-supported and ready for production. Start by adding container queries to your reusable components, then layer in cascade layers for cleaner style organization. The color functions and view transitions can enhance specific interactions.
+
+The key is gradual adoption. Pick one feature that solves an immediate problem, implement it, and build confidence before moving to the next. Your stylesheets will become more maintainable, your components more self-contained, and your user experience smoother.

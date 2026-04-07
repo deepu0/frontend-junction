@@ -1,0 +1,111 @@
+---
+title: 'Modern CSS Features Every Frontend Developer Should Know in 2026'
+description: 'Explore the most powerful CSS features of 2026—container queries, cascade layers, and more—that are transforming how we build responsive, maintainable interfaces.'
+date: '2026-03-27'
+tags: ["CSS","Design"]
+published: true
+image: './images/blog_modern-css-features-every-frontend-developer-shoul.png'
+---
+
+CSS has evolved dramatically in recent years. What once required JavaScript or complex build tools can now be achieved with native CSS properties. In this post, we'll explore the features that have become essential for modern frontend development.
+
+## Container Queries: Components That Respond to Their Context
+
+Traditional media queries respond to the viewport size, but container queries let components adapt based on their parent's dimensions. This is a game-changer for reusable components.
+
+```css
+.card-container {
+  container-type: inline-size;
+}
+
+@container (min-width: 400px) {
+  .card {
+    display: grid;
+    grid-template-columns: auto 1fr;
+  }
+}
+```
+
+By declaring a container and querying its size, your components become truly portable—they work whether placed in a sidebar or main content area.
+
+## CSS Cascade Layers: Taming specificity
+
+Cascade layers (`@layer`) give you explicit control over the CSS cascade without fighting specificity wars. You can now layer styles from low to high priority:
+
+```css
+@layer reset, base, components, utilities;
+
+@layer reset {
+  * { margin: 0; }
+}
+
+@layer components {
+  .btn { padding: 1rem 2rem; }
+}
+
+@layer utilities {
+  .mt-4 { margin-top: 1rem; }
+}
+```
+
+This approach is particularly useful when integrating third-party CSS—import it in a layer and your own styles can easily override it.
+
+## :has() Selector: The Parent Selector We Always Wanted
+
+The `:has()` pseudo-class lets you style an element based on its descendants. It's been a long-awaited feature:
+
+```css
+/* Style a card differently when it contains an image */
+.card:has(img) {
+  padding: 0;
+  border-radius: 8px;
+}
+
+/* Style a form when it has a validation error */
+form:has(.error) {
+  border-color: red;
+}
+```
+
+This replaces many JavaScript solutions and makes CSS more expressive.
+
+## Modern Color and Typography
+
+CSS now supports beautiful color spaces and flexible typography out of the box:
+
+```css
+.hero {
+  /* OKLCH provides wider gamut and better perceptual matching */
+  background: oklch(70% 0.15 280);
+  color: oklch(95% 0.02 280);
+}
+
+.text-container {
+  /* Fluid typography scales between viewport sizes */
+  font-size: clamp(1rem, 2vw + 1rem, 2rem);
+}
+```
+
+The `clamp()` function for fluid sizing and the `dvh`/`svh` units for responsive viewport heights are also worth exploring.
+
+## Nesting: Native CSS Preprocessing
+n
+CSS nesting is now supported in all major browsers, letting you write nested rules without a preprocessor:
+
+```css
+.card {
+  & .title {
+    font-weight: bold;
+  }
+  
+  &:hover {
+    transform: translateY(-2px);
+  }
+}
+```
+
+This simplifies your workflow and reduces the need for tools like Sass for nesting alone.
+
+## Conclusion
+
+These features represent where CSS is heading: more expressive, more modular, and more capable of handling complex UI challenges without JavaScript. Container queries and `:has()` alone can replace significant amounts of conditional logic. Start experimenting with these in your projects—they're ready for production use in 2026.
