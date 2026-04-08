@@ -1,17 +1,17 @@
 ---
 title: 'Modern CSS Features Every Frontend Developer Should Know in 2026'
-description: 'Explore the most powerful CSS features of 2026—container queries, cascade layers, and more—that are transforming how we build responsive, maintainable interfaces.'
-date: '2026-03-27'
+description: 'Explore powerful CSS features like container queries, @layer, anchor positioning, and scroll-state queries that are transforming how we build responsive, maintainable interfaces.'
+date: '2026-04-08'
 tags: ["CSS","Design"]
 published: true
 image: './images/blog_modern-css-features-every-frontend-developer-shoul.png'
 ---
 
-CSS has evolved dramatically in recent years. What once required JavaScript or complex build tools can now be achieved with native CSS properties. In this post, we'll explore the features that have become essential for modern frontend development.
+CSS has undergone a massive transformation in recent years. Features that once required JavaScript hacks are now native, powerful, and widely supported. Here's what every frontend developer should be using in 2026.
 
-## Container Queries: Components That Respond to Their Context
+## Container Queries: Component-Based Responsive Design
 
-Traditional media queries respond to the viewport size, but container queries let components adapt based on their parent's dimensions. This is a game-changer for reusable components.
+Media queries respond to the viewport—but container queries respond to their parent element. This enables truly component-based responsive design where cards, sidebars, and widgets adapt to their container, not the screen.
 
 ```css
 .card-container {
@@ -26,21 +26,22 @@ Traditional media queries respond to the viewport size, but container queries le
 }
 ```
 
-By declaring a container and querying its size, your components become truly portable—they work whether placed in a sidebar or main content area.
+No more prop-driven responsive variants in JavaScript. The component owns its responsive behaviour.
 
-## CSS Cascade Layers: Taming specificity
+## @layer: Taming the Cascade
 
-Cascade layers (`@layer`) give you explicit control over the CSS cascade without fighting specificity wars. You can now layer styles from low to high priority:
+Cascade layers give you explicit control over style priority without fighting specificity wars or reaching for `!important`.
 
 ```css
+/* Define layer order once */
 @layer reset, base, components, utilities;
 
 @layer reset {
-  * { margin: 0; }
+  * { margin: 0; padding: 0; }
 }
 
 @layer components {
-  .btn { padding: 1rem 2rem; }
+  .button { background: #2563eb; }
 }
 
 @layer utilities {
@@ -48,64 +49,78 @@ Cascade layers (`@layer`) give you explicit control over the CSS cascade without
 }
 ```
 
-This approach is particularly useful when integrating third-party CSS—import it in a layer and your own styles can easily override it.
+Layers declared later win over earlier ones—even with lower specificity. This is a game-changer for integrating third-party styles while keeping your own predictable.
 
-## :has() Selector: The Parent Selector We Always Wanted
+## Anchor Positioning: Tooltips Without JavaScript
 
-The `:has()` pseudo-class lets you style an element based on its descendants. It's been a long-awaited feature:
+The `anchor-positioning` property lets elements automatically position relative to another element (the anchor), like tooltips following their trigger.
 
 ```css
-/* Style a card differently when it contains an image */
-.card:has(img) {
-  padding: 0;
-  border-radius: 8px;
+.anchor {
+  anchor-name: --tooltip-anchor;
 }
 
-/* Style a form when it has a validation error */
-form:has(.error) {
-  border-color: red;
+.tooltip {
+  position: absolute;
+  position-anchor: --tooltip-anchor;
+  position-area: bottom;
+  margin-top: 8px;
 }
 ```
 
-This replaces many JavaScript solutions and makes CSS more expressive.
+This replaces libraries like Popper.js for common tooltip and dropdown use cases.
+
+## Scroll-State Queries: Style Based on Scroll Position
+
+Container scroll-state queries let you detect whether an element is stuck, snapped, or scrollable—purely in CSS.
+
+```css
+.sticky-header {
+  container-type: scroll-state;
+}
+
+@container scroll-state(stuck: top) {
+  .sticky-header {
+    background: white;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  }
+}
+
+@container scroll-state(snapped: center) {
+  .card {
+    transform: scale(1.02);
+  }
+}
+```
+
+This replaces scroll event listeners for sticky headers, active snap states, and scroll-progress indicators.
 
 ## Modern Color and Typography
 
-CSS now supports beautiful color spaces and flexible typography out of the box:
+CSS Color Level 5 brings `oklch()` and relative color syntax, offering colors that were previously impossible or required preprocessors.
 
 ```css
-.hero {
-  /* OKLCH provides wider gamut and better perceptual matching */
-  background: oklch(70% 0.15 280);
-  color: oklch(95% 0.02 280);
+/* oklch: perceptually uniform, wide gamut */
+.button {
+  background: oklch(60% 0.15 250);
 }
 
-.text-container {
-  /* Fluid typography scales between viewport sizes */
-  font-size: clamp(1rem, 2vw + 1rem, 2rem);
+/* Relative colors: adjust lightness of any color */
+.button:hover {
+  background: oklch(from var(--color-primary) calc(l + 10%) h c);
 }
 ```
 
-The `clamp()` function for fluid sizing and the `dvh`/`svh` units for responsive viewport heights are also worth exploring.
-
-## Nesting: Native CSS Preprocessing
-n
-CSS nesting is now supported in all major browsers, letting you write nested rules without a preprocessor:
+For typography, `text-wrap: balance` and `text-wrap: pretty` handle orphan words and line balancing automatically.
 
 ```css
-.card {
-  & .title {
-    font-weight: bold;
-  }
-  
-  &:hover {
-    transform: translateY(-2px);
-  }
+h1 {
+  text-wrap: balance;
 }
 ```
 
-This simplifies your workflow and reduces the need for tools like Sass for nesting alone.
+## The Bottom Line
 
-## Conclusion
+These features aren't experimental—they're shipped and supported across all major browsers. They reduce JavaScript dependencies, improve performance, and make your styles more maintainable. The best approach? Pick one feature, refactor a component to use it, and experience the difference.
 
-These features represent where CSS is heading: more expressive, more modular, and more capable of handling complex UI challenges without JavaScript. Container queries and `:has()` alone can replace significant amounts of conditional logic. Start experimenting with these in your projects—they're ready for production use in 2026.
+CSS in 2026 is about writing less JavaScript and more powerful styles. Your components will thank you.
