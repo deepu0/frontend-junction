@@ -25,25 +25,23 @@ export async function POST(request: Request) {
   const results = { inserted: 0, skipped: 0, errors: [] as string[] };
 
   for (const exp of seedData) {
-    const { error } = await supabaseAdmin
-      .from('scraped_experiences')
-      .upsert(
-        {
-          title: (exp as any).title,
-          original_url: (exp as any).original_url,
-          source: (exp as any).source,
-          author: (exp as any).author,
-          published_at: (exp as any).published_at || new Date().toISOString(),
-          tags: (exp as any).tags || [],
-          summary: (exp as any).summary || '',
-          formatted_content: (exp as any).formatted_content || '',
-          slug: (exp as any).slug || '',
-          metadata: {},
-          status: 'approved',
-          ai_processed: true,
-        },
-        { onConflict: 'original_url', ignoreDuplicates: false }
-      );
+    const { error } = await supabaseAdmin.from('scraped_experiences').upsert(
+      {
+        title: (exp as any).title,
+        original_url: (exp as any).original_url,
+        source: (exp as any).source,
+        author: (exp as any).author,
+        published_at: (exp as any).published_at || new Date().toISOString(),
+        tags: (exp as any).tags || [],
+        summary: (exp as any).summary || '',
+        formatted_content: (exp as any).formatted_content || '',
+        slug: (exp as any).slug || '',
+        metadata: {},
+        status: 'approved',
+        ai_processed: true,
+      },
+      { onConflict: 'original_url', ignoreDuplicates: false }
+    );
 
     if (error) {
       results.errors.push(`${(exp as any).title}: ${error.message}`);

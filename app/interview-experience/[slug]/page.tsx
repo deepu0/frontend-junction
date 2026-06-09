@@ -202,7 +202,11 @@ export default async function ExperienceSlugPage({ params }: Props) {
           {/* Content Analysis (AI Generated or Raw) */}
           <div className='prose prose-lg dark:prose-invert max-w-none prose-headings:font-bold prose-headings:text-foreground prose-p:text-muted-foreground prose-strong:text-foreground prose-a:text-primary hover:prose-a:underline prose-img:rounded-xl'>
             {experience.content?.trim().startsWith('<') ? (
-              <div dangerouslySetInnerHTML={{ __html: sanitizeHtml(experience.content) }} />
+              <div
+                dangerouslySetInnerHTML={{
+                  __html: sanitizeHtml(experience.content),
+                }}
+              />
             ) : (
               <ReactMarkdown>
                 {experience.content || experience.summary || ''}

@@ -2,7 +2,7 @@
 title: 'State Management in 2026: Signals, Simplicity, and the Death of Boilerplate'
 description: 'How modern state management has evolved beyond complex patterns—embracing signals, fine-grained reactivity, and server-state co-location for cleaner, faster apps.'
 date: '2026-03-08'
-tags: ["React","State"]
+tags: ['React', 'State']
 published: true
 image: './images/blog_state-management-in-2026-signals-simplicity-and-th.png'
 ---
@@ -38,13 +38,18 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 function UserProfile({ userId }) {
   const { data: user, isLoading } = useQuery({
     queryKey: ['user', userId],
-    fetcher: () => fetch(`/api/users/${userId}`).then(r => r.json()),
+    fetcher: () => fetch(`/api/users/${userId}`).then((r) => r.json()),
   });
 
   const queryClient = useQueryClient();
   const updateName = useMutation({
-    mutationFn: (name) => fetch(`/api/users/${userId}`, { method: 'PATCH', body: JSON.stringify({ name }) }),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['user', userId] }),
+    mutationFn: (name) =>
+      fetch(`/api/users/${userId}`, {
+        method: 'PATCH',
+        body: JSON.stringify({ name }),
+      }),
+    onSuccess: () =>
+      queryClient.invalidateQueries({ queryKey: ['user', userId] }),
   });
 
   if (isLoading) return <Spinner />;

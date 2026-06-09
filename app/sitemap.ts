@@ -79,7 +79,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         .limit(1000);
 
       if (scrapedError) {
-        console.error('[Sitemap] Error fetching scraped experiences:', scrapedError.message);
+        console.error(
+          '[Sitemap] Error fetching scraped experiences:',
+          scrapedError.message
+        );
       }
 
       if (scrapedExperiences) {
@@ -100,7 +103,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         .limit(500);
 
       if (userError) {
-        console.error('[Sitemap] Error fetching user experiences:', userError.message);
+        console.error(
+          '[Sitemap] Error fetching user experiences:',
+          userError.message
+        );
       }
 
       if (userExperiences) {
@@ -119,7 +125,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         `[Sitemap] Generated ${experiencePages.length} experience URLs, ${companyPages.length} company URLs, ${blogPages.length} blog URLs`
       );
     } else {
-      console.warn('[Sitemap] Missing Supabase credentials — experience pages will not be included');
+      console.warn(
+        '[Sitemap] Missing Supabase credentials — experience pages will not be included'
+      );
     }
   } catch (error) {
     console.error('[Sitemap] Error fetching data:', error);

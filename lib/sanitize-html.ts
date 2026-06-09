@@ -22,9 +22,6 @@ export function sanitizeHtml(html: string): string {
       // Remove javascript: URIs
       .replace(/href\s*=\s*["']?\s*javascript\s*:/gi, 'href="')
       // Remove data: URIs in src attributes (except images)
-      .replace(
-        /src\s*=\s*["']?\s*data\s*:(?!image\/)/gi,
-        'src="data:removed'
-      )
+      .replace(/src\s*=\s*["']?\s*data\s*:(?!image\/)/gi, 'src="data:removed')
   );
 }

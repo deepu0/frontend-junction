@@ -2,7 +2,7 @@
 title: 'React Performance Optimization: A Practical Guide for 2026'
 description: 'Learn actionable techniques to speed up your React applications, from memoization strategies to modern rendering patterns that every frontend developer should know.'
 date: '2026-03-13'
-tags: ["React","Performance"]
+tags: ['React', 'Performance']
 published: true
 image: './images/blog_react-performance-optimization-a-practical-guide-f.png'
 ---
@@ -23,7 +23,7 @@ Memoization is your first line of defense. These hooks cache computed values so 
 function ExpensiveComponent({ items, filter }) {
   // Only recalculates when items or filter changes
   const filteredItems = useMemo(() => {
-    return items.filter(item => item.name.includes(filter));
+    return items.filter((item) => item.name.includes(filter));
   }, [items, filter]);
 
   // Stable reference - won't change unless dependencies change
@@ -33,7 +33,7 @@ function ExpensiveComponent({ items, filter }) {
 
   return (
     <ul>
-      {filteredItems.map(item => (
+      {filteredItems.map((item) => (
         <li key={item.id} onClick={() => handleClick(item.id)}>
           {item.name}
         </li>
@@ -139,7 +139,7 @@ function Counter() {
   const [count, setCount] = useState(0);
   // No manual useMemo needed—compiler optimizes
   const doubled = count * 2;
-  return <button onClick={() => setCount(c => c + 1)}>{doubled}</button>;
+  return <button onClick={() => setCount((c) => c + 1)}>{doubled}</button>;
 }
 ```
 

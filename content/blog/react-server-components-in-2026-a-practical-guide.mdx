@@ -2,7 +2,7 @@
 title: 'React Server Components in 2026: A Practical Guide'
 description: 'Learn how to leverage React Server Components for better performance and user experience. This guide covers modern patterns and best practices for 2026.'
 date: '2026-03-11'
-tags: ["React","Next.js"]
+tags: ['React', 'Next.js']
 published: true
 image: './images/blog_react-server-components-in-2026-a-practical-guide.png'
 ---
@@ -22,6 +22,7 @@ Server Components run only on the server, never in the browser. They have zero J
 Here's a practical decision framework for 2026:
 
 **Use Server Components for:**
+
 - Data fetching (direct database or API calls)
 - Accessing backend resources (file system, microservices)
 - Keeping sensitive logic server-side (API keys, auth)
@@ -29,6 +30,7 @@ Here's a practical decision framework for 2026:
 - Static UI without interactivity
 
 **Use Client Components for:**
+
 - Interactive elements (onClick, onChange handlers)
 - Browser-only APIs (localStorage, geolocation)
 - React state and effects (useState, useEffect)
@@ -46,12 +48,8 @@ import { useState } from 'react';
 
 export default function LikeButton({ initialCount }) {
   const [count, setCount] = useState(initialCount);
-  
-  return (
-    <button onClick={() => setCount(c => c + 1)}>
-      ❤️ {count}
-    </button>
-  );
+
+  return <button onClick={() => setCount((c) => c + 1)}>❤️ {count}</button>;
 }
 ```
 
@@ -65,12 +63,12 @@ This is where many developers get stuck. Server Components can't directly pass f
 // Server Component - fetches data
 async function ArticleList() {
   const articles = await db.articles.findMany();
-  
+
   return (
     <div>
-      {articles.map(article => (
-        <ArticleCard 
-          key={article.id} 
+      {articles.map((article) => (
+        <ArticleCard
+          key={article.id}
           title={article.title}
           onShare={/* can't pass function! */}
         />
@@ -89,14 +87,14 @@ function ShareButton({ articleId }) {
   const share = () => {
     navigator.share({ url: `/articles/${articleId}` });
   };
-  
+
   return <button onClick={share}>Share</button>;
 }
 
 // Server Component - composes everything
 async function ArticleCard({ title, articleId }) {
   return (
-    <div className="card">
+    <div className='card'>
       <h2>{title}</h2>
       <ShareButton articleId={articleId} />
     </div>

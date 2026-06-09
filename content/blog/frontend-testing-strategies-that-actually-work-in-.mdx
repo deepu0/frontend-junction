@@ -2,7 +2,7 @@
 title: 'Frontend Testing Strategies That Actually Work in 2026'
 description: 'A practical guide to building a frontend testing pyramid with Vitest, React Testing Library, and Playwright - with real code examples you can apply today.'
 date: '2026-03-12'
-tags: ["Testing","Quality"]
+tags: ['Testing', 'Quality']
 published: true
 image: './images/blog_frontend-testing-strategies-that-actually-work-in-.png'
 ---
@@ -26,18 +26,18 @@ Vitest has become the default choice for React projects in 2026. It's compatible
 
 ```typescript
 // utils/formatPrice.test.ts
-import { describe, it, expect } from 'vitest'
-import { formatPrice } from './formatPrice'
+import { describe, it, expect } from 'vitest';
+import { formatPrice } from './formatPrice';
 
 describe('formatPrice', () => {
   it('formats USD by default', () => {
-    expect(formatPrice(1999)).toBe('$19.99')
-  })
-  
+    expect(formatPrice(1999)).toBe('$19.99');
+  });
+
   it('handles zero decimal currencies', () => {
-    expect(formatPrice(1000, { currency: 'JPY' })).toBe('¥1,000')
-  })
-})
+    expect(formatPrice(1000, { currency: 'JPY' })).toBe('¥1,000');
+  });
+});
 ```
 
 Vitest's watch mode makes TDD practical — tests rerun instantly as you code.
@@ -48,17 +48,17 @@ Testing Library shifts the mindset from "does this component render?" to "does t
 
 ```tsx
 // components/CartButton.test.tsx
-import { render, screen, fireEvent } from '@testing-library/react'
-import { CartButton } from './CartButton'
+import { render, screen, fireEvent } from '@testing-library/react';
+import { CartButton } from './CartButton';
 
 test('shows item count and handles click', () => {
-  render(<CartButton items={3} onClick={() => {}} />)
-  
-  expect(screen.getByText('3 items')).toBeInTheDocument()
-  
-  fireEvent.click(screen.getByRole('button'))
+  render(<CartButton items={3} onClick={() => {}} />);
+
+  expect(screen.getByText('3 items')).toBeInTheDocument();
+
+  fireEvent.click(screen.getByRole('button'));
   // Assert callback was called
-})
+});
 ```
 
 Notice we're querying by accessible roles and text, not implementation details. This makes tests resilient to refactoring.
@@ -69,25 +69,25 @@ For testing complete user flows, Playwright has become the gold standard. It han
 
 ```typescript
 // tests/checkout flow.spec.ts
-import { test, expect } from '@playwright/test'
+import { test, expect } from '@playwright/test';
 
 test('complete checkout flow', async ({ page }) => {
-  await page.goto('/cart')
-  
+  await page.goto('/cart');
+
   // Add item to cart
-  await page.click('[data-testid="add-item"]')
-  
+  await page.click('[data-testid="add-item"]');
+
   // Proceed to checkout
-  await page.click('text=Checkout')
-  await expect(page).toHaveURL(/checkout/)
-  
+  await page.click('text=Checkout');
+  await expect(page).toHaveURL(/checkout/);
+
   // Fill form
-  await page.fill('#email', 'test@example.com')
-  await page.click('text=Place Order')
-  
+  await page.fill('#email', 'test@example.com');
+  await page.click('text=Place Order');
+
   // Verify success
-  await expect(page.locator('text=Order confirmed')).toBeVisible()
-})
+  await expect(page.locator('text=Order confirmed')).toBeVisible();
+});
 ```
 
 Playwright's auto-wait feature eliminates flaky tests caused by timing issues.

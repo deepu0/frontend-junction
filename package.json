@@ -30,7 +30,7 @@
     "@radix-ui/react-toast": "^1.2.2",
     "@radix-ui/react-tooltip": "^1.1.4",
     "@supabase/ssr": "^0.8.0",
-    "@supabase/supabase-js": "^2.39.7",
+    "@supabase/supabase-js": "^2.108.0",
     "@vercel/analytics": "^1.6.1",
     "autoprefixer": "10.4.15",
     "class-variance-authority": "^0.7.0",
