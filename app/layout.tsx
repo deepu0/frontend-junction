@@ -1,5 +1,6 @@
 import './globals.css';
 import type { Metadata } from 'next';
+import { Inter } from 'next/font/google';
 import { cn } from '@/lib/utils';
 import { SiteHeader } from '@/components/common/site-header';
 import { ThemeProvider } from '@/components/common/theme-provider';
@@ -12,6 +13,12 @@ import {
   WebsiteSchema,
 } from '@/components/structured-data';
 import { Analytics } from '@vercel/analytics/next';
+
+const inter = Inter({
+  subsets: ['latin'],
+  display: 'swap',
+  variable: '--font-inter',
+});
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://www.frontend-junction.com'),
@@ -99,12 +106,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang='en' suppressHydrationWarning>
+    <html lang='en' suppressHydrationWarning className={inter.variable}>
       <head>
         <meta name='google-adsense-account' content='ca-pub-4467873688771542' />
         <Script
           id='google-adsense'
-          strategy='beforeInteractive'
+          strategy='lazyOnload'
           async
           src='https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4467873688771542'
           crossOrigin='anonymous'
@@ -112,17 +119,6 @@ export default function RootLayout({
         {/* Structured Data */}
         <OrganizationSchema />
         <WebsiteSchema />
-        <link rel='preconnect' href='https://fonts.googleapis.com' />
-        <link
-          rel='preconnect'
-          href='https://fonts.gstatic.com'
-          crossOrigin='anonymous'
-        />
-        {/* eslint-disable-next-line @next/next/no-page-custom-font */}
-        <link
-          href='https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap'
-          rel='stylesheet'
-        />
       </head>
       {process.env.NEXT_GOOGLE_ANALYTICS && (
         <Script
@@ -144,7 +140,7 @@ export default function RootLayout({
           }}
         />
       )}
-      <body className={cn('font-sans antialiased')}>
+      <body className={cn('font-sans antialiased', inter.className)}>
         {/* Skip to main content - Accessibility */}
         <a
           href='#main-content'

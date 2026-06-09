@@ -3,13 +3,15 @@ import Link from 'next/link';
 import { Metadata } from 'next';
 import Script from 'next/script';
 
-export const dynamic = 'force-dynamic';
-export const revalidate = 3600; // Cache for 1 hour
+export const revalidate = 3600; // ISR: revalidate every 1 hour
 
 export const metadata: Metadata = {
   title: 'Top Companies for Frontend Interviews | Frontend Junction',
   description:
     'Browse frontend interview experiences by company. Prepare for your next interview at Google, Amazon, Uber, and more.',
+  alternates: {
+    canonical: 'https://www.frontend-junction.com/companies',
+  },
   openGraph: {
     title: 'Top Companies for Frontend Interviews',
     description:

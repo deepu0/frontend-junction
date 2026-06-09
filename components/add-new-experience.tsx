@@ -151,7 +151,7 @@ const InterviewExperienceForm: React.FC = () => {
     setFormSubmitAttempted(true);
 
     if (validateForm()) {
-      console.log('Form submitted:', formData);
+
       setIsLoading(true); // Set loading to true when the request starts
 
       try {

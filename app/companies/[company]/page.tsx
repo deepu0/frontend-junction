@@ -6,8 +6,7 @@ import { Metadata } from 'next';
 import Script from 'next/script';
 import { FaCalendar, FaUser } from 'react-icons/fa';
 
-export const dynamic = 'force-dynamic';
-export const revalidate = 600; // Cache for 10 minutes
+export const revalidate = 600; // ISR: revalidate every 10 minutes
 
 interface Props {
   params: Promise<{ company: string }>;
@@ -32,6 +31,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       `${companyName} software engineer interview`,
       `${companyName} react interview`,
     ],
+    alternates: {
+      canonical: `https://www.frontend-junction.com/companies/${company}`,
+    },
     openGraph: {
       title: `${companyName} Frontend Interview Experiences`,
       description: `Browse real ${companyName} frontend engineer interview experiences.`,

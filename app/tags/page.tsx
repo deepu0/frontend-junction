@@ -4,8 +4,12 @@ import { posts } from '#site/content';
 import { Tag } from '@/components/tag';
 
 export const metadata: Metadata = {
-  title: 'Tags',
-  description: "Topic I've written about",
+  title: 'Tags | Browse All Frontend Topics',
+  description:
+    'Browse all frontend development topics — React, JavaScript, CSS, Next.js, TypeScript, and more. Find articles and guides by tag.',
+  alternates: {
+    canonical: 'https://www.frontend-junction.com/tags',
+  },
 };
 
 export default async function TagsPage() {
