@@ -3,15 +3,13 @@ import { createClient } from '@supabase/supabase-js';
 import seedData from '@/data/seed-experiences.json';
 
 /**
- * One-time seed endpoint to insert 29 fully complete interview experiences.
- * Each entry has title, author, tags, summary, AND formatted_content (full article body).
+ * One-time seed endpoint — 50 complete interview experiences with full content.
+ * Each entry has: title, author, tags, summary, formatted_content (full HTML article body).
  *
- * Requires CRON_SECRET auth and SUPABASE_SERVICE_ROLE_KEY.
- *
- * Usage: POST /api/seed-experiences
+ * POST /api/seed-experiences
  * Header: Authorization: Bearer <CRON_SECRET>
  *
- * After running successfully, delete this route + data/seed-experiences.json.
+ * After seeding, delete this route + data/seed-experiences.json.
  */
 export async function POST(request: Request) {
   const authHeader = request.headers.get('authorization');
