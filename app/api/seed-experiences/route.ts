@@ -3,16 +3,17 @@ import { createClient } from '@supabase/supabase-js';
 import seedData from '@/data/seed-experiences.json';
 
 /**
- * One-time seed endpoint to insert 49 scraped interview experiences.
+ * One-time seed endpoint to insert 29 fully complete interview experiences.
+ * Each entry has title, author, tags, summary, AND formatted_content (full article body).
+ *
  * Requires CRON_SECRET auth and SUPABASE_SERVICE_ROLE_KEY.
  *
  * Usage: POST /api/seed-experiences
  * Header: Authorization: Bearer <CRON_SECRET>
  *
- * After running successfully, you can delete this route.
+ * After running successfully, delete this route + data/seed-experiences.json.
  */
 export async function POST(request: Request) {
-  // Auth check
   const authHeader = request.headers.get('authorization');
   if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -30,28 +31,31 @@ export async function POST(request: Request) {
       .from('scraped_experiences')
       .upsert(
         {
-          title: exp.title,
-          original_url: exp.original_url,
-          source: exp.source,
-          author: exp.author,
-          published_at: exp.published_at || new Date().toISOString(),
-          tags: exp.tags || [],
-          summary: exp.summary || '',
+          title: (exp as any).title,
+          original_url: (exp as any).original_url,
+          source: (exp as any).source,
+          author: (exp as any).author,
+          published_at: (exp as any).published_at || new Date().toISOString(),
+          tags: (exp as any).tags || [],
+          summary: (exp as any).summary || '',
+          formatted_content: (exp as any).formatted_content || '',
+          slug: (exp as any).slug || '',
           metadata: {},
           status: 'approved',
+          ai_processed: true,
         },
-        { onConflict: 'original_url', ignoreDuplicates: true }
+        { onConflict: 'original_url', ignoreDuplicates: false }
       );
 
     if (error) {
-      results.errors.push(`${exp.title}: ${error.message}`);
+      results.errors.push(`${(exp as any).title}: ${error.message}`);
     } else {
       results.inserted++;
     }
   }
 
   return NextResponse.json({
-    message: `Seeded ${results.inserted} experiences (${results.errors.length} errors)`,
+    message: `Seeded ${results.inserted} complete experiences (${results.errors.length} errors)`,
     total_in_file: seedData.length,
     ...results,
   });
