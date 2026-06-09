@@ -10,6 +10,9 @@ export const metadata: Metadata = {
   title: 'Blog | Frontend Development Insights & Tutorials',
   description:
     'Deep dives into frontend development, performance optimization, React patterns, CSS techniques, and industry best practices from the Frontend Junction community.',
+  alternates: {
+    canonical: 'https://www.frontend-junction.com/blog',
+  },
 };
 
 const POSTS_PER_PAGE = 6; // Changed to 6 for better grid (2x3)

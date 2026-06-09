@@ -1,4 +1,5 @@
 import { getExperienceBySlug } from '@/lib/getExperienceBySlug';
+import { sanitizeHtml } from '@/lib/sanitize-html';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { FaExternalLinkAlt, FaCalendar, FaUser } from 'react-icons/fa';
@@ -7,8 +8,7 @@ import ReactMarkdown from 'react-markdown';
 import ViewCounter from '@/components/view-counter';
 import Script from 'next/script';
 
-export const dynamic = 'force-dynamic';
-export const revalidate = 60; // ISR
+export const revalidate = 60; // ISR: revalidate every 60 seconds
 
 interface Props {
   params: Promise<{ slug: string }>;
@@ -202,7 +202,7 @@ export default async function ExperienceSlugPage({ params }: Props) {
           {/* Content Analysis (AI Generated or Raw) */}
           <div className='prose prose-lg dark:prose-invert max-w-none prose-headings:font-bold prose-headings:text-foreground prose-p:text-muted-foreground prose-strong:text-foreground prose-a:text-primary hover:prose-a:underline prose-img:rounded-xl'>
             {experience.content?.trim().startsWith('<') ? (
-              <div dangerouslySetInnerHTML={{ __html: experience.content }} />
+              <div dangerouslySetInnerHTML={{ __html: sanitizeHtml(experience.content) }} />
             ) : (
               <ReactMarkdown>
                 {experience.content || experience.summary || ''}

@@ -63,7 +63,7 @@ export default function FooterComponent() {
             <h4 className='font-semibold mb-4 text-foreground'>Community</h4>
             <div className='flex gap-4'>
               <a
-                href='https://github.com/depaksharma'
+                href='https://github.com/deepu0'
                 target='_blank'
                 rel='noopener noreferrer'
                 className='text-muted-foreground hover:text-white transition-colors'
@@ -72,7 +72,7 @@ export default function FooterComponent() {
                 <FaGithub size={20} />
               </a>
               <a
-                href='https://twitter.com'
+                href='https://twitter.com/frontendjunction'
                 target='_blank'
                 rel='noopener noreferrer'
                 className='text-muted-foreground hover:text-[#1DA1F2] transition-colors'

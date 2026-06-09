@@ -50,7 +50,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   try {
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-    const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+    // Use service role key if available, fall back to anon key
+    const supabaseKey =
+      process.env.SUPABASE_SERVICE_ROLE_KEY ||
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
     // Fetch Companies
     const companies = await getCompanies();
@@ -67,12 +70,17 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       const supabase = createClient(supabaseUrl, supabaseKey);
 
       // Fetch scraped experiences with slugs
-      const { data: scrapedExperiences } = await supabase
+      const { data: scrapedExperiences, error: scrapedError } = await supabase
         .from('scraped_experiences')
         .select('slug, updated_at')
+        .eq('status', 'approved')
         .not('slug', 'is', null)
         .order('updated_at', { ascending: false })
-        .limit(500);
+        .limit(1000);
+
+      if (scrapedError) {
+        console.error('[Sitemap] Error fetching scraped experiences:', scrapedError.message);
+      }
 
       if (scrapedExperiences) {
         experiencePages = scrapedExperiences.map((exp) => ({
@@ -84,12 +92,16 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       }
 
       // Fetch user-submitted experiences
-      const { data: userExperiences } = await supabase
+      const { data: userExperiences, error: userError } = await supabase
         .from('new_interview')
         .select('slug, updated_at')
         .not('slug', 'is', null)
         .order('updated_at', { ascending: false })
-        .limit(200);
+        .limit(500);
+
+      if (userError) {
+        console.error('[Sitemap] Error fetching user experiences:', userError.message);
+      }
 
       if (userExperiences) {
         experiencePages = [
@@ -102,6 +114,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
           })),
         ];
       }
+
+      console.log(
+        `[Sitemap] Generated ${experiencePages.length} experience URLs, ${companyPages.length} company URLs, ${blogPages.length} blog URLs`
+      );
+    } else {
+      console.warn('[Sitemap] Missing Supabase credentials — experience pages will not be included');
     }
   } catch (error) {
     console.error('[Sitemap] Error fetching data:', error);
