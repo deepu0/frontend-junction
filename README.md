@@ -89,11 +89,17 @@ Open [http://localhost:3000](http://localhost:3000) to see the app.
 
 ### Environment Variables
 
-| Variable | Description |
-|----------|------------|
-| `NEXT_PUBLIC_SUPABASE_URL` | Your Supabase project URL |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase anonymous/public key |
-| `GOOGLE_GENERATIVE_AI_KEY` | Google Gemini API key (for content pipeline) |
+| Variable                        | Description                                                      |
+| ------------------------------- | ---------------------------------------------------------------- |
+| `NEXT_PUBLIC_SUPABASE_URL`      | Your Supabase project URL                                        |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase anonymous/public key                                    |
+| `SUPABASE_SERVICE_ROLE_KEY`     | Supabase service role key for server-side admin routes           |
+| `GEMINI_API_KEY`                | Google Gemini API key for the content pipeline and summaries     |
+| `CRON_SECRET`                   | Shared secret used to protect scheduled pipeline and seed routes |
+| `NEXT_GOOGLE_ANALYTICS`         | Optional Google Analytics measurement ID                         |
+| `GOOGLE_SITE_VERIFICATION`      | Optional Google Search Console verification token                |
+| `NEXT_PUBLIC_IS_DEV`            | Optional flag for enabling development behavior                  |
+| `NEXT_PUBLIC_LOGO_DEV_KEY`      | Optional Logo.dev public key override                            |
 
 ### Scripts
 
