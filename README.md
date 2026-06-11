@@ -46,18 +46,18 @@ Frontend developers preparing for interviews often rely on scattered LinkedIn po
 
 ## Tech Stack
 
-| Layer | Technology |
-|-------|-----------|
-| **Framework** | Next.js 15 (App Router, Server Actions, ISR) |
-| **Language** | TypeScript |
-| **Database** | Supabase (PostgreSQL + Auth + Storage) |
-| **Styling** | Tailwind CSS + Radix UI primitives |
-| **Animations** | Framer Motion |
-| **Content** | MDX via Velite |
-| **AI** | Google Gemini (content processing pipeline) |
-| **CI/CD** | GitHub Actions (lint, type check, security audit, bundle size, Lighthouse) |
-| **Auth** | Supabase SSR Auth with middleware |
-| **Deployment** | Vercel |
+| Layer          | Technology                                                                 |
+| -------------- | -------------------------------------------------------------------------- |
+| **Framework**  | Next.js 15 (App Router, Server Actions, ISR)                               |
+| **Language**   | TypeScript                                                                 |
+| **Database**   | Supabase (PostgreSQL + Auth + Storage)                                     |
+| **Styling**    | Tailwind CSS + Radix UI primitives                                         |
+| **Animations** | Framer Motion                                                              |
+| **Content**    | MDX via Velite                                                             |
+| **AI**         | Google Gemini (content processing pipeline)                                |
+| **CI/CD**      | GitHub Actions (lint, type check, security audit, bundle size, Lighthouse) |
+| **Auth**       | Supabase SSR Auth with middleware                                          |
+| **Deployment** | Vercel                                                                     |
 
 ## Getting Started
 
@@ -79,7 +79,7 @@ npm install
 
 # Set up environment variables
 cp .env.example .env.local
-# Add your Supabase URL, Anon Key, and other config
+# Fill in the values from your Supabase, Gemini, and optional Logo.dev accounts
 
 # Run the development server
 npm run dev
@@ -89,11 +89,13 @@ Open [http://localhost:3000](http://localhost:3000) to see the app.
 
 ### Environment Variables
 
-| Variable | Description |
-|----------|------------|
-| `NEXT_PUBLIC_SUPABASE_URL` | Your Supabase project URL |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase anonymous/public key |
-| `GOOGLE_GENERATIVE_AI_KEY` | Google Gemini API key (for content pipeline) |
+| Variable                        | Description                                                                                           |
+| ------------------------------- | ----------------------------------------------------------------------------------------------------- |
+| `NEXT_PUBLIC_SUPABASE_URL`      | Your Supabase project URL                                                                             |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase anonymous/public key                                                                         |
+| `SUPABASE_SERVICE_ROLE_KEY`     | Server-only Supabase key for admin routes, data pipelines, and sitemap generation                     |
+| `GEMINI_API_KEY`                | Server-only Google Gemini API key for the content pipeline                                            |
+| `NEXT_PUBLIC_LOGO_DEV_KEY`      | Optional public Logo.dev token for company logos; the app falls back to a bundled demo key when unset |
 
 ### Scripts
 
@@ -150,13 +152,13 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for detailed guidelines.
 
 ## Stats
 
-| Metric | Count |
-|--------|-------|
-| Interview Experiences | 106+ |
-| Blog Posts | 23 |
-| Companies Covered | 103 |
-| Pull Requests | 91+ |
-| Commits | 127+ |
+| Metric                | Count |
+| --------------------- | ----- |
+| Interview Experiences | 106+  |
+| Blog Posts            | 23    |
+| Companies Covered     | 103   |
+| Pull Requests         | 91+   |
+| Commits               | 127+  |
 
 ## License
 
