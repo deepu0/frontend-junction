@@ -266,7 +266,7 @@ export default function InterviewExperiences({
         </div>
 
         {/* Stats Bar */}
-        <div className='flex items-center justify-center gap-4'>
+        <div className='flex flex-wrap items-center justify-center gap-4'>
           <div className='flex items-center gap-2 px-4 py-2 rounded-xl bg-primary/5 border border-primary/10'>
             <span className='text-2xl font-bold text-primary'>
               {totalCount}
@@ -284,7 +284,7 @@ export default function InterviewExperiences({
         </div>
 
         {/* Controls Container */}
-        <div className='flex flex-col gap-4 bg-card/80 backdrop-blur-md p-4 rounded-2xl border border-border shadow-sm sticky top-20 z-40'>
+        <div className='flex flex-col gap-4 bg-card/80 backdrop-blur-md p-4 rounded-2xl border border-border shadow-sm md:sticky md:top-20 z-40'>
           <div className='flex flex-col md:flex-row gap-4 justify-between'>
             {/* Search */}
             <div className='relative w-full md:w-96 group'>
@@ -298,9 +298,9 @@ export default function InterviewExperiences({
               />
             </div>
 
-            <div className='flex items-center gap-3'>
+            <div className='flex flex-col sm:flex-row sm:items-center gap-3'>
               {/* Main Filter Tabs */}
-              <div className='flex items-center gap-1 p-1 bg-muted rounded-xl bg-background/50 border border-border'>
+              <div className='flex w-full sm:w-auto items-center gap-1 overflow-x-auto p-1 bg-muted rounded-xl bg-background/50 border border-border'>
                 {[
                   'all',
                   'community',
@@ -310,7 +310,7 @@ export default function InterviewExperiences({
                   <button
                     key={filter}
                     onClick={() => setActiveFilter(filter as any)}
-                    className={`px-3 py-2 rounded-lg text-sm font-medium transition-all ${
+                    className={`shrink-0 px-3 py-2 rounded-lg text-sm font-medium transition-all ${
                       activeFilter === filter
                         ? 'bg-primary text-primary-foreground shadow-sm'
                         : 'text-muted-foreground hover:text-foreground hover:bg-muted'
@@ -323,7 +323,7 @@ export default function InterviewExperiences({
 
               {/* Sort Dropdown */}
               <select
-                className='bg-background border border-border rounded-xl text-sm px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-primary/20 text-foreground cursor-pointer'
+                className='w-full sm:w-auto bg-background border border-border rounded-xl text-sm px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-primary/20 text-foreground cursor-pointer'
                 value={sortBy}
                 onChange={(e) =>
                   setSortBy(e.target.value as 'newest' | 'oldest')
