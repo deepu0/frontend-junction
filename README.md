@@ -79,7 +79,7 @@ npm install
 
 # Set up environment variables
 cp .env.example .env.local
-# Fill in the values from your Supabase, Gemini, and optional Logo.dev accounts
+# Fill in the values from Supabase plus any pipeline, analytics, or deployment settings you need
 
 # Run the development server
 npm run dev
@@ -95,6 +95,10 @@ Open [http://localhost:3000](http://localhost:3000) to see the app.
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase anonymous/public key                                                                         |
 | `SUPABASE_SERVICE_ROLE_KEY`     | Server-only Supabase key for admin routes, data pipelines, and sitemap generation                     |
 | `GEMINI_API_KEY`                | Server-only Google Gemini API key for the content pipeline                                            |
+| `CRON_SECRET`                   | Server-only bearer token that authorizes the protected pipeline and seed API routes                   |
+| `NEXT_GOOGLE_ANALYTICS`         | Optional Google Analytics measurement ID used to load the site tag                                    |
+| `GOOGLE_SITE_VERIFICATION`      | Optional Google Search Console verification token exposed in the page metadata                        |
+| `NEXT_PUBLIC_IS_DEV`            | Optional non-production flag that relaxes cron protection for local pipeline testing                  |
 | `NEXT_PUBLIC_LOGO_DEV_KEY`      | Optional public Logo.dev token for company logos; the app falls back to a bundled demo key when unset |
 
 ### Scripts
