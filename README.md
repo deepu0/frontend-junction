@@ -98,6 +98,8 @@ Open [http://localhost:3000](http://localhost:3000) to see the app.
 | `CRON_SECRET`                   | Server-only bearer token that authorizes the protected pipeline and seed API routes                   |
 | `NEXT_GOOGLE_ANALYTICS`         | Optional Google Analytics measurement ID used to load the site tag                                    |
 | `GOOGLE_SITE_VERIFICATION`      | Optional Google Search Console verification token exposed in the page metadata                        |
+| `NEXT_PUBLIC_TURNSTILE_SITE_KEY` | Optional public Cloudflare Turnstile site key used by bot-protected forms                            |
+| `TURNSTILE_SECRET_KEY`          | Optional server-only Cloudflare Turnstile secret used to verify bot-protected form submissions        |
 | `NEXT_PUBLIC_IS_DEV`            | Optional non-production flag that relaxes cron protection for local pipeline testing                  |
 | `NEXT_PUBLIC_LOGO_DEV_KEY`      | Optional public Logo.dev token for company logos; the app falls back to a bundled demo key when unset |
 
