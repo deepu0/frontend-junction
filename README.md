@@ -46,18 +46,18 @@ Frontend developers preparing for interviews often rely on scattered LinkedIn po
 
 ## Tech Stack
 
-| Layer          | Technology                                                                 |
-| -------------- | -------------------------------------------------------------------------- |
-| **Framework**  | Next.js 15 (App Router, Server Actions, ISR)                               |
-| **Language**   | TypeScript                                                                 |
-| **Database**   | Supabase (PostgreSQL + Auth + Storage)                                     |
-| **Styling**    | Tailwind CSS + Radix UI primitives                                         |
-| **Animations** | Framer Motion                                                              |
-| **Content**    | MDX via Velite                                                             |
-| **AI**         | Google Gemini (content processing pipeline)                                |
-| **CI/CD**      | GitHub Actions (lint, type check, security audit, bundle size, Lighthouse) |
-| **Auth**       | Supabase SSR Auth with middleware                                          |
-| **Deployment** | Vercel                                                                     |
+| Layer | Technology |
+|-------|-----------|
+| **Framework** | Next.js 15 (App Router, Server Actions, ISR) |
+| **Language** | TypeScript |
+| **Database** | Supabase (PostgreSQL + Auth + Storage) |
+| **Styling** | Tailwind CSS + Radix UI primitives |
+| **Animations** | Framer Motion |
+| **Content** | MDX via Velite |
+| **AI** | Google Gemini (content processing pipeline) |
+| **CI/CD** | GitHub Actions (lint, type check, security audit, bundle size, Lighthouse) |
+| **Auth** | Supabase SSR Auth with middleware |
+| **Deployment** | Vercel |
 
 ## Getting Started
 
@@ -158,13 +158,13 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for detailed guidelines.
 
 ## Stats
 
-| Metric                | Count |
-| --------------------- | ----- |
-| Interview Experiences | 106+  |
-| Blog Posts            | 23    |
-| Companies Covered     | 103   |
-| Pull Requests         | 91+   |
-| Commits               | 127+  |
+| Metric | Count |
+|--------|-------|
+| Interview Experiences | 106+ |
+| Blog Posts | 23 |
+| Companies Covered | 103 |
+| Pull Requests | 91+ |
+| Commits | 127+ |
 
 ## License
 
