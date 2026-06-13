@@ -2,7 +2,12 @@ import { getExperienceBySlug } from '@/lib/getExperienceBySlug';
 import { sanitizeHtml } from '@/lib/sanitize-html';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
-import { FaExternalLinkAlt, FaCalendar, FaUser } from 'react-icons/fa';
+import {
+  FaExternalLinkAlt,
+  FaCalendar,
+  FaUser,
+} from 'react-icons/fa';
+import { FaBriefcase } from 'react-icons/fa6';
 import { Metadata } from 'next';
 import ReactMarkdown from 'react-markdown';
 import ViewCounter from '@/components/view-counter';
@@ -212,6 +217,33 @@ export default async function ExperienceSlugPage({ params }: Props) {
                 {experience.content || experience.summary || ''}
               </ReactMarkdown>
             )}
+          </div>
+
+          {/* Cross-link to OnlyFrontendJobs */}
+          <div className='mt-12 p-6 rounded-2xl border border-primary/20 bg-primary/5'>
+            <div className='flex items-start gap-4'>
+              <div className='flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 border border-primary/20'>
+                <FaBriefcase className='w-4 h-4 text-primary' />
+              </div>
+              <div>
+                <h4 className='text-lg font-bold text-foreground mb-1'>
+                  Ready to apply?
+                </h4>
+                <p className='text-sm text-muted-foreground mb-4'>
+                  Browse hundreds of frontend-only roles on OnlyFrontendJobs — no
+                  backend noise.
+                </p>
+                <Link
+                  href={`https://onlyfrontendjobs.com/?utm_source=frontend-junction&utm_medium=experience_page&utm_campaign=${encodeURIComponent(slug)}`}
+                  target='_blank'
+                  rel='noopener noreferrer'
+                  className='inline-flex items-center gap-2 px-5 py-2.5 bg-primary text-primary-foreground rounded-full text-sm font-bold hover:opacity-90 transition-all'
+                >
+                  Browse Frontend Jobs
+                  <FaExternalLinkAlt className='w-3 h-3' />
+                </Link>
+              </div>
+            </div>
           </div>
 
           {/* Original Source CTA */}
