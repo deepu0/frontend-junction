@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { Metadata } from 'next';
 import Script from 'next/script';
 import { FaCalendar, FaUser } from 'react-icons/fa';
+import { FaBriefcase } from 'react-icons/fa6';
 
 export const revalidate = 600; // ISR: revalidate every 10 minutes
 
@@ -172,6 +173,29 @@ export default async function CompanyHubPage({ params }: Props) {
             </article>
           ))}
         </div>
+
+        {/* Cross-link to OnlyFrontendJobs */}
+        <a
+          href={`https://onlyfrontendjobs.com/companies/${company}?utm_source=frontend-junction&utm_medium=company_page&utm_campaign=${encodeURIComponent(company)}`}
+          target='_blank'
+          rel='noopener noreferrer'
+          className='mt-10 block p-6 bg-card border border-primary/20 rounded-2xl hover:border-primary/50 transition-all shadow-sm group'
+        >
+          <div className='flex items-start gap-4'>
+            <div className='flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 border border-primary/20'>
+              <FaBriefcase className='w-4 h-4 text-primary' />
+            </div>
+            <div>
+              <h3 className='text-lg font-bold text-foreground group-hover:text-primary transition-colors'>
+                Browse {companyName} Frontend Jobs
+              </h3>
+              <p className='mt-1 text-sm text-muted-foreground'>
+                See open frontend roles at {companyName} on OnlyFrontendJobs
+                — India&apos;s dedicated frontend job board.
+              </p>
+            </div>
+          </div>
+        </a>
       </div>
     </div>
   );
