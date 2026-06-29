@@ -9,24 +9,13 @@ import { usePathname } from 'next/navigation';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
-import { getSupabaseBrowserClient } from '@/lib/supabase-browser';
 import { useAuth } from '../session-provider';
-import { useRouter } from 'next/navigation';
 
 export default function Profile() {
-  const router = useRouter();
   const path = usePathname();
-  const supabase = getSupabaseBrowserClient();
-  const { user = null, setUser } = useAuth();
-
-  const handleLogout = async () => {
-    await supabase.auth.signOut();
-    setUser(null);
-    router.push('/');
-  };
+  const { user = null } = useAuth();
 
   const isAdmin = user?.role === 'admin';
-  const isSub = user?.stripe_customer_id;
 
   return (
     <Popover>

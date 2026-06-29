@@ -46,6 +46,9 @@ export const metadata: Metadata = {
   publisher: 'Frontend Junction',
   alternates: {
     canonical: '/',
+    types: {
+      'application/rss+xml': '/feed.xml',
+    },
   },
   formatDetection: {
     email: false,
@@ -99,12 +102,16 @@ export const metadata: Metadata = {
 
 import { MobileStickyCta } from '@/components/common/mobile-sticky-cta';
 import { AnnouncementBanner } from '@/components/common/announcement-banner';
+import { MotionProvider } from '@/components/motion-provider';
 
-export default function RootLayout({
+import { getAuthState } from '@/lib/auth';
+
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const { isAdmin } = await getAuthState().catch(() => ({ isAdmin: false, user: null, role: null }));
   return (
     <html lang='en' suppressHydrationWarning className={inter.variable}>
       <head>
@@ -122,14 +129,14 @@ export default function RootLayout({
       </head>
       {process.env.NEXT_GOOGLE_ANALYTICS && (
         <Script
-          strategy='afterInteractive'
+          strategy='lazyOnload'
           src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_GOOGLE_ANALYTICS}`}
         />
       )}
       {process.env.NEXT_GOOGLE_ANALYTICS && (
         <Script
           id='google-analytics'
-          strategy='afterInteractive'
+          strategy='lazyOnload'
           dangerouslySetInnerHTML={{
             __html: `
             window.dataLayer = window.dataLayer || [];
@@ -157,10 +164,12 @@ export default function RootLayout({
           <Toaster />
           <LoadingProvider>
             <AuthProvider>
+              <MotionProvider>
               <AnnouncementBanner />
-              <SiteHeader />
+              <SiteHeader isAdmin={isAdmin} />
               <main id='main-content'>{children}</main>
               <MobileStickyCta />
+              </MotionProvider>
             </AuthProvider>
           </LoadingProvider>
         </ThemeProvider>

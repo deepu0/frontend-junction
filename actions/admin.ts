@@ -1,8 +1,7 @@
 'use server';
 
-import { createServerClient } from '@supabase/ssr';
 import { createClient } from '@supabase/supabase-js';
-import { cookies } from 'next/headers';
+import { requireAdmin } from '@/lib/auth';
 
 async function getAdminSupabase() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL!;
@@ -14,42 +13,15 @@ async function getAdminSupabase() {
 }
 
 async function assertAdmin() {
-  const cookieStore = await cookies();
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: { get: (name) => cookieStore.get(name)?.value },
-    }
-  );
-
-  const {
-    data: { session },
-  } = await supabase.auth.getSession();
-
-  if (!session) throw new Error('Unauthorized');
-
-  const { data: profile } = await supabase
-    .from('users')
-    .select('user_role')
-    .eq('id', session.user.id)
-    .maybeSingle();
-
-  const role = profile?.user_role;
-  const isAdmin =
-    role === 'admin' ||
-    role === 'superadmin' ||
-    session.user.email === 'deepaksharma834@gmail.com';
-
-  if (!isAdmin) throw new Error('Forbidden');
+  await requireAdmin();
 }
 
 // Table mapping based on experience type
-const TABLE_MAP: Record<string, string> = {
+const TABLE_MAP = {
   user: 'new_interview',
   scraped: 'scraped_experiences',
   legacy: 'experiences',
-};
+} as const satisfies Record<string, string>;
 
 export async function deleteExperience(
   rawId: string,
