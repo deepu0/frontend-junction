@@ -87,6 +87,21 @@ npm run dev
 
 Open [http://localhost:3000](http://localhost:3000) to see the app.
 
+### Database Setup
+
+Run [`scripts/setup.sql`](scripts/setup.sql) in your Supabase SQL Editor. It creates the
+pipeline + question-bank tables and the row-level-security policies the app relies on.
+
+Then grant yourself admin access (used by `/admin`):
+
+```sql
+UPDATE auth.users
+SET raw_app_meta_data = raw_app_meta_data || '{"role": "admin"}'::jsonb
+WHERE email = 'your@email.com';
+```
+
+Admin role is read from Supabase `app_metadata` — there are no hardcoded admin emails.
+
 ### Environment Variables
 
 | Variable | Description |
