@@ -36,11 +36,7 @@ const InterviewInputText = ({
   return (
     <div>
       {' '}
-      <TextEditor
-        placeHolder={placeholder}
-        onChange={onChange}
-        value={value}
-      />
+      <TextEditor placeHolder={placeholder} onChange={onChange} value={value} />
     </div>
   );
 };

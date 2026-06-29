@@ -18,7 +18,7 @@ export function DropdownSelectOption({
 }: DropdownSelectOptionProps) {
   return (
     <button
-      type="button"
+      type='button'
       className={classNames(styles['dropdown-select__option'], className, {
         [styles['animate']]: isSelected,
         [styles['selected']]: isSelected,

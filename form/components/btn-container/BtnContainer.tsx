@@ -37,7 +37,11 @@ export function BtnContainer({
 
   return (
     <div className={classNames(styles['btn-container'], className)}>
-      <button type="button" className={questrialFont.className} onClick={onClick}>
+      <button
+        type='button'
+        className={questrialFont.className}
+        onClick={onClick}
+      >
         {children}
       </button>
       {isOnMobile || !showPressEnter || (

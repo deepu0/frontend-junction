@@ -43,7 +43,8 @@ export default {
           },
           {
             key: 'Content-Security-Policy-Report-Only',
-            value: "default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://www.google-analytics.com https://googleads.g.doubleclick.net https://va.vercel-scripts.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https: blob:; font-src 'self' data:; connect-src 'self' https://*.supabase.co https://www.google-analytics.com https://vitals.vercel-insights.com; frame-src 'self'; object-src 'none'; base-uri 'self'",
+            value:
+              "default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://www.google-analytics.com https://googleads.g.doubleclick.net https://va.vercel-scripts.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https: blob:; font-src 'self' data:; connect-src 'self' https://*.supabase.co https://www.google-analytics.com https://vitals.vercel-insights.com; frame-src 'self'; object-src 'none'; base-uri 'self'",
           },
           {
             key: 'Permissions-Policy',

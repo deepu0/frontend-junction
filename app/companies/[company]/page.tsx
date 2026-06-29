@@ -99,12 +99,16 @@ export default async function CompanyHubPage({ params }: Props) {
       <Script
         id={`json-ld-breadcrumb-company-${company}`}
         type='application/ld+json'
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd).replace(/</g, '\\u003c') }}
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(breadcrumbLd).replace(/</g, '\\u003c'),
+        }}
       />
       <Script
         id={`json-ld-collection-company-${company}`}
         type='application/ld+json'
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(collectionLd).replace(/</g, '\\u003c') }}
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(collectionLd).replace(/</g, '\\u003c'),
+        }}
       />
 
       <div className='container mx-auto px-4 max-w-4xl'>
@@ -174,8 +178,13 @@ export default async function CompanyHubPage({ params }: Props) {
 
         {/* Cross-promotion: Jobs */}
         <div className='mt-12 p-6 rounded-2xl border border-primary/20 bg-primary/5 text-center'>
-          <p className='text-lg font-semibold mb-2'>🚀 {companyName} hiring frontend devs?</p>
-          <p className='text-muted-foreground text-sm mb-4'>Check open frontend positions at {companyName} and 500+ other companies</p>
+          <p className='text-lg font-semibold mb-2'>
+            🚀 {companyName} hiring frontend devs?
+          </p>
+          <p className='text-muted-foreground text-sm mb-4'>
+            Check open frontend positions at {companyName} and 500+ other
+            companies
+          </p>
           <a
             href={`https://onlyfrontendjobs.com/jobs?q=${encodeURIComponent(companyName)}&utm_source=frontend-junction&utm_medium=company-page&utm_campaign=${company}`}
             target='_blank'

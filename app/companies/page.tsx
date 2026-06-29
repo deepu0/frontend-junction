@@ -47,7 +47,9 @@ export default async function CompaniesPage() {
       <Script
         id='json-ld-companies-list'
         type='application/ld+json'
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, '\\u003c') }}
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(jsonLd).replace(/</g, '\\u003c'),
+        }}
       />
       <div className='container mx-auto px-4 max-w-5xl'>
         <div className='mb-12 text-center'>

@@ -78,7 +78,10 @@ export async function GET() {
     });
   } catch (error: any) {
     if (error instanceof AuthError) {
-      return NextResponse.json({ error: error.message }, { status: error.status });
+      return NextResponse.json(
+        { error: error.message },
+        { status: error.status }
+      );
     }
     console.error('[AdminStatsAPI] Error:', error);
     return NextResponse.json({ error: error.message }, { status: 500 });

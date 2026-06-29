@@ -29,26 +29,27 @@ checked admin status differently). Authorization decisions use the insecure
 ### Module: `lib/auth.ts` (server-only)
 
 ```ts
-getServerSupabase()        // the ONE server client (full cookie read/write)
-getVerifiedUser()          // supabase.auth.getUser() → User | null (verified)
-getAuthState()             // { user, role, isAdmin } — resolves role via dual check
-requireAdmin()             // returns AuthState if admin, else throws AuthError(403/401)
+getServerSupabase(); // the ONE server client (full cookie read/write)
+getVerifiedUser(); // supabase.auth.getUser() → User | null (verified)
+getAuthState(); // { user, role, isAdmin } — resolves role via dual check
+requireAdmin(); // returns AuthState if admin, else throws AuthError(403/401)
 ```
 
 Role resolution (single implementation):
+
 1. Read `user.app_metadata.role`.
 2. If not admin/superadmin, query `users.user_role` for the user id.
 3. `isAdmin = role ∈ {admin, superadmin}`.
 
 ### Consumers refactored to use the module
 
-| File | Before | After |
-|------|--------|-------|
-| `app/admin/page.tsx` | inline dual check | `requireAdmin()` (redirect on fail) |
-| `actions/admin.ts` | inline dual check | `requireAdmin()` |
-| `app/api/admin/stats/route.ts` | app_metadata only | `requireAdmin()` |
-| `app/api/pipeline/route.ts` | app_metadata only | `requireAdmin()` (OR cron token) |
-| `app/api/auth/me/route.ts` | inline dual | `getAuthState()` |
+| File                           | Before            | After                               |
+| ------------------------------ | ----------------- | ----------------------------------- |
+| `app/admin/page.tsx`           | inline dual check | `requireAdmin()` (redirect on fail) |
+| `actions/admin.ts`             | inline dual check | `requireAdmin()`                    |
+| `app/api/admin/stats/route.ts` | app_metadata only | `requireAdmin()`                    |
+| `app/api/pipeline/route.ts`    | app_metadata only | `requireAdmin()` (OR cron token)    |
+| `app/api/auth/me/route.ts`     | inline dual       | `getAuthState()`                    |
 
 ### Client side
 

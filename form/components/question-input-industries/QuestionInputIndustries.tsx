@@ -111,9 +111,11 @@ export function QuestionInputIndustries({
     // react-doctor-disable-next-line react-doctor/prefer-tag-over-role
     <div
       className={styles['dropdown-select__industries']}
-      role="group"
+      role='group'
       onClick={handleDropdownClick}
-      onKeyDown={(e) => { if (e.key === 'Enter') handleDropdownClick(e as unknown as MouseEvent); }}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter') handleDropdownClick(e as unknown as MouseEvent);
+      }}
     >
       <QuestionInputText
         className={styles['dropdown-select__input']}
@@ -124,7 +126,7 @@ export function QuestionInputIndustries({
       />
 
       <button
-        type="button"
+        type='button'
         className={classNames(styles['dropdown-select__btn'], {
           [styles['close']]: !showIndustriesList && !localIndustry,
         })}

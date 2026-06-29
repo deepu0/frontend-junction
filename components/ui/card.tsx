@@ -6,7 +6,9 @@ const Card = ({
   ref,
   className,
   ...props
-}: React.HTMLAttributes<HTMLDivElement> & { ref?: React.Ref<HTMLDivElement> }) => (
+}: React.HTMLAttributes<HTMLDivElement> & {
+  ref?: React.Ref<HTMLDivElement>;
+}) => (
   <div
     ref={ref}
     className={cn(
@@ -22,7 +24,9 @@ const CardHeader = ({
   ref,
   className,
   ...props
-}: React.HTMLAttributes<HTMLDivElement> & { ref?: React.Ref<HTMLDivElement> }) => (
+}: React.HTMLAttributes<HTMLDivElement> & {
+  ref?: React.Ref<HTMLDivElement>;
+}) => (
   <div
     ref={ref}
     className={cn('flex flex-col space-y-1.5 p-6', className)}
@@ -40,7 +44,9 @@ const CardTitle = ({
 }) => (
   <h3
     ref={ref}
-    aria-label={typeof props.children === 'string' ? props.children : 'Card title'}
+    aria-label={
+      typeof props.children === 'string' ? props.children : 'Card title'
+    }
     className={cn(
       'text-2xl font-semibold leading-none tracking-tight',
       className
@@ -69,16 +75,18 @@ const CardContent = ({
   ref,
   className,
   ...props
-}: React.HTMLAttributes<HTMLDivElement> & { ref?: React.Ref<HTMLDivElement> }) => (
-  <div ref={ref} className={cn('p-6 pt-0', className)} {...props} />
-);
+}: React.HTMLAttributes<HTMLDivElement> & {
+  ref?: React.Ref<HTMLDivElement>;
+}) => <div ref={ref} className={cn('p-6 pt-0', className)} {...props} />;
 CardContent.displayName = 'CardContent';
 
 const CardFooter = ({
   ref,
   className,
   ...props
-}: React.HTMLAttributes<HTMLDivElement> & { ref?: React.Ref<HTMLDivElement> }) => (
+}: React.HTMLAttributes<HTMLDivElement> & {
+  ref?: React.Ref<HTMLDivElement>;
+}) => (
   <div
     ref={ref}
     className={cn('flex items-center p-6 pt-0', className)}

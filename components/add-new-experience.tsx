@@ -256,7 +256,9 @@ const InterviewExperienceForm: React.FC = () => {
             <Tabs
               defaultValue='link'
               className='w-full'
-              onValueChange={(val) => { isExclusive.current = val === 'exclusive'; }}
+              onValueChange={(val) => {
+                isExclusive.current = val === 'exclusive';
+              }}
             >
               <TabsList className='grid w-full grid-cols-2 bg-gray-700'>
                 <TabsTrigger

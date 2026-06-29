@@ -171,10 +171,13 @@ const TextEditor: React.FC<Props> = (props: Props) => {
     showAllOptions = false,
   } = props;
   const [editorText, setEditorText] = useState<any>(value || '');
-  const handleChange = useCallback((content: any) => {
-    setEditorText(content);
-    onChange(content);
-  }, [onChange]);
+  const handleChange = useCallback(
+    (content: any) => {
+      setEditorText(content);
+      onChange(content);
+    },
+    [onChange]
+  );
 
   return (
     <ReactQuill

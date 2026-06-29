@@ -27,7 +27,9 @@ export function OrganizationSchema({
     <Script
       id='organization-schema'
       type='application/ld+json'
-      dangerouslySetInnerHTML={{ __html: JSON.stringify(schema).replace(/</g, '\\u003c') }}
+      dangerouslySetInnerHTML={{
+        __html: JSON.stringify(schema).replace(/</g, '\\u003c'),
+      }}
     />
   );
 }
@@ -79,7 +81,9 @@ export function ArticleSchema({
     <Script
       id='article-schema'
       type='application/ld+json'
-      dangerouslySetInnerHTML={{ __html: JSON.stringify(schema).replace(/</g, '\\u003c') }}
+      dangerouslySetInnerHTML={{
+        __html: JSON.stringify(schema).replace(/</g, '\\u003c'),
+      }}
     />
   );
 }
@@ -106,7 +110,9 @@ export function WebsiteSchema() {
     <Script
       id='website-schema'
       type='application/ld+json'
-      dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteSchemaData).replace(/</g, '\\u003c') }}
+      dangerouslySetInnerHTML={{
+        __html: JSON.stringify(websiteSchemaData).replace(/</g, '\\u003c'),
+      }}
     />
   );
 }
@@ -131,16 +137,22 @@ export function BreadcrumbSchema({ items }: BreadcrumbSchemaProps) {
     <Script
       id='breadcrumb-schema'
       type='application/ld+json'
-      dangerouslySetInnerHTML={{ __html: JSON.stringify(schema).replace(/</g, '\\u003c') }}
+      dangerouslySetInnerHTML={{
+        __html: JSON.stringify(schema).replace(/</g, '\\u003c'),
+      }}
     />
   );
 }
 
-export function FaqSchema({ faqs }: { faqs: { question: string; answer: string }[] }) {
+export function FaqSchema({
+  faqs,
+}: {
+  faqs: { question: string; answer: string }[];
+}) {
   const schema = {
     '@context': 'https://schema.org',
     '@type': 'FAQPage',
-    mainEntity: faqs.map(faq => ({
+    mainEntity: faqs.map((faq) => ({
       '@type': 'Question',
       name: faq.question,
       acceptedAnswer: { '@type': 'Answer', text: faq.answer },
@@ -148,8 +160,10 @@ export function FaqSchema({ faqs }: { faqs: { question: string; answer: string }
   };
   return (
     <script
-      type="application/ld+json"
-      dangerouslySetInnerHTML={{ __html: JSON.stringify(schema).replace(/</g, '\\u003c') }}
+      type='application/ld+json'
+      dangerouslySetInnerHTML={{
+        __html: JSON.stringify(schema).replace(/</g, '\\u003c'),
+      }}
     />
   );
 }

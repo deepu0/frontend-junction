@@ -1,5 +1,4 @@
 import LandingPage from '@/components/home';
-import getCompanies from '@/hooks/useGetCompanies';
 import getExperiences from '@/hooks/getExperiences';
 import { posts } from '#site/content';
 import type { Metadata } from 'next';
@@ -49,6 +48,29 @@ export const metadata: Metadata = {
   },
 };
 
+import { createClient } from '@supabase/supabase-js';
+
+async function getCompaniesServer() {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!url || !key) return [];
+  try {
+    const supabaseAdmin = createClient(url, key);
+    const { data, error } = await supabaseAdmin
+      .from('company')
+      .select('id,company_name,logo');
+    if (error) throw error;
+    return (data || []).map((c: any) => ({
+      id: c.id,
+      companyName: c.company_name,
+      logoUrl: c?.logo || '',
+    }));
+  } catch (err) {
+    console.error('[getCompaniesServer] Error:', err);
+    return [];
+  }
+}
+
 // Cached data fetchers for instant page loads
 const getCachedExperiences = unstable_cache(
   async () => {
@@ -62,8 +84,8 @@ const getCachedExperiences = unstable_cache(
 
 const getCachedCompanies = unstable_cache(
   async () => {
-    const companies = await getCompanies();
-    return companies || [];
+    const companies = await getCompaniesServer();
+    return companies;
   },
   ['homepage-companies'],
   { revalidate: 300, tags: ['companies'] }

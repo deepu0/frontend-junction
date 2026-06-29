@@ -9,7 +9,10 @@ import { QuestionNumHeading } from '../question-num-heading/QuestionNumHeading';
 import classNames from 'classnames';
 import styles from './Question.module.css';
 import Image from 'next/image';
-import { REMOVE_GOAL, SET_GOALS } from '@/form/reducers/actions/questionsActions';
+import {
+  REMOVE_GOAL,
+  SET_GOALS,
+} from '@/form/reducers/actions/questionsActions';
 
 export function GoalInput() {
   const { errorMsg: error, setErrorMsg, handleOkClick } = useSharedStates();

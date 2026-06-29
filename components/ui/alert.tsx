@@ -45,7 +45,9 @@ const AlertTitle = ({
 }) => (
   <h5
     ref={ref}
-    aria-label={typeof props.children === 'string' ? props.children : 'Alert title'}
+    aria-label={
+      typeof props.children === 'string' ? props.children : 'Alert title'
+    }
     className={cn('mb-1 font-medium leading-none tracking-tight', className)}
     {...props}
   />

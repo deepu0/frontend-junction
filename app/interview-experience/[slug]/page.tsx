@@ -138,9 +138,18 @@ export default async function ExperienceSlugPage({ params }: Props) {
   const companyName = titleWords[0];
 
   const faqs = [
-    { question: `What is the interview process at ${companyName}?`, answer: `The interview process at ${companyName} typically includes a recruiter screen, technical phone interview, and onsite rounds covering coding, system design, and behavioral questions. Read this experience for specific details.` },
-    { question: `How to prepare for ${companyName} frontend interview?`, answer: `Focus on JavaScript fundamentals, React concepts, CSS layout, system design for frontend, and practice coding challenges. Review real interview experiences like this one on Frontend Junction.` },
-    { question: `What questions are asked in ${companyName} frontend interview?`, answer: `Common topics include DOM manipulation, React lifecycle, state management, performance optimization, accessibility, and frontend system design. This experience shares specific questions encountered.` },
+    {
+      question: `What is the interview process at ${companyName}?`,
+      answer: `The interview process at ${companyName} typically includes a recruiter screen, technical phone interview, and onsite rounds covering coding, system design, and behavioral questions. Read this experience for specific details.`,
+    },
+    {
+      question: `How to prepare for ${companyName} frontend interview?`,
+      answer: `Focus on JavaScript fundamentals, React concepts, CSS layout, system design for frontend, and practice coding challenges. Review real interview experiences like this one on Frontend Junction.`,
+    },
+    {
+      question: `What questions are asked in ${companyName} frontend interview?`,
+      answer: `Common topics include DOM manipulation, React lifecycle, state management, performance optimization, accessibility, and frontend system design. This experience shares specific questions encountered.`,
+    },
   ];
 
   return (
@@ -149,12 +158,16 @@ export default async function ExperienceSlugPage({ params }: Props) {
       <Script
         id={`json-ld-article-${slug}`}
         type='application/ld+json'
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, '\\u003c') }}
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(jsonLd).replace(/</g, '\\u003c'),
+        }}
       />
       <Script
         id={`json-ld-breadcrumb-${slug}`}
         type='application/ld+json'
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd).replace(/</g, '\\u003c') }}
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(breadcrumbLd).replace(/</g, '\\u003c'),
+        }}
       />
       <FaqSchema faqs={faqs} />
 
@@ -252,7 +265,9 @@ export default async function ExperienceSlugPage({ params }: Props) {
         {/* Jobs CTA */}
         <div className='mt-8 p-6 rounded-2xl border border-primary/20 bg-primary/5 text-center'>
           <p className='text-lg font-semibold mb-2'>Ready to apply?</p>
-          <p className='text-muted-foreground text-sm mb-4'>Browse open frontend positions at top companies</p>
+          <p className='text-muted-foreground text-sm mb-4'>
+            Browse open frontend positions at top companies
+          </p>
           <a
             href='https://onlyfrontendjobs.com?utm_source=frontend-junction&utm_medium=experience-page'
             target='_blank'

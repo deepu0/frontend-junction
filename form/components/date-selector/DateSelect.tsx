@@ -8,7 +8,13 @@ interface DateSelectorProps {
   ref?: React.Ref<HTMLInputElement>;
 }
 
-const DateSelector = ({ className, value, onChange, placeholder, ref }: DateSelectorProps) => {
+const DateSelector = ({
+  className,
+  value,
+  onChange,
+  placeholder,
+  ref,
+}: DateSelectorProps) => {
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {

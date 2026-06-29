@@ -9,7 +9,10 @@ import styles from './Question.module.css';
 import Image from 'next/image';
 import { useQuestions, useSharedStates } from '@/form/contexts/index';
 import { IDENTITY } from '@/form/constants';
-import { SET_ROLE, SET_IDENTITY } from '@/form/reducers/actions/questionsActions';
+import {
+  SET_ROLE,
+  SET_IDENTITY,
+} from '@/form/reducers/actions/questionsActions';
 
 export function IdentityInput() {
   const { errorMsg: error, setErrorMsg, handleOkClick } = useSharedStates();

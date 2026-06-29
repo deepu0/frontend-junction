@@ -24,7 +24,7 @@ export async function POST(request: Request) {
 
   const results = { inserted: 0, skipped: 0, errors: [] as string[] };
 
-  const upsertResults = await Promise.all(
+  const upsertResults = await Promise.allSettled(
     seedData.map((exp) =>
       supabaseAdmin.from('scraped_experiences').upsert(
         {
@@ -47,9 +47,15 @@ export async function POST(request: Request) {
   );
 
   for (let i = 0; i < upsertResults.length; i++) {
-    const { error } = upsertResults[i];
-    if (error) {
-      results.errors.push(`${(seedData[i] as any).title}: ${error.message}`);
+    const result = upsertResults[i];
+    if (result.status === 'rejected') {
+      results.errors.push(
+        `${(seedData[i] as any).title}: ${result.reason?.message ?? result.reason}`
+      );
+    } else if (result.value.error) {
+      results.errors.push(
+        `${(seedData[i] as any).title}: ${result.value.error.message}`
+      );
     } else {
       results.inserted++;
     }

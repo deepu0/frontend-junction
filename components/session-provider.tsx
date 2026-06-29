@@ -1,5 +1,12 @@
 'use client';
-import { createContext, use, useEffect, useState, useMemo, useCallback } from 'react';
+import {
+  createContext,
+  use,
+  useEffect,
+  useState,
+  useMemo,
+  useCallback,
+} from 'react';
 import { getSupabaseBrowserClient } from '@/lib/supabase-browser';
 import { useRouter } from 'next/navigation';
 import type { Session, User } from '@supabase/supabase-js';
@@ -41,9 +48,7 @@ const userToProfile = (user: User): UserProfile => ({
     user.email?.split('@')[0],
   image_url: user.user_metadata?.avatar_url || user.user_metadata?.picture,
   role:
-    (user.app_metadata as any)?.role ||
-    user.user_metadata?.role ||
-    undefined,
+    (user.app_metadata as any)?.role || user.user_metadata?.role || undefined,
 });
 
 // Resolve a full profile, falling back to the users table for the role
@@ -146,10 +151,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   );
 
   return (
-    <AuthContext.Provider
-      value={contextValue}
-    >
-      {children}
-    </AuthContext.Provider>
+    <AuthContext.Provider value={contextValue}>{children}</AuthContext.Provider>
   );
 };

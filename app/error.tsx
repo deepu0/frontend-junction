@@ -19,7 +19,7 @@ export default function Error({
       </p>
       <div className='flex flex-wrap gap-4 justify-center'>
         <button
-          type="button"
+          type='button'
           onClick={reset}
           className='px-6 py-3 rounded-lg bg-primary text-primary-foreground font-semibold hover:opacity-90 transition-opacity'
         >

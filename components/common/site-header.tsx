@@ -70,13 +70,37 @@ export function SiteHeader({ isAdmin = false }: { isAdmin?: boolean }) {
             ))}
             {isAdmin && (
               <>
-                <Link href="/admin" className={cn('text-sm font-medium transition-colors hover:text-primary whitespace-nowrap', pathname === '/admin' ? 'text-foreground' : 'text-orange-500')}>
+                <Link
+                  href='/admin'
+                  className={cn(
+                    'text-sm font-medium transition-colors hover:text-primary whitespace-nowrap',
+                    pathname === '/admin'
+                      ? 'text-foreground'
+                      : 'text-orange-500'
+                  )}
+                >
                   Admin
                 </Link>
-                <Link href="/admin/captured" className={cn('text-sm font-medium transition-colors hover:text-primary whitespace-nowrap', pathname === '/admin/captured' ? 'text-foreground' : 'text-orange-500')}>
+                <Link
+                  href='/admin/captured'
+                  className={cn(
+                    'text-sm font-medium transition-colors hover:text-primary whitespace-nowrap',
+                    pathname === '/admin/captured'
+                      ? 'text-foreground'
+                      : 'text-orange-500'
+                  )}
+                >
                   Captured
                 </Link>
-                <Link href="/admin/ingest" className={cn('text-sm font-medium transition-colors hover:text-primary whitespace-nowrap', pathname === '/admin/ingest' ? 'text-foreground' : 'text-orange-500')}>
+                <Link
+                  href='/admin/ingest'
+                  className={cn(
+                    'text-sm font-medium transition-colors hover:text-primary whitespace-nowrap',
+                    pathname === '/admin/ingest'
+                      ? 'text-foreground'
+                      : 'text-orange-500'
+                  )}
+                >
                   Ingest
                 </Link>
               </>
@@ -128,17 +152,37 @@ export function SiteHeader({ isAdmin = false }: { isAdmin?: boolean }) {
                 ))}
                 {isAdmin && (
                   <div className='pt-4 mt-4 border-t border-border'>
-                    <Link href="/admin" onClick={() => setOpen(false)} className='block text-lg font-medium text-orange-500 hover:text-primary mb-3'>Admin</Link>
-                    <Link href="/admin/ingest" onClick={() => setOpen(false)} className='block text-lg font-medium text-orange-500 hover:text-primary'>Ingest</Link>
+                    <Link
+                      href='/admin'
+                      onClick={() => setOpen(false)}
+                      className='block text-lg font-medium text-orange-500 hover:text-primary mb-3'
+                    >
+                      Admin
+                    </Link>
+                    <Link
+                      href='/admin/ingest'
+                      onClick={() => setOpen(false)}
+                      className='block text-lg font-medium text-orange-500 hover:text-primary'
+                    >
+                      Ingest
+                    </Link>
                   </div>
                 )}
                 <div className='pt-4 mt-4 border-t border-border md:hidden'>
                   {user ? (
-                    <button type="button" className="w-full text-left appearance-none bg-transparent border-0 p-0 cursor-pointer" onClick={() => setOpen(false)}>
+                    <button
+                      type='button'
+                      className='w-full text-left appearance-none bg-transparent border-0 p-0 cursor-pointer'
+                      onClick={() => setOpen(false)}
+                    >
                       <Profile />
                     </button>
                   ) : (
-                    <button type="button" className="w-full text-left appearance-none bg-transparent border-0 p-0 cursor-pointer" onClick={() => setOpen(false)}>
+                    <button
+                      type='button'
+                      className='w-full text-left appearance-none bg-transparent border-0 p-0 cursor-pointer'
+                      onClick={() => setOpen(false)}
+                    >
                       <Login path={pathname} />
                     </button>
                   )}

@@ -16,7 +16,7 @@ export default async function getExperiences() {
         supabase
           .from('new_interview')
           .select(
-            'id, title, slug, company, description, tags, approval_status, blog_link, created_at'
+            'id, title, slug, company, description, tags, approval_status, blog_link, created_at, is_exclusive'
           )
           .order('created_at', { ascending: false }),
 
@@ -113,6 +113,7 @@ const transformNewData = (data: any) => {
       company: experience.company,
       source: 'Community',
       blogLink: experience.blog_link,
+      isExclusive: experience.is_exclusive ?? false,
     }));
   }
   return [];
@@ -128,7 +129,8 @@ const transformData = (data: any) => {
           rawId: experience.id,
           title: experience.title,
           imageSrc: '',
-          description: experience?.summary || experience?.detail_experience || '',
+          description:
+            experience?.summary || experience?.detail_experience || '',
           tags: experience?.tags || [],
           status: experience?.status,
           link: getLink(experience, 'legacy'),

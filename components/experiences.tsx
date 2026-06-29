@@ -309,7 +309,8 @@ export default function InterviewExperiences({
                   'web',
                   ...(isAdmin ? ['pending'] : []),
                 ].map((filter) => (
-                  <button type="button"
+                  <button
+                    type='button'
                     key={filter}
                     onClick={() => setActiveFilter(filter as any)}
                     className={`shrink-0 px-3 py-2 rounded-lg text-sm font-medium transition-all ${
@@ -343,7 +344,8 @@ export default function InterviewExperiences({
               <span className='text-xs font-medium text-muted-foreground uppercase tracking-wider mr-1'>
                 Year:
               </span>
-              <button type="button"
+              <button
+                type='button'
                 onClick={() => setSelectedYear(null)}
                 className={`px-3 py-1 rounded-full text-xs font-medium border transition-all ${
                   selectedYear === null
@@ -354,7 +356,8 @@ export default function InterviewExperiences({
                 All
               </button>
               {availableYears.map((year) => (
-                <button type="button"
+                <button
+                  type='button'
                   key={year}
                   onClick={() =>
                     setSelectedYear(selectedYear === year ? null : year)
@@ -378,7 +381,8 @@ export default function InterviewExperiences({
             </span>
 
             {FAMOUS_COMPANIES.map((company) => (
-              <button type="button"
+              <button
+                type='button'
                 key={company}
                 onClick={() => toggleCompany(company)}
                 className={`px-3 py-1 rounded-full text-xs font-medium border transition-all ${
@@ -409,7 +413,8 @@ export default function InterviewExperiences({
                     >
                       {c}
                     </option>
-                  ))}
+                  )
+                )}
               </select>
             </div>
           </div>
@@ -423,7 +428,8 @@ export default function InterviewExperiences({
                   className='inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-accent text-accent-foreground text-xs font-medium border border-border'
                 >
                   {c}
-                  <button type="button"
+                  <button
+                    type='button'
                     onClick={() => toggleCompany(c)}
                     className='hover:text-destructive ml-1'
                   >
@@ -431,7 +437,8 @@ export default function InterviewExperiences({
                   </button>
                 </span>
               ))}
-              <button type="button"
+              <button
+                type='button'
                 onClick={() => setSelectedCompanies([])}
                 className='text-xs text-muted-foreground hover:text-foreground'
               >
@@ -487,7 +494,8 @@ export default function InterviewExperiences({
           <p className='text-xl text-muted-foreground'>
             No experiences found matching your criteria.
           </p>
-          <button type="button"
+          <button
+            type='button'
             onClick={() => {
               setSearchQuery('');
               setActiveFilter('all');

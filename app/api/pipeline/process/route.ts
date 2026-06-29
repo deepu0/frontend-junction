@@ -36,6 +36,10 @@ async function fetchMediumContent(url: string) {
   }
 }
 
+export async function GET(request: Request) {
+  return POST(request);
+}
+
 export async function POST(request: Request) {
   // Security Check
   const { searchParams } = new URL(request.url);
