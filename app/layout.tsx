@@ -102,7 +102,6 @@ export const metadata: Metadata = {
 
 import { MobileStickyCta } from '@/components/common/mobile-sticky-cta';
 import { AnnouncementBanner } from '@/components/common/announcement-banner';
-import { MotionProvider } from '@/components/motion-provider';
 
 import { getAuthState } from '@/lib/auth';
 
@@ -111,7 +110,6 @@ export default async function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const { isAdmin } = await getAuthState().catch(() => ({ isAdmin: false, user: null, role: null }));
   return (
     <html lang='en' suppressHydrationWarning className={inter.variable}>
       <head>
@@ -164,12 +162,10 @@ export default async function RootLayout({
           <Toaster />
           <LoadingProvider>
             <AuthProvider>
-              <MotionProvider>
               <AnnouncementBanner />
-              <SiteHeader isAdmin={isAdmin} />
+              <SiteHeader />
               <main id='main-content'>{children}</main>
               <MobileStickyCta />
-              </MotionProvider>
             </AuthProvider>
           </LoadingProvider>
         </ThemeProvider>
