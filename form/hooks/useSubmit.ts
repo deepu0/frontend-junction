@@ -2,8 +2,8 @@ import { FormEvent, useState, useEffect } from 'react';
 import { useToast } from '@/components/ui/use-toast';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/components/session-provider';
-import { useQuestions } from '../contexts';
-import { RESET_STATE } from '@/form/reducers';
+import { useQuestions } from '../contexts/questions-context';
+import { RESET_STATE } from '@/form/reducers/actions/questionsActions';
 
 const useCustomSubmit = (now: number) => {
   const { user } = useAuth();

@@ -1,7 +1,7 @@
 // components/hero/HeroSection.tsx
 'use client';
 
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { FaSearch } from 'react-icons/fa';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -73,7 +73,7 @@ const HeroContent = memo(
 
             <AnimatePresence>
               {showPreview && (results.length > 0 || isSearching) && (
-                <motion.div
+                <m.div
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: 10 }}
@@ -112,7 +112,7 @@ const HeroContent = memo(
                       })
                     )}
                   </div>
-                </motion.div>
+                </m.div>
               )}
             </AnimatePresence>
           </div>
@@ -120,7 +120,7 @@ const HeroContent = memo(
           {/* CTA */}
           <div className='flex flex-col sm:flex-row items-center justify-center gap-4 pb-16'>
             <Link href='/interview-experience' prefetch={false}>
-              <button className='px-8 py-3.5 rounded-full bg-white/10 hover:bg-white/20 border border-white/10 text-white font-medium transition-all backdrop-blur-sm active:scale-95 duration-200'>
+              <button type="button" className='px-8 py-3.5 rounded-full bg-white/10 hover:bg-white/20 border border-white/10 text-white font-medium transition-all backdrop-blur-sm active:scale-95 duration-200'>
                 Browse Experiences
               </button>
             </Link>

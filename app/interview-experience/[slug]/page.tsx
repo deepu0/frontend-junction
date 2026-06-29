@@ -7,6 +7,7 @@ import { Metadata } from 'next';
 import ReactMarkdown from 'react-markdown';
 import ViewCounter from '@/components/view-counter';
 import Script from 'next/script';
+import { FaqSchema } from '@/components/structured-data';
 
 export const revalidate = 60; // ISR: revalidate every 60 seconds
 
@@ -133,19 +134,29 @@ export default async function ExperienceSlugPage({ params }: Props) {
     ],
   };
 
+  const titleWords = experience.title.split(' ');
+  const companyName = titleWords[0];
+
+  const faqs = [
+    { question: `What is the interview process at ${companyName}?`, answer: `The interview process at ${companyName} typically includes a recruiter screen, technical phone interview, and onsite rounds covering coding, system design, and behavioral questions. Read this experience for specific details.` },
+    { question: `How to prepare for ${companyName} frontend interview?`, answer: `Focus on JavaScript fundamentals, React concepts, CSS layout, system design for frontend, and practice coding challenges. Review real interview experiences like this one on Frontend Junction.` },
+    { question: `What questions are asked in ${companyName} frontend interview?`, answer: `Common topics include DOM manipulation, React lifecycle, state management, performance optimization, accessibility, and frontend system design. This experience shares specific questions encountered.` },
+  ];
+
   return (
     <div className='min-h-screen bg-background text-foreground pt-24 pb-16'>
       {/* Inject Structured Data */}
       <Script
         id={`json-ld-article-${slug}`}
         type='application/ld+json'
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, '\\u003c') }}
       />
       <Script
         id={`json-ld-breadcrumb-${slug}`}
         type='application/ld+json'
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd).replace(/</g, '\\u003c') }}
       />
+      <FaqSchema faqs={faqs} />
 
       <div className='container mx-auto px-4 max-w-4xl'>
         {/* Back Link */}
@@ -237,6 +248,20 @@ export default async function ExperienceSlugPage({ params }: Props) {
             )}
           </div>
         </article>
+
+        {/* Jobs CTA */}
+        <div className='mt-8 p-6 rounded-2xl border border-primary/20 bg-primary/5 text-center'>
+          <p className='text-lg font-semibold mb-2'>Ready to apply?</p>
+          <p className='text-muted-foreground text-sm mb-4'>Browse open frontend positions at top companies</p>
+          <a
+            href='https://onlyfrontendjobs.com?utm_source=frontend-junction&utm_medium=experience-page'
+            target='_blank'
+            rel='noopener noreferrer'
+            className='inline-flex items-center gap-2 px-5 py-2.5 bg-primary text-primary-foreground rounded-lg font-medium hover:opacity-90 transition-opacity'
+          >
+            Browse Frontend Jobs →
+          </a>
+        </div>
       </div>
     </div>
   );

@@ -17,7 +17,8 @@ export function DropdownSelectOption({
   children,
 }: DropdownSelectOptionProps) {
   return (
-    <span
+    <button
+      type="button"
       className={classNames(styles['dropdown-select__option'], className, {
         [styles['animate']]: isSelected,
         [styles['selected']]: isSelected,
@@ -33,6 +34,6 @@ export function DropdownSelectOption({
           height={30}
         />
       )}
-    </span>
+    </button>
   );
 }

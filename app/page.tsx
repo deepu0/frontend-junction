@@ -1,5 +1,5 @@
 import LandingPage from '@/components/home';
-import useGetCompanies from '@/hooks/useGetCompanies';
+import getCompanies from '@/hooks/useGetCompanies';
 import getExperiences from '@/hooks/getExperiences';
 import { posts } from '#site/content';
 import type { Metadata } from 'next';
@@ -62,7 +62,7 @@ const getCachedExperiences = unstable_cache(
 
 const getCachedCompanies = unstable_cache(
   async () => {
-    const companies = await useGetCompanies();
+    const companies = await getCompanies();
     return companies || [];
   },
   ['homepage-companies'],

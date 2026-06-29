@@ -1,6 +1,5 @@
 import {
   QuestionsActionsType,
-  QuestionsStateType,
   REMOVE_GOAL,
   SET_FIRST_NAME,
   SET_LAST_NAME,
@@ -12,7 +11,8 @@ import {
   SET_IDENTITY,
   RESET_STATE,
   SET_INTERVIEW_DATE,
-} from '../index';
+} from '../actions/questionsActions';
+import { QuestionsStateType } from '../states/questionsInitialState';
 import { questionsInitialState } from '../states/questionsInitialState';
 
 export function questionsReducerFunc(

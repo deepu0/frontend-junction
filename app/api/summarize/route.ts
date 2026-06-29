@@ -39,7 +39,7 @@ export async function POST(req: Request) {
     }
 
     // 1. Fetch the URL content
-    const response = await fetch(url);
+    const response = await fetch(url, { redirect: 'manual' });
     const html = await response.text();
 
     // 2. Simple parsing to get readable text

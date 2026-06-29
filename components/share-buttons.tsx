@@ -59,6 +59,7 @@ export function ShareButtons({ url, title, className }: ShareButtonsProps) {
         </a>
       ))}
       <button
+        type="button"
         onClick={copyToClipboard}
         className='p-2 rounded-full border border-border bg-background hover:bg-muted transition-all duration-300 hover:text-primary shadow-sm'
         aria-label='Copy link'

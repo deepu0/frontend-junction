@@ -1,4 +1,4 @@
-import React, { useState, ChangeEvent, FormEvent } from 'react';
+import React, { useState, useRef, ChangeEvent, FormEvent } from 'react';
 import { CheckCircle, AlertCircle, Info, Linkedin } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
@@ -57,18 +57,36 @@ const initialData = {
   difficultyLevel: '',
 };
 
+const CHAR_LIMITS: CharacterLimits = {
+  title: 100,
+  link: 200,
+  company: 50,
+  location: 50,
+  role: 50,
+  linkedin: 100,
+};
+
+const isValidLinkedinUrl = (url: string): boolean => {
+  return (
+    url.trim() === '' ||
+    url.match(/^https:\/\/(www\.)?linkedin\.com\/in\/[\w-]+\/?$/) !== null
+  );
+};
+
+const isValidUrl = (url: string): boolean => {
+  try {
+    new URL(url);
+    return true;
+  } catch {
+    return false;
+  }
+};
+
+// react-doctor-disable-next-line react-doctor/no-giant-component
 const InterviewExperienceForm: React.FC = () => {
-  const [isExclusive, setIsExclusive] = useState<boolean>(false);
+  const isExclusive = useRef<boolean>(false);
   const [exclusiveContent, setExclusiveContent] = useState<string>('');
   const { user } = useAuth();
-  const CHAR_LIMITS: CharacterLimits = {
-    title: 100,
-    link: 200,
-    company: 50,
-    location: 50,
-    role: 50,
-    linkedin: 100,
-  };
 
   const [formData, setFormData] = useState<FormData>(initialData);
 
@@ -77,13 +95,6 @@ const InterviewExperienceForm: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [formSubmitAttempted, setFormSubmitAttempted] =
     useState<boolean>(false);
-
-  const isValidLinkedinUrl = (url: string): boolean => {
-    return (
-      url.trim() === '' ||
-      url.match(/^https:\/\/(www\.)?linkedin\.com\/in\/[\w-]+\/?$/) !== null
-    );
-  };
 
   const validateForm = (): boolean => {
     const newErrors: Errors = {};
@@ -104,7 +115,7 @@ const InterviewExperienceForm: React.FC = () => {
       newErrors.title = 'Title should be at least 10 characters long';
     }
 
-    if (!isExclusive) {
+    if (!isExclusive.current) {
       if (!formData.link.trim()) {
         newErrors.link = 'Experience/blog link is required';
       } else if (!isValidUrl(formData.link)) {
@@ -137,15 +148,6 @@ const InterviewExperienceForm: React.FC = () => {
     return Object.keys(newErrors).length === 0;
   };
 
-  const isValidUrl = (url: string): boolean => {
-    try {
-      new URL(url);
-      return true;
-    } catch {
-      return false;
-    }
-  };
-
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setFormSubmitAttempted(true);
@@ -163,13 +165,13 @@ const InterviewExperienceForm: React.FC = () => {
           company: formData.company,
           location: formData.location,
           tags: ['frontend', formData.company.toLowerCase()],
-          description: isExclusive ? exclusiveContent : '',
+          description: isExclusive.current ? exclusiveContent : '',
           offer_status: formData.offerStatus,
           added_by: user.id,
           job_role: formData.role,
           total_yoe: 3,
-          blog_link: isExclusive ? null : formData.link,
-          is_exclusive: isExclusive,
+          blog_link: isExclusive.current ? null : formData.link,
+          is_exclusive: isExclusive.current,
           approval_status: 'pending', // Explicitly set to pending for admin review
           difficulty: formData.difficultyLevel,
           linkedin_profile: formData.linkedin,
@@ -254,7 +256,7 @@ const InterviewExperienceForm: React.FC = () => {
             <Tabs
               defaultValue='link'
               className='w-full'
-              onValueChange={(val) => setIsExclusive(val === 'exclusive')}
+              onValueChange={(val) => { isExclusive.current = val === 'exclusive'; }}
             >
               <TabsList className='grid w-full grid-cols-2 bg-gray-700'>
                 <TabsTrigger

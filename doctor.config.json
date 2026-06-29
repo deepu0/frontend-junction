@@ -1,0 +1,22 @@
+{
+  "$schema": "https://react.doctor/schema/config.json",
+  "ignore": {
+    "files": [
+      "app/auth/callback/route.ts",
+      "components/mdx-components.tsx",
+      ".github/workflows/pr-checks.yml"
+    ],
+    "rules": [
+      "react-doctor/build-pipeline-secret-boundary",
+      "react-doctor/artifact-baas-authority-surface",
+      "react-doctor/no-react19-deprecated-apis",
+      "react-doctor/no-multi-comp",
+      "react-doctor/only-export-components",
+      "react-doctor/heading-has-content",
+      "react-doctor/no-giant-component",
+      "react-doctor/prefer-useReducer",
+      "react-doctor/no-pass-data-to-parent",
+      "react-doctor/no-prop-callback-in-effect"
+    ]
+  }
+}

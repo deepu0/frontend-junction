@@ -30,15 +30,17 @@ export default function FooterComponent() {
                 </Link>
               </li>
               <li>
-                <Link
-                  href='/jobs'
-                  className='hover:text-primary transition-colors opacity-50 cursor-not-allowed'
+                <a
+                  href='https://onlyfrontendjobs.com'
+                  target='_blank'
+                  rel='noopener noreferrer'
+                  className='hover:text-primary transition-colors'
                 >
-                  Job Board{' '}
-                  <span className='text-[10px] bg-primary/10 text-primary px-1.5 py-0.5 rounded ml-1'>
-                    SOON
+                  Frontend Jobs{' '}
+                  <span className='text-[10px] bg-green-500/10 text-green-500 px-1.5 py-0.5 rounded ml-1'>
+                    LIVE
                   </span>
-                </Link>
+                </a>
               </li>
               <li>
                 <Link
@@ -94,7 +96,7 @@ export default function FooterComponent() {
         </div>
 
         <div className='border-t border-white/5 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-muted-foreground'>
-          <p>
+          <p suppressHydrationWarning>
             © {new Date().getFullYear()} Frontend Junction. All rights
             reserved.
           </p>

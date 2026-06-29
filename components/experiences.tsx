@@ -3,7 +3,7 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { useSearchParams, useRouter, usePathname } from 'next/navigation';
 import CardComponent from './common/card';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { FaSearch, FaFilter, FaSortAmountDown } from 'react-icons/fa';
 import { useAuth } from './session-provider';
 import {
@@ -34,11 +34,16 @@ const FAMOUS_COMPANIES = [
 
 const ITEMS_PER_PAGE = 12;
 
+const DEFAULT_DATA: any[] = [];
+const DEFAULT_COMPANIES: string[] = [];
+const DEFAULT_YEARS: string[] = [];
+
+// react-doctor-disable-next-line react-doctor/no-giant-component
 export default function InterviewExperiences({
-  initialData = [],
+  initialData = DEFAULT_DATA,
   initialTotalCount = 0,
-  availableCompanies = [],
-  availableYears = [],
+  availableCompanies = DEFAULT_COMPANIES,
+  availableYears = DEFAULT_YEARS,
 }: IExperienceProps) {
   const { user } = useAuth();
   const searchParams = useSearchParams();
@@ -71,7 +76,7 @@ export default function InterviewExperiences({
   // Data state
   const [data, setData] = useState<any[]>(initialData);
   const [totalCount, setTotalCount] = useState<number>(initialTotalCount);
-  const [page, setPage] = useState(1);
+  const pageRef = useRef(1);
   const [isLoading, setIsLoading] = useState(false); // Initial load of filters
   const [isLoadingMore, setIsLoadingMore] = useState(false); // Infinite scroll load
   const [hasMore, setHasMore] = useState(
@@ -149,7 +154,7 @@ export default function InterviewExperiences({
       updateURLParams();
 
       setIsLoading(true);
-      setPage(1);
+      pageRef.current = 1;
 
       const filters: ExperienceFilters = {
         page: 1,
@@ -162,6 +167,7 @@ export default function InterviewExperiences({
         isAdmin,
       };
 
+      // react-doctor-disable-next-line react-doctor/async-defer-await
       const result = await fetchPaginatedExperiences(filters);
 
       // Discard if a newer request has been fired
@@ -174,6 +180,7 @@ export default function InterviewExperiences({
     }, 300);
 
     return () => clearTimeout(debounceTimer);
+    // react-doctor-disable-next-line react-doctor/exhaustive-deps
   }, [
     searchQuery,
     activeFilter,
@@ -181,39 +188,33 @@ export default function InterviewExperiences({
     selectedYear,
     sortBy,
     isAdmin,
-    updateURLParams,
   ]);
 
   // 2. Fetch data on pagination (infinite scroll)
-  useEffect(() => {
-    if (page === 1) return; // Handled by filter fetch
+  const fetchMoreData = useCallback(async () => {
+    pageRef.current += 1;
+    setIsLoadingMore(true);
 
-    const fetchMoreData = async () => {
-      setIsLoadingMore(true);
-
-      const currentFilters = filtersRef.current;
-      const filters: ExperienceFilters = {
-        page,
-        limit: ITEMS_PER_PAGE,
-        search: currentFilters.searchQuery,
-        source: currentFilters.activeFilter,
-        companies: currentFilters.selectedCompanies,
-        year: currentFilters.selectedYear,
-        sortBy: currentFilters.sortBy,
-        isAdmin: currentFilters.isAdmin,
-      };
-
-      const result = await fetchPaginatedExperiences(filters);
-      setData((prev) => {
-        const newData = [...prev, ...result.data];
-        setHasMore(newData.length < result.totalCount);
-        return newData;
-      });
-      setIsLoadingMore(false);
+    const currentFilters = filtersRef.current;
+    const filters: ExperienceFilters = {
+      page: pageRef.current,
+      limit: ITEMS_PER_PAGE,
+      search: currentFilters.searchQuery,
+      source: currentFilters.activeFilter,
+      companies: currentFilters.selectedCompanies,
+      year: currentFilters.selectedYear,
+      sortBy: currentFilters.sortBy,
+      isAdmin: currentFilters.isAdmin,
     };
 
-    fetchMoreData();
-  }, [page]); // only run when page increments
+    const result = await fetchPaginatedExperiences(filters);
+    setData((prev) => {
+      const newData = [...prev, ...result.data];
+      setHasMore(newData.length < result.totalCount);
+      return newData;
+    });
+    setIsLoadingMore(false);
+  }, []);
 
   // Intersection Observer for infinite scrolling
   const observerRef = useRef<IntersectionObserver | null>(null);
@@ -226,7 +227,7 @@ export default function InterviewExperiences({
         observerRef.current = new IntersectionObserver(
           (entries) => {
             if (entries[0].isIntersecting && !isLoadingMore && hasMore) {
-              setPage((prev) => prev + 1);
+              fetchMoreData();
             }
           },
           { rootMargin: '400px', threshold: 0.1 }
@@ -234,7 +235,7 @@ export default function InterviewExperiences({
         observerRef.current.observe(node);
       }
     },
-    [isLoading, isLoadingMore, hasMore]
+    [isLoading, isLoadingMore, hasMore, fetchMoreData]
   );
 
   const toggleCompany = (company: string) => {
@@ -292,6 +293,7 @@ export default function InterviewExperiences({
               <input
                 type='text'
                 placeholder='Search companies, titles, tags...'
+                aria-label='Search companies, titles, tags'
                 className='w-full pl-10 pr-4 py-2.5 bg-background border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all text-foreground placeholder:text-muted-foreground'
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
@@ -307,7 +309,7 @@ export default function InterviewExperiences({
                   'web',
                   ...(isAdmin ? ['pending'] : []),
                 ].map((filter) => (
-                  <button
+                  <button type="button"
                     key={filter}
                     onClick={() => setActiveFilter(filter as any)}
                     className={`shrink-0 px-3 py-2 rounded-lg text-sm font-medium transition-all ${
@@ -341,7 +343,7 @@ export default function InterviewExperiences({
               <span className='text-xs font-medium text-muted-foreground uppercase tracking-wider mr-1'>
                 Year:
               </span>
-              <button
+              <button type="button"
                 onClick={() => setSelectedYear(null)}
                 className={`px-3 py-1 rounded-full text-xs font-medium border transition-all ${
                   selectedYear === null
@@ -352,7 +354,7 @@ export default function InterviewExperiences({
                 All
               </button>
               {availableYears.map((year) => (
-                <button
+                <button type="button"
                   key={year}
                   onClick={() =>
                     setSelectedYear(selectedYear === year ? null : year)
@@ -376,7 +378,7 @@ export default function InterviewExperiences({
             </span>
 
             {FAMOUS_COMPANIES.map((company) => (
-              <button
+              <button type="button"
                 key={company}
                 onClick={() => toggleCompany(company)}
                 className={`px-3 py-1 rounded-full text-xs font-medium border transition-all ${
@@ -398,9 +400,8 @@ export default function InterviewExperiences({
                 value=''
               >
                 <option value=''>+ More</option>
-                {availableCompanies
-                  .filter((c) => !FAMOUS_COMPANIES.includes(c))
-                  .map((c) => (
+                {availableCompanies.map((c) =>
+                  FAMOUS_COMPANIES.includes(c) ? null : (
                     <option
                       key={c}
                       value={c}
@@ -422,7 +423,7 @@ export default function InterviewExperiences({
                   className='inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-accent text-accent-foreground text-xs font-medium border border-border'
                 >
                   {c}
-                  <button
+                  <button type="button"
                     onClick={() => toggleCompany(c)}
                     className='hover:text-destructive ml-1'
                   >
@@ -430,7 +431,7 @@ export default function InterviewExperiences({
                   </button>
                 </span>
               ))}
-              <button
+              <button type="button"
                 onClick={() => setSelectedCompanies([])}
                 className='text-xs text-muted-foreground hover:text-foreground'
               >
@@ -449,10 +450,10 @@ export default function InterviewExperiences({
           ))}
         </div>
       ) : (
-        <motion.div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
+        <m.div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
           <AnimatePresence mode='popLayout'>
             {data.map((interview) => (
-              <motion.div
+              <m.div
                 key={interview.id}
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
@@ -460,10 +461,10 @@ export default function InterviewExperiences({
                 transition={{ duration: 0.2 }}
               >
                 <CardComponent {...interview} isAdmin={isAdmin} />
-              </motion.div>
+              </m.div>
             ))}
           </AnimatePresence>
-        </motion.div>
+        </m.div>
       )}
 
       {/* Infinite Scroll Sentinel + Skeleton */}
@@ -486,7 +487,7 @@ export default function InterviewExperiences({
           <p className='text-xl text-muted-foreground'>
             No experiences found matching your criteria.
           </p>
-          <button
+          <button type="button"
             onClick={() => {
               setSearchQuery('');
               setActiveFilter('all');

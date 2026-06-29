@@ -1,16 +1,14 @@
-import {
-  BtnContainer,
-  Error,
-  QuestionNumHeading,
-  InterviewInputText,
-  InterviewBoxPara,
-} from '../index';
+import { BtnContainer } from '../btn-container/BtnContainer';
+import { Error } from '../error/Error';
+import { QuestionNumHeading } from '../question-num-heading/QuestionNumHeading';
+import { InterviewInputText } from '../question-input-text/InterviewInputText';
+import { InterviewBoxPara } from '../question-box-para/QuestionBoxPara';
 import classNames from 'classnames';
 import styles from './Question.module.css';
 import Image from 'next/image';
 import { ChangeEventHandler } from 'react';
-import { SET_DESCRIPTION } from '@/form/reducers';
-import { useQuestions, useSharedStates } from '@/form/contexts';
+import { SET_DESCRIPTION } from '@/form/reducers/actions/questionsActions';
+import { useQuestions, useSharedStates } from '@/form/contexts/index';
 
 export function InterviewInput() {
   const { errorMsg: error, setErrorMsg, handleOkClick } = useSharedStates();

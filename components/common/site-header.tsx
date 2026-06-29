@@ -6,7 +6,6 @@ import { cn } from '@/lib/utils';
 import { useAuth } from '@/components/session-provider';
 import Login from './login';
 import Profile from './profile';
-import { motion } from 'framer-motion';
 
 import { ModeToggle } from '@/components/mode-toggle';
 import { Menu } from 'lucide-react';
@@ -19,19 +18,19 @@ import {
 } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
 
-export function SiteHeader() {
+const navItems = [
+  { name: 'Explore', href: '/interview-experience' },
+  { name: 'Blog', href: '/blog' },
+  {
+    name: 'Jobs',
+    href: 'https://onlyfrontendjobs.com?utm_source=frontend-junction&utm_medium=nav&utm_campaign=jobs-promotion',
+  },
+  { name: 'Mentorship', href: 'https://topmate.io/deepak_sharma' },
+];
+
+export function SiteHeader({ isAdmin = false }: { isAdmin?: boolean }) {
   const { user } = useAuth();
   const pathname = usePathname();
-
-  const navItems = [
-    { name: 'Explore', href: '/interview-experience' },
-    { name: 'Blog', href: '/blog' },
-    {
-      name: 'Jobs',
-      href: 'https://onlyfrontendjobs.com?utm_source=frontend-junction&utm_medium=nav&utm_campaign=jobs-promotion',
-    },
-    { name: 'Mentorship', href: 'https://topmate.io/deepak_sharma' },
-  ];
 
   const [open, setOpen] = React.useState(false);
 
@@ -69,6 +68,19 @@ export function SiteHeader() {
                 {item.name}
               </Link>
             ))}
+            {isAdmin && (
+              <>
+                <Link href="/admin" className={cn('text-sm font-medium transition-colors hover:text-primary whitespace-nowrap', pathname === '/admin' ? 'text-foreground' : 'text-orange-500')}>
+                  Admin
+                </Link>
+                <Link href="/admin/captured" className={cn('text-sm font-medium transition-colors hover:text-primary whitespace-nowrap', pathname === '/admin/captured' ? 'text-foreground' : 'text-orange-500')}>
+                  Captured
+                </Link>
+                <Link href="/admin/ingest" className={cn('text-sm font-medium transition-colors hover:text-primary whitespace-nowrap', pathname === '/admin/ingest' ? 'text-foreground' : 'text-orange-500')}>
+                  Ingest
+                </Link>
+              </>
+            )}
           </nav>
         </div>
 
@@ -114,15 +126,21 @@ export function SiteHeader() {
                     {item.name}
                   </Link>
                 ))}
+                {isAdmin && (
+                  <div className='pt-4 mt-4 border-t border-border'>
+                    <Link href="/admin" onClick={() => setOpen(false)} className='block text-lg font-medium text-orange-500 hover:text-primary mb-3'>Admin</Link>
+                    <Link href="/admin/ingest" onClick={() => setOpen(false)} className='block text-lg font-medium text-orange-500 hover:text-primary'>Ingest</Link>
+                  </div>
+                )}
                 <div className='pt-4 mt-4 border-t border-border md:hidden'>
                   {user ? (
-                    <div onClick={() => setOpen(false)}>
+                    <button type="button" className="w-full text-left appearance-none bg-transparent border-0 p-0 cursor-pointer" onClick={() => setOpen(false)}>
                       <Profile />
-                    </div>
+                    </button>
                   ) : (
-                    <div onClick={() => setOpen(false)}>
+                    <button type="button" className="w-full text-left appearance-none bg-transparent border-0 p-0 cursor-pointer" onClick={() => setOpen(false)}>
                       <Login path={pathname} />
-                    </div>
+                    </button>
                   )}
                 </div>
               </nav>

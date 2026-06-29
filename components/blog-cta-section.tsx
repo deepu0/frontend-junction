@@ -1,6 +1,6 @@
 'use client';
 
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import Link from 'next/link';
 import Image from 'next/image';
 import { FaArrowRight, FaBookOpen, FaCalendar } from 'react-icons/fa';
@@ -19,18 +19,18 @@ interface BlogCtaSectionProps {
   latestPosts: BlogPost[];
 }
 
+const formatDate = (dateStr: string) => {
+  return new Date(dateStr).toLocaleDateString('en-US', {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+  });
+};
+
 export default function BlogCtaSection({ latestPosts }: BlogCtaSectionProps) {
   if (!latestPosts || latestPosts.length === 0) {
     return null;
   }
-
-  const formatDate = (dateStr: string) => {
-    return new Date(dateStr).toLocaleDateString('en-US', {
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric',
-    });
-  };
 
   return (
     <section className='py-20 relative overflow-hidden'>
@@ -38,7 +38,7 @@ export default function BlogCtaSection({ latestPosts }: BlogCtaSectionProps) {
       <div className='absolute inset-0 bg-gradient-to-b from-primary/5 via-transparent to-secondary/5 pointer-events-none' />
 
       <div className='container mx-auto px-4 relative z-10'>
-        <motion.div
+        <m.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
@@ -47,7 +47,7 @@ export default function BlogCtaSection({ latestPosts }: BlogCtaSectionProps) {
           {/* Header */}
           <div className='flex flex-col md:flex-row justify-between items-start md:items-end mb-12 gap-4'>
             <div>
-              <motion.div
+              <m.div
                 initial={{ opacity: 0, x: -20 }}
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }}
@@ -58,7 +58,7 @@ export default function BlogCtaSection({ latestPosts }: BlogCtaSectionProps) {
                   <FaBookOpen className='w-3 h-3' />
                   Insights & Tutorials
                 </span>
-              </motion.div>
+              </m.div>
               <h2 className='text-3xl md:text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-foreground via-foreground to-foreground/60 mb-2'>
                 From the Blog
               </h2>
@@ -68,7 +68,7 @@ export default function BlogCtaSection({ latestPosts }: BlogCtaSectionProps) {
               </p>
             </div>
 
-            <motion.div
+            <m.div
               initial={{ opacity: 0, x: 20 }}
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
@@ -81,11 +81,11 @@ export default function BlogCtaSection({ latestPosts }: BlogCtaSectionProps) {
                 <span>All Posts</span>
                 <FaArrowRight className='w-3 h-3 group-hover:translate-x-1 transition-transform' />
               </Link>
-            </motion.div>
+            </m.div>
           </div>
 
           {/* Blog Cards */}
-          <motion.div
+          <m.div
             initial='hidden'
             whileInView='visible'
             viewport={{ once: true, margin: '-50px' }}
@@ -100,7 +100,7 @@ export default function BlogCtaSection({ latestPosts }: BlogCtaSectionProps) {
             className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'
           >
             {latestPosts.slice(0, 3).map((post) => (
-              <motion.article
+              <m.article
                 key={post.slug}
                 variants={{
                   hidden: { opacity: 0, y: 30, scale: 0.95 },
@@ -190,12 +190,12 @@ export default function BlogCtaSection({ latestPosts }: BlogCtaSectionProps) {
                     </div>
                   </div>
                 </Link>
-              </motion.article>
+              </m.article>
             ))}
-          </motion.div>
+          </m.div>
 
           {/* Mobile CTA */}
-          <motion.div
+          <m.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
@@ -209,8 +209,8 @@ export default function BlogCtaSection({ latestPosts }: BlogCtaSectionProps) {
               <span>View All Posts</span>
               <FaArrowRight className='w-3 h-3 group-hover:translate-x-1 transition-transform' />
             </Link>
-          </motion.div>
-        </motion.div>
+          </m.div>
+        </m.div>
       </div>
     </section>
   );

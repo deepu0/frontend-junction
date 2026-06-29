@@ -1,10 +1,11 @@
 import { TOTAL_QUESTIONS } from '@/form/constants';
-import { questionsInitialState, questionsReducerFunc } from '@/form/reducers';
-import { QuestionsContextType } from '@/form/types';
+import { questionsInitialState } from '@/form/reducers/states/questionsInitialState';
+import { questionsReducerFunc } from '@/form/reducers/reducer-func/questionsReducerFunc';
+import { QuestionsContextType } from '@/form/types/contexts';
 import {
   createContext,
   ReactNode,
-  useContext,
+  use,
   useMemo,
   useReducer,
 } from 'react';
@@ -64,7 +65,7 @@ export function QuestionsProvider({ children }: QuestionsProviderType) {
 }
 
 export function useQuestions(): QuestionsContextType {
-  const context = useContext(QuestionsContext);
+  const context = use(QuestionsContext);
 
   if (context) {
     return context;

@@ -13,10 +13,7 @@ interface Props {
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { company } = await params;
-
-  // Find real name to format nicely
-  const companies = await getCompanies();
+  const [{ company }, companies] = await Promise.all([params, getCompanies()]);
   const matchedCompany = companies.find(
     (c) => c.slug === company.toLowerCase()
   );
@@ -47,14 +44,16 @@ export default async function CompanyHubPage({ params }: Props) {
   const { company } = await params;
 
   // Fetch the experiences for this specific company
-  const experiences = await getExperiencesByCompanySlug(company);
+  const [experiences, companies] = await Promise.all([
+    getExperiencesByCompanySlug(company),
+    getCompanies(),
+  ]);
 
   if (!experiences || experiences.length === 0) {
     notFound();
   }
 
   // Get nicely formatted company name
-  const companies = await getCompanies();
   const matchedCompany = companies.find(
     (c) => c.slug === company.toLowerCase()
   );
@@ -100,12 +99,12 @@ export default async function CompanyHubPage({ params }: Props) {
       <Script
         id={`json-ld-breadcrumb-company-${company}`}
         type='application/ld+json'
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd).replace(/</g, '\\u003c') }}
       />
       <Script
         id={`json-ld-collection-company-${company}`}
         type='application/ld+json'
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(collectionLd) }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(collectionLd).replace(/</g, '\\u003c') }}
       />
 
       <div className='container mx-auto px-4 max-w-4xl'>
@@ -171,6 +170,20 @@ export default async function CompanyHubPage({ params }: Props) {
               </div>
             </article>
           ))}
+        </div>
+
+        {/* Cross-promotion: Jobs */}
+        <div className='mt-12 p-6 rounded-2xl border border-primary/20 bg-primary/5 text-center'>
+          <p className='text-lg font-semibold mb-2'>🚀 {companyName} hiring frontend devs?</p>
+          <p className='text-muted-foreground text-sm mb-4'>Check open frontend positions at {companyName} and 500+ other companies</p>
+          <a
+            href={`https://onlyfrontendjobs.com/jobs?q=${encodeURIComponent(companyName)}&utm_source=frontend-junction&utm_medium=company-page&utm_campaign=${company}`}
+            target='_blank'
+            rel='noopener noreferrer'
+            className='inline-flex items-center gap-2 px-5 py-2.5 bg-primary text-primary-foreground rounded-lg font-medium hover:opacity-90 transition-opacity'
+          >
+            View Jobs at {companyName} →
+          </a>
         </div>
       </div>
     </div>

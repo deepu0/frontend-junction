@@ -17,13 +17,13 @@ export function BtnContainer({
   className,
   onClick,
 }: BtnContainerProps) {
-  const [isOnMobile, setIsOnMobile] = useState(false);
+  const [isOnMobile, setIsOnMobile] = useState(() =>
+    typeof navigator !== 'undefined'
+      ? navigator.userAgent.toLowerCase().includes('mobile')
+      : false
+  );
 
   useEffect(() => {
-    if (navigator?.userAgent.toLowerCase().includes('mobile')) {
-      setIsOnMobile(true);
-    }
-
     const handleResizeEvent = () => {
       setIsOnMobile(navigator?.userAgent.toLowerCase().includes('mobile'));
     };
@@ -37,7 +37,7 @@ export function BtnContainer({
 
   return (
     <div className={classNames(styles['btn-container'], className)}>
-      <button className={questrialFont.className} onClick={onClick}>
+      <button type="button" className={questrialFont.className} onClick={onClick}>
         {children}
       </button>
       {isOnMobile || !showPressEnter || (

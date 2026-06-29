@@ -1,17 +1,15 @@
-import {
-  BtnContainer,
-  DropdownSelect,
-  DropdownSelectOption,
-  Error,
-  QuestionBoxPara,
-  QuestionNumHeading,
-} from '../index';
+import { BtnContainer } from '../btn-container/BtnContainer';
+import { DropdownSelect } from '../dropdown-select/DropdownSelect';
+import { DropdownSelectOption } from '../dropdown-select-option/DropdownSelectOption';
+import { Error } from '../error/Error';
+import { QuestionBoxPara } from '../question-box-para/QuestionBoxPara';
+import { QuestionNumHeading } from '../question-num-heading/QuestionNumHeading';
 import classNames from 'classnames';
 import styles from './Question.module.css';
 import Image from 'next/image';
-import { useQuestions, useSharedStates } from '@/form/contexts';
+import { useQuestions, useSharedStates } from '@/form/contexts/index';
 import { IDENTITY } from '@/form/constants';
-import { SET_ROLE, SET_IDENTITY } from '@/form/reducers';
+import { SET_ROLE, SET_IDENTITY } from '@/form/reducers/actions/questionsActions';
 
 export function IdentityInput() {
   const { errorMsg: error, setErrorMsg, handleOkClick } = useSharedStates();

@@ -1,4 +1,5 @@
 import { posts } from '#site/content';
+import { Suspense } from 'react';
 import { PostItem } from '@/components/post-item';
 import { QueryPagination } from '@/components/query-pagination';
 import { Tag } from '@/components/tag';
@@ -81,10 +82,12 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
         <p>Nothing to see here yet</p>
       )}
 
-      <QueryPagination
-        totalPages={totalPages}
-        className='justify-center mt-8'
-      />
+      <Suspense fallback={null}>
+        <QueryPagination
+          totalPages={totalPages}
+          className='justify-center mt-8'
+        />
+      </Suspense>
     </div>
   );
 }

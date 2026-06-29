@@ -1,12 +1,6 @@
-import { createClient } from '@supabase/supabase-js';
-
-export const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
+import { createClient } from '@/utils/supabase/client';
 
 /**
- * NOTE: Administrative operations using SUPABASE_SERVICE_ROLE_KEY
- * MUST only be performed in server-side code (API routes or Sever Actions).
- * NEVER prefix service role keys with NEXT_PUBLIC_.
+ * @deprecated Use `createClient` from `@/utils/supabase/client` directly.
  */
+export const supabase = createClient();

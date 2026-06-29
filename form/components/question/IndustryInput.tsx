@@ -1,14 +1,12 @@
-import {
-  BtnContainer,
-  Error,
-  QuestionBoxPara,
-  QuestionInputIndustries,
-  QuestionNumHeading,
-} from '../index';
+import { BtnContainer } from '../btn-container/BtnContainer';
+import { Error } from '../error/Error';
+import { QuestionBoxPara } from '../question-box-para/QuestionBoxPara';
+import { QuestionInputIndustries } from '../question-input-industries/QuestionInputIndustries';
+import { QuestionNumHeading } from '../question-num-heading/QuestionNumHeading';
 import classNames from 'classnames';
 import styles from './Question.module.css';
 import Image from 'next/image';
-import { useSharedStates, useQuestions } from '@/form/contexts';
+import { useSharedStates, useQuestions } from '@/form/contexts/index';
 
 export function IndustryInput() {
   const {

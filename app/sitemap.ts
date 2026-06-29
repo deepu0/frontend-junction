@@ -35,14 +35,17 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   ];
 
   // Blog posts from Velite (static at build time)
-  const blogPages: MetadataRoute.Sitemap = posts
-    .filter((post) => post.published)
-    .map((post) => ({
-      url: `${BASE_URL}/${post.slug}`,
-      lastModified: new Date(post.date),
-      changeFrequency: 'monthly' as const,
-      priority: 0.7,
-    }));
+  const blogPages: MetadataRoute.Sitemap = [];
+  for (const post of posts) {
+    if (post.published) {
+      blogPages.push({
+        url: `${BASE_URL}/${post.slug}`,
+        lastModified: new Date(post.date),
+        changeFrequency: 'monthly' as const,
+        priority: 0.7,
+      });
+    }
+  }
 
   // Fetch dynamic experience pages
   let experiencePages: MetadataRoute.Sitemap = [];
