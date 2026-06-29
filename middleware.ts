@@ -1,14 +1,20 @@
 import { createServerClient, type CookieOptions } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
 
+/**
+ * Middleware responsibilities:
+ *  1. Refresh the Supabase auth session cookie on every request.
+ *  2. Protect authenticated-only routes (currently /add-experience).
+ *
+ * Authorization for admin areas is enforced in the routes/pages themselves
+ * via lib/auth (requireAdmin / getAuthState), not here.
+ */
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  let response = NextResponse.next({
-    request: {
-      headers: request.headers,
-    },
-  });
+  // Use a single mutable response — never reinitialise it inside callbacks
+  // or Supabase may drop multi-chunk session cookies.
+  const response = NextResponse.next({ request: { headers: request.headers } });
 
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -19,82 +25,38 @@ export async function middleware(request: NextRequest) {
           return request.cookies.get(name)?.value;
         },
         set(name: string, value: string, options: CookieOptions) {
-          request.cookies.set({
-            name,
-            value,
-            ...options,
-          });
-          response = NextResponse.next({
-            request: {
-              headers: request.headers,
-            },
-          });
-          response.cookies.set({
-            name,
-            value,
-            ...options,
-          });
+          // Write to both request and response so downstream code sees the
+          // refreshed token, and the browser receives the updated cookie.
+          request.cookies.set({ name, value, ...options });
+          response.cookies.set({ name, value, ...options });
         },
         remove(name: string, options: CookieOptions) {
-          request.cookies.set({
-            name,
-            value: '',
-            ...options,
-          });
-          response = NextResponse.next({
-            request: {
-              headers: request.headers,
-            },
-          });
-          response.cookies.set({
-            name,
-            value: '',
-            ...options,
-          });
+          request.cookies.set({ name, value: '', ...options });
+          response.cookies.set({ name, value: '', ...options });
         },
       },
     }
   );
 
-  /* Debug logging for auth */
-  // console.log(`[Middleware] Path: ${pathname}`);
-  const { data } = await supabase.auth.getSession();
+  // getUser() verifies the JWT with the auth server (secure) and triggers
+  // session refresh when the token is close to expiry, writing the new
+  // token via the set() handler above.
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
-  if (data.session) {
-    // console.log(`[Middleware] Session found for user: ${data.session.user.id}`);
-    // Check role safely by querying the database
-    // We only need to check role for specific protected routes or if we want to enforce admin access globally for some paths
-    // Current logic seemed to safeguard everything that wasn't /add-experience?
-    // The original logic was: if /add-experience, allow. Else check role === admin.
-    // This implies ALL other routes required admin? That seems wrong for a public site.
-    // Reviewing config matcher: ['/dashboard/:path*', '/add-experience']
-
-    if (pathname.startsWith('/dashboard')) {
-      // Dashboard is likely admin only
-      const { data: userProfile } = await supabase
-        .from('users')
-        .select('user_role')
-        .eq('id', data.session.user.id)
-        .single();
-
-      if (
-        userProfile?.user_role !== 'admin' &&
-        userProfile?.user_role !== 'superadmin'
-      ) {
-        return NextResponse.redirect(new URL('/', request.url));
-      }
-    }
-
-    // /add-experience is protected but allowed for any authenticated user (already handled by session check)
-    if (pathname === '/add-experience') {
-      return response;
-    }
-  } else {
-    // No session
+  // Protected route: must be signed in.
+  if (pathname === '/add-experience' && !user) {
     return NextResponse.redirect(new URL('/', request.url));
   }
+
+  return response;
 }
 
 export const config = {
-  matcher: ['/dashboard/:path*', '/add-experience'],
+  // Run on all page routes so that session tokens are refreshed site-wide.
+  // Exclude static assets, image optimisation, and Next.js internals.
+  matcher: [
+    '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico|css|js)$).*)',
+  ],
 };
