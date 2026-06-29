@@ -1,6 +1,7 @@
-import { QuestionsActionsType, QuestionsStateType } from '@/form/reducers';
+import { QuestionsActionsType } from '@/form/reducers/actions/questionsActions';
+import { QuestionsStateType } from '@/form/reducers/states/questionsInitialState';
 import { Dispatch, SetStateAction } from 'react';
-import { ObjectType } from './index';
+import { ObjectType } from './misc';
 
 /**
  * questions-context

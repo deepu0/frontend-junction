@@ -1,17 +1,18 @@
-import { useQuestions, useSharedStates } from '@/form/contexts';
+import { useQuestions, useSharedStates } from '@/form/contexts/index';
 import { getGoals } from '@/form/utils';
 import { useMemo } from 'react';
-import {
-  BtnContainer,
-  DropdownSelect,
-  DropdownSelectOption,
-  Error,
-  QuestionNumHeading,
-} from '../index';
+import { BtnContainer } from '../btn-container/BtnContainer';
+import { DropdownSelect } from '../dropdown-select/DropdownSelect';
+import { DropdownSelectOption } from '../dropdown-select-option/DropdownSelectOption';
+import { Error } from '../error/Error';
+import { QuestionNumHeading } from '../question-num-heading/QuestionNumHeading';
 import classNames from 'classnames';
 import styles from './Question.module.css';
 import Image from 'next/image';
-import { REMOVE_GOAL, SET_GOALS } from '@/form/reducers';
+import {
+  REMOVE_GOAL,
+  SET_GOALS,
+} from '@/form/reducers/actions/questionsActions';
 
 export function GoalInput() {
   const { errorMsg: error, setErrorMsg, handleOkClick } = useSharedStates();

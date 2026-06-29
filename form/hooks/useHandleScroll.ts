@@ -1,4 +1,4 @@
-import { useSharedStates } from '@/form/contexts';
+import { useSharedStates } from '@/form/contexts/index';
 import { useEffect, useRef } from 'react';
 
 export function useHandleScroll() {
@@ -23,7 +23,7 @@ export function useHandleScroll() {
       }, 32);
     }
 
-    document.addEventListener('wheel', handleScroll);
+    document.addEventListener('wheel', handleScroll, { passive: true });
 
     return function () {
       document.removeEventListener('wheel', handleScroll);

@@ -1,17 +1,15 @@
-import { QuestionProps } from '@/form/types';
+import { QuestionProps } from '@/form/types/question';
 import classNames from 'classnames';
-import {
-  EmailInput,
-  FirstNameInput,
-  GoalInput,
-  IndustryInput,
-  Intro,
-  LastNameInput,
-  RoleInput,
-  InterviewInput,
-  IdentityInput,
-  DateInput,
-} from './index';
+import { EmailInput } from './EmailInput';
+import { FirstNameInput } from './FirstNameInput';
+import { GoalInput } from './GoalInput';
+import { IndustryInput } from './IndustryInput';
+import { Intro } from './Intro';
+import { LastNameInput } from './LastNameInput';
+import { RoleInput } from './RoleInput';
+import { InterviewInput } from './InterviewInput';
+import { IdentityInput } from './PostType';
+import { DateInput } from './DateInput';
 import styles from './Question.module.css';
 
 export function Question({

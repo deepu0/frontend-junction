@@ -24,17 +24,21 @@ export class MediumSource implements ContentSource {
 
       let allItems: any[] = [];
 
-      // Fetch from multiple tags
-      for (const tag of TAGS) {
-        try {
-          const FEED_URL = `https://medium.com/feed/tag/${tag}`;
-          const feed = await this.parser.parseURL(FEED_URL);
-          if (feed.items) {
-            allItems = [...allItems, ...feed.items];
+      // Fetch from multiple tags in parallel
+      const tagResults = await Promise.all(
+        TAGS.map(async (tag) => {
+          try {
+            const FEED_URL = `https://medium.com/feed/tag/${tag}`;
+            const feed = await this.parser.parseURL(FEED_URL);
+            return feed.items || [];
+          } catch (e) {
+            console.warn(`Failed to fetch Medium tag: ${tag}`);
+            return [];
           }
-        } catch (e) {
-          console.warn(`Failed to fetch Medium tag: ${tag}`);
-        }
+        })
+      );
+      for (const items of tagResults) {
+        allItems = [...allItems, ...items];
       }
 
       // Deduplicate by URL or Title

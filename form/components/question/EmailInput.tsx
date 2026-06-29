@@ -1,16 +1,14 @@
-import { useQuestions, useSharedStates } from '@/form/contexts';
+import { useQuestions, useSharedStates } from '@/form/contexts/index';
 import classNames from 'classnames';
-import {
-  BtnContainer,
-  Error,
-  QuestionBoxPara,
-  QuestionInputText,
-  QuestionNumHeading,
-} from '../index';
+import { BtnContainer } from '../btn-container/BtnContainer';
+import { Error } from '../error/Error';
+import { QuestionBoxPara } from '../question-box-para/QuestionBoxPara';
+import { QuestionInputText } from '../question-input-text/QuestionInputText';
+import { QuestionNumHeading } from '../question-num-heading/QuestionNumHeading';
 import Image from 'next/image';
 import styles from './Question.module.css';
 import { ChangeEventHandler } from 'react';
-import { SET_EMAIL } from '@/form/reducers';
+import { SET_EMAIL } from '@/form/reducers/actions/questionsActions';
 
 export function EmailInput() {
   const { errorMsg: error, setErrorMsg, handleOkClick } = useSharedStates();

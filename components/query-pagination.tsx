@@ -47,7 +47,7 @@ export function QueryPagination({
           .map((_, index) => (
             <PaginationItem
               className='hidden sm:inline-block'
-              key={`page-button-${index}`}
+              key={`page-${index + 1}`}
             >
               <PaginationLink
                 isActive={currentPage === index + 1}

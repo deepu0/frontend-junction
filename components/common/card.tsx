@@ -261,7 +261,10 @@ const CardComponent: React.FC<CardProps> = ({
 }) => {
   const [isProcessing, setIsProcessing] = React.useState(false);
   const [description, setDescription] = React.useState(initialDescription);
-  const [currentStatus, setCurrentStatus] = React.useState(status);
+  const [statusOverride, setStatusOverride] = React.useState<
+    string | undefined
+  >(undefined);
+  const currentStatus = statusOverride ?? status;
 
   const handleSummarize = async () => {
     if (!blogLink || isProcessing) return;
@@ -303,7 +306,7 @@ const CardComponent: React.FC<CardProps> = ({
     try {
       const result = await approveExperience(rawId);
       if (!result.success) throw new Error(result.error);
-      setCurrentStatus('accepted');
+      setStatusOverride('accepted');
       onApprove?.();
       toast({
         title: 'Post Approved!',
@@ -458,6 +461,7 @@ const CardComponent: React.FC<CardProps> = ({
                 <>
                   {!isExclusive && blogLink && (
                     <button
+                      type='button'
                       onClick={handleSummarize}
                       disabled={isProcessing}
                       className='flex items-center gap-1 text-[10px] bg-violet-600 hover:bg-violet-700 text-white px-2 py-1.5 rounded-md transition-colors disabled:opacity-50 font-semibold'
@@ -471,6 +475,7 @@ const CardComponent: React.FC<CardProps> = ({
                     </button>
                   )}
                   <button
+                    type='button'
                     onClick={handleApprove}
                     disabled={isProcessing}
                     className='flex items-center gap-1 text-[10px] bg-green-600 hover:bg-green-700 text-white px-2 py-1.5 rounded-md transition-colors disabled:opacity-50 font-semibold'
@@ -485,6 +490,7 @@ const CardComponent: React.FC<CardProps> = ({
                 </>
               )}
               <button
+                type='button'
                 onClick={handleDelete}
                 disabled={isProcessing}
                 className='flex items-center gap-1 text-[10px] bg-red-600/10 hover:bg-red-600 text-red-500 hover:text-white px-2 py-1.5 rounded-md transition-all disabled:opacity-50 border border-red-600/20'
@@ -533,7 +539,7 @@ const CardComponent: React.FC<CardProps> = ({
           <div className='flex flex-wrap gap-2'>
             {tags.slice(0, 3).map((tag, index) => (
               <span
-                key={index}
+                key={tag}
                 className='px-2.5 py-1 rounded-md text-xs font-medium bg-primary/10 text-primary border border-primary/20'
                 suppressHydrationWarning
               >

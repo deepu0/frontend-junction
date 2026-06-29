@@ -1,10 +1,10 @@
-import { TOTAL_QUESTIONS } from '@/form/constants';
+import { TOTAL_QUESTIONS } from '@/form/constants/TOTAL_QUESTIONS';
 import {
-  ObjectType,
   QuestionNumType,
   SharedStatesContextType,
-} from '@/form/types';
-import { createContext, ReactNode, useContext, useState } from 'react';
+} from '@/form/types/contexts';
+import { ObjectType } from '@/form/types/misc';
+import { createContext, ReactNode, use, useState } from 'react';
 
 const SharedStatesContext = createContext<SharedStatesContextType>({
   questionNum: { prev: null, now: 0 },
@@ -21,6 +21,14 @@ type SharedStatesProviderType = {
   readonly children: ReactNode;
 };
 
+function handleOkClick() {
+  document.dispatchEvent(
+    new KeyboardEvent('keypress', {
+      key: 'Enter',
+    })
+  );
+}
+
 export function SharedStatesProvider({ children }: SharedStatesProviderType) {
   const [questionNum, setQuestionNum] = useState<QuestionNumType>({
     prev: null,
@@ -35,14 +43,6 @@ export function SharedStatesProvider({ children }: SharedStatesProviderType) {
       prevValue.now + 1 >= TOTAL_QUESTIONS + 1
         ? { ...prevValue }
         : { prev: prevValue.now, now: prevValue.now + 1 }
-    );
-  }
-
-  function handleOkClick() {
-    document.dispatchEvent(
-      new KeyboardEvent('keypress', {
-        key: 'Enter',
-      })
     );
   }
 
@@ -65,7 +65,7 @@ export function SharedStatesProvider({ children }: SharedStatesProviderType) {
 }
 
 export function useSharedStates(): SharedStatesContextType {
-  const context = useContext(SharedStatesContext);
+  const context = use(SharedStatesContext);
 
   if (context) {
     return context;

@@ -4,7 +4,7 @@ import { useExperiences } from '@/hooks/useExperiences';
 import { useAuth } from './session-provider';
 import CardComponent from './common/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import {
   Loader2,
   ShieldCheck,
@@ -198,7 +198,7 @@ export default function AdminDashboard({
               <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
                 <AnimatePresence>
                   {pendingPosts.map((post: Experience) => (
-                    <motion.div
+                    <m.div
                       key={post.id}
                       layout
                       initial={{ opacity: 0, scale: 0.9 }}
@@ -211,7 +211,7 @@ export default function AdminDashboard({
                         onDelete={() => removeExperience(post.id)}
                         onApprove={() => markApproved(post.id)}
                       />
-                    </motion.div>
+                    </m.div>
                   ))}
                 </AnimatePresence>
               </div>

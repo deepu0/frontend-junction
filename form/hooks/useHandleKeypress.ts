@@ -1,4 +1,4 @@
-import { useQuestions, useSharedStates } from '@/form/contexts';
+import { useQuestions, useSharedStates } from '@/form/contexts/index';
 import {
   isNotValidEmail,
   isTaskSpecificEmail,

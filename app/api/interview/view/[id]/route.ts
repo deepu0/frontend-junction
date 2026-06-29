@@ -10,8 +10,7 @@ export async function GET(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const { id } = await params;
-  const cookieStore = await cookies();
+  const [{ id }, cookieStore] = await Promise.all([params, cookies()]);
   const supabase = createServerClient(
     supabaseUrl,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
@@ -45,8 +44,7 @@ export async function POST(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const { id } = await params;
-  const cookieStore = await cookies();
+  const [{ id }, cookieStore] = await Promise.all([params, cookies()]);
   const supabase = createServerClient(
     supabaseUrl,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,

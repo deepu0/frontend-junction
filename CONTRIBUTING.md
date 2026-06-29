@@ -73,6 +73,7 @@ npm run dev
 5. Submit the PR against `main`
 
 Our CI pipeline runs automatically:
+
 - ESLint + TypeScript type checking
 - Security audit
 - Production build

@@ -1,15 +1,13 @@
-import {
-  BtnContainer,
-  Error,
-  QuestionInputText,
-  QuestionNumHeading,
-} from '../index';
+import { BtnContainer } from '../btn-container/BtnContainer';
+import { Error } from '../error/Error';
+import { QuestionInputText } from '../question-input-text/QuestionInputText';
+import { QuestionNumHeading } from '../question-num-heading/QuestionNumHeading';
 import classNames from 'classnames';
 import styles from './Question.module.css';
 import Image from 'next/image';
 import { ChangeEventHandler } from 'react';
-import { SET_INTERVIEW_DATE } from '@/form/reducers';
-import { useQuestions, useSharedStates } from '@/form/contexts';
+import { SET_INTERVIEW_DATE } from '@/form/reducers/actions/questionsActions';
+import { useQuestions, useSharedStates } from '@/form/contexts/index';
 import DateSelector from '../date-selector/DateSelect';
 
 export function DateInput() {

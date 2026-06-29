@@ -1,5 +1,4 @@
 import fs from 'fs';
-import Head from 'next/head';
 import matter from 'gray-matter';
 import getPostMetadata from '@/lib/getPostMetaData';
 import MarkdownRenderer from '@/components/markdown-renderer';
@@ -63,25 +62,25 @@ export async function generateMetadata({
   };
 }
 
+const h2Style: React.CSSProperties = {
+  color: '#ff5733',
+  fontSize: '24px',
+  margin: '20px 0',
+};
+const aStyle: React.CSSProperties = {
+  color: '#ff5733',
+};
+const strongStyle: React.CSSProperties = {
+  color: '#33aaff',
+  fontWeight: 'bold',
+};
+const preStyle: React.CSSProperties = {
+  color: 'greenyellow',
+};
+
 const PostPage = async (props: { params: Promise<{ slug: string }> }) => {
   const { slug } = await props.params;
   const post = getPostContent(slug);
-  const h2Style: React.CSSProperties = {
-    color: '#ff5733',
-    fontSize: '24px',
-    margin: '20px 0',
-  };
-  const aStyle: React.CSSProperties = {
-    color: '#ff5733',
-  };
-
-  const strongStyle: React.CSSProperties = {
-    color: '#33aaff',
-    fontWeight: 'bold',
-  };
-  const preStyle: React.CSSProperties = {
-    color: 'greenyellow',
-  };
 
   return (
     <div className='mt-20'>

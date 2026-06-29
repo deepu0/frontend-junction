@@ -2,11 +2,12 @@ import BlotFormatter from 'quill-blot-formatter';
 //import * as Emoji from 'quill-emoji';
 //import ImageUploader from 'quill-image-uploader';
 import 'quill/dist/quill.snow.css';
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useState } from 'react';
+// react-doctor-disable-next-line react-doctor/prefer-dynamic-import
 import ReactQuill, { Quill } from 'react-quill';
 //import { UploadToS3 } from 'utils/UploadFile';
 
-import { isMobile } from 'mobile-device-detect';
+import { getIsMobile } from '@/lib/is-mobile';
 //import 'quill-emoji/dist/quill-emoji.css';
 
 var BaseImageFormat = Quill.import('formats/image');
@@ -170,13 +171,13 @@ const TextEditor: React.FC<Props> = (props: Props) => {
     showAllOptions = false,
   } = props;
   const [editorText, setEditorText] = useState<any>(value || '');
-  const onChangeHandler = (content: any) => {
-    onChange(content);
-  };
-
-  useEffect(() => {
-    onChangeHandler(editorText);
-  }, [editorText, onChangeHandler]);
+  const handleChange = useCallback(
+    (content: any) => {
+      setEditorText(content);
+      onChange(content);
+    },
+    [onChange]
+  );
 
   return (
     <ReactQuill
@@ -184,9 +185,9 @@ const TextEditor: React.FC<Props> = (props: Props) => {
       value={editorText}
       theme='snow'
       formats={formats}
-      modules={isMobile || !showAllOptions ? mobileModules : modules}
+      modules={getIsMobile() || !showAllOptions ? mobileModules : modules}
       placeholder={placeHolder}
-      onChange={setEditorText}
+      onChange={handleChange}
     />
   );
 };

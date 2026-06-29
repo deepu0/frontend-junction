@@ -1,9 +1,9 @@
-import { QuestionBoxHeading } from '../index';
+import { QuestionBoxHeading } from '../question-box-heading/QuestionBoxHeading';
 import classNames from 'classnames';
 import styles from './QuestionNumHeading.module.css';
 import Image from 'next/image';
 import { ReactNode } from 'react';
-import { useSharedStates } from '@/form/contexts';
+import { useSharedStates } from '@/form/contexts/index';
 
 type QuestionNumHeadingProps = {
   readonly children: ReactNode;

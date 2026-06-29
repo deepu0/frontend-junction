@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useRef } from 'react';
 import Confetti from 'react-confetti';
 import { useRouter } from 'next/navigation';
 import {
@@ -12,12 +12,12 @@ import {
 
 const Success = () => {
   const router = useRouter();
-  const [showModal, setShowModal] = useState(true);
+  const showModal = useRef(true);
   const message = 'Thank you for contributing to the community!🫡 ';
 
   // Close modal and redirect after 40 seconds
   setTimeout(() => {
-    setShowModal(false);
+    showModal.current = false;
     router.push('/');
   }, 7000);
 

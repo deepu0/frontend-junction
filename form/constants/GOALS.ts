@@ -1,4 +1,4 @@
-import { ObjectType } from '@/form/types';
+import { ObjectType } from '@/form/types/misc';
 
 export const FOUNDER_GOALS: ObjectType = {
   A: 'Structured approach to growth',
