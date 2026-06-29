@@ -37,6 +37,10 @@ async function fetchMediumContent(url: string) {
 }
 
 export async function GET(request: Request) {
+  return POST(request);
+}
+
+export async function POST(request: Request) {
   // Security Check
   const { searchParams } = new URL(request.url);
   const key = searchParams.get('key');
@@ -66,7 +70,7 @@ export async function GET(request: Request) {
       );
     }
 
-    const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
+    const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
     const results = { scraped: 0, user: 0, legacy: 0, errors: [] as string[] };
     const BATCH_SIZE = 200;
 
@@ -87,6 +91,7 @@ export async function GET(request: Request) {
     }
 
     if (scrapedData && scrapedData.length > 0) {
+      // Sequential processing: AI model calls must be serialized to avoid rate limits
       for (const item of scrapedData) {
         try {
           let content = item.metadata?.content || item.summary || '';
@@ -141,6 +146,7 @@ export async function GET(request: Request) {
       .limit(BATCH_SIZE);
 
     if (userData && userData.length > 0) {
+      // Sequential processing: each item requires AI model call, processed one at a time to avoid rate limits
       for (const item of userData) {
         try {
           const content = item.description || '';
@@ -186,6 +192,7 @@ export async function GET(request: Request) {
     }
 
     if (legacyData && legacyData.length > 0) {
+      // Sequential processing: each item requires AI model call, processed one at a time to avoid rate limits
       for (const item of legacyData) {
         try {
           const content = item.detail_experience || item.summary || '';

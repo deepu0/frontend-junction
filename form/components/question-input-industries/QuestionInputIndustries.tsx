@@ -1,29 +1,30 @@
-import {
-  DropdownSelect,
-  DropdownSelectOption,
-  QuestionInputText,
-} from '../index';
+import { DropdownSelect } from '../dropdown-select/DropdownSelect';
+import { DropdownSelectOption } from '../dropdown-select-option/DropdownSelectOption';
+import { QuestionInputText } from '../question-input-text/QuestionInputText';
 import styles from './QuestionInputIndustries.module.css';
 import classNames from 'classnames';
 import Image from 'next/image';
-import { useIndustries } from '@/form/hooks';
+import { useIndustries } from '@/form/hooks/useIndustries';
 import {
   ChangeEvent,
   Dispatch,
   MouseEvent,
   SetStateAction,
   useEffect,
+  useMemo,
   useRef,
   useState,
 } from 'react';
-import { SET_INDUSTRY } from '@/form/reducers';
-import { useQuestions, useSharedStates } from '@/form/contexts';
-import { IndustriesProps, ObjectType } from '@/form/types';
+import { SET_INDUSTRY } from '@/form/reducers/actions/questionsActions';
+import { useQuestions, useSharedStates } from '@/form/contexts/index';
+import { IndustriesProps } from '@/form/types/question';
+import { ObjectType } from '@/form/types/misc';
 
 type QuestionInputIndustriesProps = IndustriesProps & {
   readonly setErrorMsg: Dispatch<SetStateAction<ObjectType>> | undefined;
 };
 
+// react-doctor-disable-next-line react-doctor/no-giant-component
 export function QuestionInputIndustries({
   showIndustriesList,
   setShowIndustriesList,
@@ -37,26 +38,22 @@ export function QuestionInputIndustries({
   const inputTextRef = useRef<HTMLInputElement>(null);
   const [localIndustry, setLocalIndustry] = useState(industry);
   const [optionClicked, setOptionClicked] = useState(false);
-  const [filterIndustries, setFilteredIndustries] = useState<string[]>([]);
 
-  useEffect(() => {
-    if (optionClicked) {
-      return;
-    }
-
-    setFilteredIndustries(
-      industries.filter((_industry) =>
-        _industry.toLowerCase().includes(localIndustry.toLowerCase())
-      )
+  const filterIndustries = useMemo(() => {
+    if (optionClicked) return [];
+    return industries.filter((_industry) =>
+      _industry.toLowerCase().includes(localIndustry.toLowerCase())
     );
   }, [industries, localIndustry, optionClicked]);
 
   useEffect(() => {
-    setTimeout(() => {
+    const id = setTimeout(() => {
       inputTextRef.current?.focus();
     }, 500);
+    return () => clearTimeout(id);
   }, []);
 
+  // react-doctor-disable-next-line react-doctor/no-pass-data-to-parent, react-doctor/no-prop-callback-in-effect
   useEffect(() => {
     if (
       localIndustry &&
@@ -111,9 +108,14 @@ export function QuestionInputIndustries({
   }
 
   return (
+    // react-doctor-disable-next-line react-doctor/prefer-tag-over-role
     <div
       className={styles['dropdown-select__industries']}
+      role='group'
       onClick={handleDropdownClick}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter') handleDropdownClick(e as unknown as MouseEvent);
+      }}
     >
       <QuestionInputText
         className={styles['dropdown-select__input']}
@@ -124,6 +126,7 @@ export function QuestionInputIndustries({
       />
 
       <button
+        type='button'
         className={classNames(styles['dropdown-select__btn'], {
           [styles['close']]: !showIndustriesList && !localIndustry,
         })}

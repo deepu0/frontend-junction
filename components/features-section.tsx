@@ -1,6 +1,6 @@
 'use client';
 
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import {
   FaBookOpen,
   FaBriefcase,
@@ -39,7 +39,7 @@ export default function FeaturesSection() {
   return (
     <section className='py-24 bg-background/50 relative'>
       <div className='container mx-auto px-4'>
-        <motion.div
+        <m.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
@@ -52,12 +52,12 @@ export default function FeaturesSection() {
             We collect, verify, and organize everything you need to crack your
             next specific frontend role.
           </p>
-        </motion.div>
+        </m.div>
 
         <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8'>
           {features.map((f, i) => (
-            <motion.div
-              key={i}
+            <m.div
+              key={f.title}
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
@@ -67,7 +67,7 @@ export default function FeaturesSection() {
               <f.icon className={`text-4xl mb-4 ${f.color}`} />
               <h3 className='text-xl font-bold mb-2'>{f.title}</h3>
               <p className='text-muted-foreground'>{f.desc}</p>
-            </motion.div>
+            </m.div>
           ))}
         </div>
       </div>

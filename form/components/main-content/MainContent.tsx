@@ -1,11 +1,25 @@
 'use client';
 import '@/styles/globals.css';
-import { useState } from 'react';
-import { useSharedStates } from '@/form/contexts';
-import { useHandleKeypress, useHandleScroll } from '@/form/hooks';
+import { useRef } from 'react';
+import { useSharedStates } from '@/form/contexts/shared-states-context';
+import { useHandleKeypress } from '@/form/hooks/useHandleKeypress';
+import { useHandleScroll } from '@/form/hooks/useHandleScroll';
 import { useEffect } from 'react';
-import { Question } from '../index';
+import { Question } from '../question/Question';
 import Success from '@/components/common/confetti';
+
+const questions = [
+  { index: 0, type: 'intro' },
+  { index: 1, type: 'firstName' },
+  { index: 2, type: 'lastName' },
+  { index: 3, type: 'industry' },
+  { index: 4, type: 'role' },
+  //{ index: 5, type: 'goal' },
+  { index: 5, type: 'description' },
+  { index: 6, type: 'email' },
+  { index: 7, type: 'interviewDate' },
+  { index: 8, type: 'identity' },
+];
 
 export function MainContent() {
   const { questionNum, setShowIndustriesList } = useSharedStates();
@@ -13,10 +27,10 @@ export function MainContent() {
 
   const { isLoading, isFailure, isSuccess } = useHandleKeypress();
   //useHandleScroll();
-  const [isMounted, setIsMounted] = useState(false);
+  const isMounted = useRef(false);
 
   useEffect(() => {
-    setIsMounted(true);
+    isMounted.current = true;
   }, []);
 
   useEffect(() => {
@@ -32,8 +46,8 @@ export function MainContent() {
       document.removeEventListener('click', handleClick);
     };
 
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isMounted]);
+    // react-doctor-disable-next-line react-doctor/exhaustive-deps
+  }, []);
 
   if (isLoading) {
     return <p>Submitting your data...</p>;
@@ -42,27 +56,14 @@ export function MainContent() {
     return <Success />;
   }
 
-  const questions = [
-    { index: 0, type: 'intro' },
-    { index: 1, type: 'firstName' },
-    { index: 2, type: 'lastName' },
-    { index: 3, type: 'industry' },
-    { index: 4, type: 'role' },
-    //{ index: 5, type: 'goal' },
-    { index: 5, type: 'description' },
-    { index: 6, type: 'email' },
-    { index: 7, type: 'interviewDate' },
-    { index: 8, type: 'identity' },
-  ];
-
   return (
-    <section>
+    <section suppressHydrationWarning>
       <div>
         {questions.map(
           ({ index, type }) =>
             [prev, now].includes(index) && (
               <Question
-                key={index}
+                key={type}
                 type={type as any}
                 outView={now - 1 === index}
                 outViewSlide={now - 1 === index ? 'up' : 'down'}

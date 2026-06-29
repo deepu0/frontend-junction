@@ -1,6 +1,4 @@
 export const dynamic = 'force-dynamic';
-import { createServerClient } from '@supabase/ssr';
-import { cookies } from 'next/headers';
 import { NextResponse } from 'next/server';
 import { LeetCodeSource } from '@/lib/content-pipeline/sources/leetcode';
 import { MediumSource } from '@/lib/content-pipeline/sources/medium';
@@ -8,76 +6,51 @@ import { DevToSource } from '@/lib/content-pipeline/sources/devto';
 import { TelegramSource } from '@/lib/content-pipeline/sources/telegram';
 import { HashnodeSource } from '@/lib/content-pipeline/sources/hashnode';
 import { ScrapedArticle } from '@/lib/content-pipeline/types';
+import { getAuthState } from '@/lib/auth';
 
-export async function GET(request: Request) {
-  // Security: Check for a secret token OR an admin session
+const sources = [
+  // new LeetCodeSource(), // LeetCode is currently blocked by Cloudflare
+  new MediumSource(),
+  new DevToSource(),
+  new TelegramSource(),
+  new HashnodeSource(),
+];
+
+export async function POST(request: Request) {
+  // Authorized by a valid cron token OR an admin session (consistent rule).
   const { searchParams } = new URL(request.url);
   const token = searchParams.get('token');
   const cronSecret = process.env.CRON_SECRET;
 
-  const cookieStore = await cookies();
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        get(name: string) {
-          return cookieStore.get(name)?.value;
-        },
-      },
-    }
-  );
-
-  const {
-    data: { session },
-  } = await supabase.auth.getSession();
-  const isAdmin = session?.user.email === 'deepaksharma834@gmail.com';
-
-  const isAuthorized = (cronSecret && token === cronSecret) || isAdmin;
+  const hasValidToken = Boolean(cronSecret && token === cronSecret);
+  const isAdmin = hasValidToken ? false : (await getAuthState()).isAdmin;
+  const isAuthorized = hasValidToken || isAdmin;
 
   if (!isAuthorized) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
   try {
-    const sources = [
-      // new LeetCodeSource(), // LeetCode is currently blocked by Cloudflare
-      new MediumSource(),
-      new DevToSource(),
-      new TelegramSource(),
-      new HashnodeSource(),
-    ];
     const allArticles: ScrapedArticle[] = [];
 
-    // 1. Fetch from all sources
-    for (const source of sources) {
-      console.log(`[Pipeline] Fetching from ${source.name}...`);
-      const articles = await source.fetchArticles(50); // Fetches 50 from each source
-      console.log(`[Pipeline] Got ${articles.length} from ${source.name}`);
+    // 1. Fetch from all sources in parallel
+    const sourceResults = await Promise.all(
+      sources.map(async (source) => {
+        console.log(`[Pipeline] Fetching from ${source.name}...`);
+        const articles = await source.fetchArticles(50);
+        console.log(`[Pipeline] Got ${articles.length} from ${source.name}`);
+        return articles;
+      })
+    );
+    for (const articles of sourceResults) {
       allArticles.push(...articles);
     }
 
     // 2. Save to Database
     const results = await Promise.allSettled(
       allArticles.map(async (article) => {
-        // Upsert based on original_url?
-        // schema: original_url TEXT UNIQUE NOT NULL
-
-        // For user-facing operations (respects RLS, checks auth)
-        const cookieStore = await cookies();
-        const supabase = createServerClient(
-          process.env.NEXT_PUBLIC_SUPABASE_URL!,
-          process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-          {
-            cookies: {
-              get(name: string) {
-                return cookieStore.get(name)?.value;
-              },
-            },
-          }
-        );
-
-        // For admin operations (bypasses RLS) - Insert content
+        // Upsert based on original_url (schema: original_url TEXT UNIQUE NOT NULL).
+        // Uses the service-role client (bypasses RLS) to insert scraped content.
         const { createClient } = await import('@supabase/supabase-js');
         const supabaseAdmin = createClient(
           process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -114,9 +87,12 @@ export async function GET(request: Request) {
     );
 
     const successCount = results.filter((r) => r.status === 'fulfilled').length;
-    const errors = results
-      .filter((r) => r.status === 'rejected')
-      .map((r) => (r as PromiseRejectedResult).reason.message);
+    const errors: string[] = [];
+    for (const r of results) {
+      if (r.status === 'rejected') {
+        errors.push((r as PromiseRejectedResult).reason.message);
+      }
+    }
 
     return NextResponse.json({
       success: true,

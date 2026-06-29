@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { usePathname } from 'next/navigation';
 import React from 'react';
+import Image from 'next/image';
 import handleLogin from '@/lib/handleLogin';
 import { useLoading } from './loader';
 import { useRouter } from 'next/navigation';
@@ -43,10 +44,12 @@ export default function Login({ path = '' }: ILoginProps) {
       disabled={loading}
     >
       Sign in with
-      <img
-        style={{ height: '20px' }}
+      <Image
+        style={{ height: '20px', width: 'auto' }}
         src='/companies/google.svg'
         alt='Google logo'
+        width={20}
+        height={20}
       />
     </Button>
   );

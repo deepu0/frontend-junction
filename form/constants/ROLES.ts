@@ -1,4 +1,4 @@
-import { ObjectType } from '@/form/types';
+import { ObjectType } from '@/form/types/misc';
 
 export const ROLES: ObjectType = {
   A: 'Selected 🎉',

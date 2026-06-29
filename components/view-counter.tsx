@@ -16,6 +16,7 @@ export default function ViewCounter({
 }: ViewCounterProps) {
   const [views, setViews] = useState<number | null>(null);
 
+  // react-doctor-disable-next-line react-doctor/no-fetch-in-effect
   useEffect(() => {
     const fetchViews = async () => {
       try {

@@ -38,8 +38,39 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'URL is required' }, { status: 400 });
     }
 
+    // SSRF protection: only allow http/https to approved public domains
+    let parsedUrl: URL;
+    try {
+      parsedUrl = new URL(url);
+    } catch {
+      return NextResponse.json({ error: 'Invalid URL' }, { status: 400 });
+    }
+
+    if (!['http:', 'https:'].includes(parsedUrl.protocol)) {
+      return NextResponse.json(
+        { error: 'Invalid URL protocol' },
+        { status: 400 }
+      );
+    }
+
+    // Block private/loopback/metadata ranges
+    const hostname = parsedUrl.hostname.toLowerCase();
+    const blockedPatterns = [
+      /^localhost$/,
+      /^127\./,
+      /^10\./,
+      /^172\.(1[6-9]|2\d|3[01])\./,
+      /^192\.168\./,
+      /^169\.254\./, // AWS/GCP/Azure instance metadata
+      /^::1$/,
+      /^0\.0\.0\.0$/,
+    ];
+    if (blockedPatterns.some((re) => re.test(hostname))) {
+      return NextResponse.json({ error: 'URL not allowed' }, { status: 400 });
+    }
+
     // 1. Fetch the URL content
-    const response = await fetch(url);
+    const response = await fetch(url, { redirect: 'manual' });
     const html = await response.text();
 
     // 2. Simple parsing to get readable text

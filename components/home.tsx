@@ -2,7 +2,7 @@
 import React from 'react';
 import dynamic from 'next/dynamic';
 import { interviewData } from '@/constants/experiences';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import HeroSection from './hero-section';
 import FooterComponent from './common/footer';
 import Link from 'next/link';
@@ -61,7 +61,7 @@ const LandingPage: React.FC<IHomeProps> = (props: IHomeProps) => {
         {/* Subtle background gradient */}
         <div className='absolute inset-0 bg-gradient-to-b from-transparent via-primary/5 to-transparent pointer-events-none' />
 
-        <motion.div
+        <m.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
@@ -71,7 +71,7 @@ const LandingPage: React.FC<IHomeProps> = (props: IHomeProps) => {
           {/* Header */}
           <div className='flex flex-col md:flex-row justify-between items-start md:items-end mb-12 gap-4'>
             <div>
-              <motion.div
+              <m.div
                 initial={{ opacity: 0, x: -20 }}
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }}
@@ -81,7 +81,7 @@ const LandingPage: React.FC<IHomeProps> = (props: IHomeProps) => {
                 <span className='px-3 py-1 rounded-full bg-primary/10 text-primary text-sm font-semibold border border-primary/20'>
                   ✨ Latest
                 </span>
-              </motion.div>
+              </m.div>
               <h2 className='text-3xl md:text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-foreground to-foreground/60 mb-2'>
                 Fresh off the Press
               </h2>
@@ -89,7 +89,7 @@ const LandingPage: React.FC<IHomeProps> = (props: IHomeProps) => {
                 Latest interview experiences added by the community.
               </p>
             </div>
-            <motion.div
+            <m.div
               initial={{ opacity: 0, x: 20 }}
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
@@ -115,11 +115,11 @@ const LandingPage: React.FC<IHomeProps> = (props: IHomeProps) => {
                   />
                 </svg>
               </Link>
-            </motion.div>
+            </m.div>
           </div>
 
           {/* Cards Grid with stagger */}
-          <motion.div
+          <m.div
             initial='hidden'
             whileInView='visible'
             viewport={{ once: true, margin: '-50px' }}
@@ -136,7 +136,7 @@ const LandingPage: React.FC<IHomeProps> = (props: IHomeProps) => {
             {(experiences.length > 0 ? experiences : interviewData)
               .slice(0, 6)
               .map((interview, index) => (
-                <motion.div
+                <m.div
                   key={interview.id}
                   variants={{
                     hidden: { opacity: 0, y: 30, scale: 0.95 },
@@ -153,12 +153,12 @@ const LandingPage: React.FC<IHomeProps> = (props: IHomeProps) => {
                   }}
                 >
                   <CardComponent {...interview} />
-                </motion.div>
+                </m.div>
               ))}
-          </motion.div>
+          </m.div>
 
           {/* Mobile CTA */}
-          <motion.div
+          <m.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
@@ -185,8 +185,8 @@ const LandingPage: React.FC<IHomeProps> = (props: IHomeProps) => {
                 />
               </svg>
             </Link>
-          </motion.div>
-        </motion.div>
+          </m.div>
+        </m.div>
       </section>
 
       {/* Footer */}

@@ -10,14 +10,19 @@ export class DevToSource implements ContentSource {
       let allArticles: any[] = [];
 
       // We fetch a bit from each tag to get variety
-      for (const tag of tags) {
-        const response = await fetch(
-          `https://dev.to/api/articles?tag=${tag}&per_page=${Math.ceil(limit / tags.length)}`
-        );
-        if (response.ok) {
-          const data = await response.json();
-          allArticles = [...allArticles, ...data];
-        }
+      const tagResults = await Promise.all(
+        tags.map(async (tag) => {
+          const response = await fetch(
+            `https://dev.to/api/articles?tag=${tag}&per_page=${Math.ceil(limit / tags.length)}`
+          );
+          if (response.ok) {
+            return response.json();
+          }
+          return [];
+        })
+      );
+      for (const data of tagResults) {
+        allArticles = [...allArticles, ...data];
       }
 
       // Deduplicate by ID

@@ -1,4 +1,4 @@
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import useGetStats from '@/hooks/useGetStats';
 import { Skeleton } from './ui/skeleton';
 
@@ -25,8 +25,8 @@ export default function StatsSection() {
       <div className='container mx-auto px-4'>
         <div className='grid grid-cols-1 md:grid-cols-3 gap-8'>
           {statsDisplay.map((s, i) => (
-            <motion.div
-              key={i}
+            <m.div
+              key={s.label}
               initial={{ opacity: 0, scale: 0.9 }}
               whileInView={{ opacity: 1, scale: 1 }}
               viewport={{ once: true }}
@@ -39,7 +39,7 @@ export default function StatsSection() {
               <div className='text-sm font-medium text-muted-foreground uppercase tracking-widest'>
                 {s.label}
               </div>
-            </motion.div>
+            </m.div>
           ))}
         </div>
       </div>

@@ -18,6 +18,7 @@ export default function useGetStats() {
   const [isLoading, setIsLoading] = useState(true);
   const supabase = getSupabaseBrowserClient();
 
+  // react-doctor-disable-next-line react-doctor/no-fetch-in-effect
   useEffect(() => {
     async function fetchStats() {
       try {

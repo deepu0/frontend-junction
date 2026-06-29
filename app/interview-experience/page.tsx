@@ -34,18 +34,22 @@ export default async function Interview(props: {
   const searchParams = await props.searchParams;
 
   // Ensure we get initial data based on URL if loaded directly
-  const { data: initialData, totalCount } = await fetchPaginatedExperiences({
-    page: 1,
-    limit: 12,
-    search: searchParams?.search || '',
-    source: (searchParams?.source as any) || 'all',
-    companies: searchParams?.companies ? searchParams.companies.split(',') : [],
-    year: searchParams?.year || null,
-    sortBy: (searchParams?.sort as any) || 'newest',
-    isAdmin: false, // For safety, SSR initial props always non-admin. Client fetches admin on hydration.
-  });
-
-  const { companies, years } = await fetchCompanyAndYearStats();
+  const [{ data: initialData, totalCount }, { companies, years }] =
+    await Promise.all([
+      fetchPaginatedExperiences({
+        page: 1,
+        limit: 12,
+        search: searchParams?.search || '',
+        source: (searchParams?.source as any) || 'all',
+        companies: searchParams?.companies
+          ? searchParams.companies.split(',')
+          : [],
+        year: searchParams?.year || null,
+        sortBy: (searchParams?.sort as any) || 'newest',
+        isAdmin: false, // For safety, SSR initial props always non-admin. Client fetches admin on hydration.
+      }),
+      fetchCompanyAndYearStats(),
+    ]);
 
   return (
     <main className='flex min-h-screen flex-col items-center justify-between p-4 mt-10'>

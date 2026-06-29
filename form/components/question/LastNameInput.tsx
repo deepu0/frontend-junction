@@ -1,15 +1,13 @@
-import { SET_LAST_NAME } from '@/form/reducers';
+import { SET_LAST_NAME } from '@/form/reducers/actions/questionsActions';
 import { ChangeEventHandler } from 'react';
-import {
-  BtnContainer,
-  Error,
-  QuestionInputText,
-  QuestionNumHeading,
-} from '../index';
+import { BtnContainer } from '../btn-container/BtnContainer';
+import { Error } from '../error/Error';
+import { QuestionInputText } from '../question-input-text/QuestionInputText';
+import { QuestionNumHeading } from '../question-num-heading/QuestionNumHeading';
 import classNames from 'classnames';
 import styles from './Question.module.css';
 import Image from 'next/image';
-import { useQuestions, useSharedStates } from '@/form/contexts';
+import { useQuestions, useSharedStates } from '@/form/contexts/index';
 
 export function LastNameInput() {
   const { errorMsg: error, setErrorMsg, handleOkClick } = useSharedStates();

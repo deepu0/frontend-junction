@@ -102,6 +102,7 @@ export const metadata: Metadata = {
 
 import { MobileStickyCta } from '@/components/common/mobile-sticky-cta';
 import { AnnouncementBanner } from '@/components/common/announcement-banner';
+import { MotionProvider } from '@/components/motion-provider';
 
 export default function RootLayout({
   children,
@@ -160,10 +161,12 @@ export default function RootLayout({
           <Toaster />
           <LoadingProvider>
             <AuthProvider>
+              <MotionProvider>
               <AnnouncementBanner />
               <SiteHeader />
               <main id='main-content'>{children}</main>
               <MobileStickyCta />
+              </MotionProvider>
             </AuthProvider>
           </LoadingProvider>
         </ThemeProvider>

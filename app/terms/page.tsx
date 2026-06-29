@@ -14,7 +14,7 @@ export default function TermsOfService() {
       </h1>
 
       <section className='prose prose-invert max-w-none text-muted-foreground space-y-6'>
-        <p>
+        <p suppressHydrationWarning>
           Last updated:{' '}
           {new Date().toLocaleDateString('en-US', {
             month: 'long',

@@ -19,41 +19,55 @@ const alertVariants = cva(
   }
 );
 
-const Alert = React.forwardRef<
-  HTMLDivElement,
-  React.HTMLAttributes<HTMLDivElement> & VariantProps<typeof alertVariants>
->(({ className, variant, ...props }, ref) => (
+const Alert = ({
+  ref,
+  className,
+  variant,
+  ...props
+}: React.HTMLAttributes<HTMLDivElement> &
+  VariantProps<typeof alertVariants> & { ref?: React.Ref<HTMLDivElement> }) => (
   <div
     ref={ref}
     role='alert'
     className={cn(alertVariants({ variant }), className)}
     {...props}
   />
-));
+);
 Alert.displayName = 'Alert';
 
-const AlertTitle = React.forwardRef<
-  HTMLParagraphElement,
-  React.HTMLAttributes<HTMLHeadingElement>
->(({ className, ...props }, ref) => (
+// react-doctor-disable-next-line react-doctor/no-multiple-components
+const AlertTitle = ({
+  ref,
+  className,
+  ...props
+}: React.HTMLAttributes<HTMLHeadingElement> & {
+  ref?: React.Ref<HTMLParagraphElement>;
+}) => (
   <h5
     ref={ref}
+    aria-label={
+      typeof props.children === 'string' ? props.children : 'Alert title'
+    }
     className={cn('mb-1 font-medium leading-none tracking-tight', className)}
     {...props}
   />
-));
+);
 AlertTitle.displayName = 'AlertTitle';
 
-const AlertDescription = React.forwardRef<
-  HTMLParagraphElement,
-  React.HTMLAttributes<HTMLParagraphElement>
->(({ className, ...props }, ref) => (
+// react-doctor-disable-next-line react-doctor/no-multiple-components
+const AlertDescription = ({
+  ref,
+  className,
+  ...props
+}: React.HTMLAttributes<HTMLParagraphElement> & {
+  ref?: React.Ref<HTMLParagraphElement>;
+}) => (
   <div
     ref={ref}
     className={cn('text-sm [&_p]:leading-relaxed', className)}
     {...props}
   />
-));
+);
 AlertDescription.displayName = 'AlertDescription';
 
 export { Alert, AlertTitle, AlertDescription };

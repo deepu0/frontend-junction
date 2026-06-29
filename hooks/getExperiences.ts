@@ -16,7 +16,7 @@ export default async function getExperiences() {
         supabase
           .from('new_interview')
           .select(
-            'id, title, slug, company, description, tags, approval_status, blog_link, created_at'
+            'id, title, slug, company, description, tags, approval_status, blog_link, created_at, is_exclusive'
           )
           .order('created_at', { ascending: false }),
 
@@ -113,6 +113,7 @@ const transformNewData = (data: any) => {
       company: experience.company,
       source: 'Community',
       blogLink: experience.blog_link,
+      isExclusive: experience.is_exclusive ?? false,
     }));
   }
   return [];
@@ -120,22 +121,27 @@ const transformNewData = (data: any) => {
 
 const transformData = (data: any) => {
   if (data && data.length > 0) {
-    return data
-      .filter((data: any) => data.verification_status === 'approved')
-      .map((experience: any) => ({
-        id: `exp-${experience.id}`,
-        rawId: experience.id,
-        title: experience.title,
-        imageSrc: '',
-        description: experience?.summary || experience?.detail_experience || '',
-        tags: experience?.tags || [],
-        status: experience?.status,
-        link: getLink(experience, 'legacy'),
-        date: experience.created_at,
-        type: 'legacy',
-        company: experience.company_name,
-        source: 'Community',
-      }));
+    const result: any[] = [];
+    for (const experience of data) {
+      if (experience.verification_status === 'approved') {
+        result.push({
+          id: `exp-${experience.id}`,
+          rawId: experience.id,
+          title: experience.title,
+          imageSrc: '',
+          description:
+            experience?.summary || experience?.detail_experience || '',
+          tags: experience?.tags || [],
+          status: experience?.status,
+          link: getLink(experience, 'legacy'),
+          date: experience.created_at,
+          type: 'legacy',
+          company: experience.company_name,
+          source: 'Community',
+        });
+      }
+    }
+    return result;
   }
   return [];
 };
