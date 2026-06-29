@@ -46,6 +46,9 @@ export const metadata: Metadata = {
   publisher: 'Frontend Junction',
   alternates: {
     canonical: '/',
+    types: {
+      'application/rss+xml': '/feed.xml',
+    },
   },
   formatDetection: {
     email: false,
@@ -122,14 +125,14 @@ export default function RootLayout({
       </head>
       {process.env.NEXT_GOOGLE_ANALYTICS && (
         <Script
-          strategy='afterInteractive'
+          strategy='lazyOnload'
           src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_GOOGLE_ANALYTICS}`}
         />
       )}
       {process.env.NEXT_GOOGLE_ANALYTICS && (
         <Script
           id='google-analytics'
-          strategy='afterInteractive'
+          strategy='lazyOnload'
           dangerouslySetInnerHTML={{
             __html: `
             window.dataLayer = window.dataLayer || [];
