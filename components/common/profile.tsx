@@ -15,7 +15,7 @@ export default function Profile() {
   const path = usePathname();
   const { user = null } = useAuth();
 
-  const isAdmin = user?.role === 'admin';
+  const isAdmin = user?.role === 'admin' || user?.role === 'superadmin';
 
   return (
     <Popover>

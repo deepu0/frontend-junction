@@ -103,9 +103,7 @@ export const metadata: Metadata = {
 import { MobileStickyCta } from '@/components/common/mobile-sticky-cta';
 import { AnnouncementBanner } from '@/components/common/announcement-banner';
 
-import { getAuthState } from '@/lib/auth';
-
-export default async function RootLayout({
+export default function RootLayout({
   children,
 }: {
   children: React.ReactNode;
