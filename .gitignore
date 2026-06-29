@@ -59,3 +59,7 @@ screenshots/
 
 # Scripts
 scripts/
+
+# One-off files
+cleaned_medium_posts.csv
+test-gemini.js
