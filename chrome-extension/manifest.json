@@ -1,0 +1,10 @@
+{
+  "manifest_version": 3,
+  "name": "Frontend Junction - Capture",
+  "version": "1.0.0",
+  "description": "Capture frontend interview experiences from any blog",
+  "permissions": ["activeTab", "scripting"],
+  "action": {
+    "default_popup": "popup.html"
+  }
+}

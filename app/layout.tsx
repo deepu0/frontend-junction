@@ -162,10 +162,10 @@ export default function RootLayout({
           <LoadingProvider>
             <AuthProvider>
               <MotionProvider>
-              <AnnouncementBanner />
-              <SiteHeader />
-              <main id='main-content'>{children}</main>
-              <MobileStickyCta />
+                <AnnouncementBanner />
+                <SiteHeader />
+                <main id='main-content'>{children}</main>
+                <MobileStickyCta />
               </MotionProvider>
             </AuthProvider>
           </LoadingProvider>

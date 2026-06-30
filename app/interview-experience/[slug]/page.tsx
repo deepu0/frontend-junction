@@ -194,7 +194,7 @@ export default async function ExperienceSlugPage({ params }: Props) {
               ))}
             </div>
 
-            <h1 className='text-3xl md:text-5xl font-bold text-foreground mb-6 leading-tight'>
+            <h1 className='text-xl md:text-2xl font-bold text-foreground mb-6 leading-snug'>
               {experience.title}
             </h1>
 

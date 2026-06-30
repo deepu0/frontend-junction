@@ -32,6 +32,10 @@ export function SiteHeader({ isAdmin = false }: { isAdmin?: boolean }) {
   const { user } = useAuth();
   const pathname = usePathname();
 
+  // Derive admin status from the live auth context.
+  // The isAdmin prop is kept for backward compat but the context always wins.
+  const isAdminUser = isAdmin || user?.role === 'admin';
+
   const [open, setOpen] = React.useState(false);
 
   return (
@@ -68,7 +72,7 @@ export function SiteHeader({ isAdmin = false }: { isAdmin?: boolean }) {
                 {item.name}
               </Link>
             ))}
-            {isAdmin && (
+            {isAdminUser && (
               <>
                 <Link
                   href='/admin'
@@ -150,7 +154,7 @@ export function SiteHeader({ isAdmin = false }: { isAdmin?: boolean }) {
                     {item.name}
                   </Link>
                 ))}
-                {isAdmin && (
+                {isAdminUser && (
                   <div className='pt-4 mt-4 border-t border-border'>
                     <Link
                       href='/admin'
