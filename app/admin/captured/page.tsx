@@ -25,15 +25,24 @@ export default function CapturedDashboard() {
     const supabase = getSupabaseBrowserClient();
     const { data } = await supabase
       .from('captured_content')
-      .select('id, title, original_url, status, quality_score, company, source, captured_at, ai_processed')
+      .select(
+        'id, title, original_url, status, quality_score, company, source, captured_at, ai_processed'
+      )
       .order('captured_at', { ascending: false });
     setItems(data || []);
     setLoading(false);
   };
 
-  useEffect(() => { fetchItems(); }, []);
+  useEffect(() => {
+    fetchItems();
+  }, []);
 
-  const [actionMsg, setActionMsg] = React.useState<{ id: string; msg: string; ok: boolean; link?: string | null } | null>(null);
+  const [actionMsg, setActionMsg] = React.useState<{
+    id: string;
+    msg: string;
+    ok: boolean;
+    link?: string | null;
+  } | null>(null);
 
   const handleAction = async (id: string, action: string) => {
     setActionLoading(id);
@@ -70,12 +79,21 @@ export default function CapturedDashboard() {
       if (res.ok) {
         await fetchItems();
         if (action === 'process') {
-          const scoreEmoji = data.score >= 8 ? '🚀' : data.score >= 7 ? '👀' : '❌';
-          const statusLabel = data.status === 'published' ? 'Auto-published!' : data.status === 'review' ? 'Needs your review' : 'Rejected (low quality)';
-          const link = data.status === 'published' && data.slug
-            ? `/interview-experience/${data.slug}`
-            : null;
-          setActionMsg({ id, msg: `${scoreEmoji} Score ${data.score}/10 · ${statusLabel}${data.company ? ` · ${data.company}` : ''}`, ok: data.score >= 7, link });
+          const scoreEmoji =
+            data.score >= 8 ? '🚀' : data.score >= 7 ? '👀' : '❌';
+          const statusLabel =
+            data.status === 'published'
+              ? 'Auto-published!'
+              : data.status === 'review'
+                ? 'Needs your review'
+                : 'Rejected (low quality)';
+          const link = data.slug ? `/interview-experience/${data.slug}` : null;
+          setActionMsg({
+            id,
+            msg: `${scoreEmoji} Score ${data.score}/10 · ${statusLabel}${data.company ? ` · ${data.company}` : ''}`,
+            ok: data.score >= 7,
+            link,
+          });
         } else {
           setActionMsg({ id, msg: `✅ ${data.message || 'Done'}`, ok: true });
         }
@@ -98,90 +116,142 @@ export default function CapturedDashboard() {
     rejected: 'bg-red-500/20 text-red-500',
   };
 
-  if (loading) return <div className="min-h-screen pt-24 flex items-center justify-center">Loading...</div>;
+  if (loading)
+    return (
+      <div className='min-h-screen pt-24 flex items-center justify-center'>
+        Loading...
+      </div>
+    );
 
   return (
-    <div className="min-h-screen bg-background pt-24 pb-16">
-      <div className="container mx-auto px-4 max-w-5xl">
-        <div className="flex justify-between items-center mb-8">
+    <div className='min-h-screen bg-background pt-24 pb-16'>
+      <div className='container mx-auto px-4 max-w-5xl'>
+        <div className='flex justify-between items-center mb-8'>
           <div>
-            <h1 className="text-3xl font-bold">Captured Content</h1>
-            <p className="text-muted-foreground">Extension & manual captures. Process individually or wait for cron.</p>
+            <h1 className='text-3xl font-bold'>Captured Content</h1>
+            <p className='text-muted-foreground'>
+              Extension & manual captures. Process individually or wait for
+              cron.
+            </p>
           </div>
-          <div className="text-sm text-muted-foreground">
-            {items.filter(i => i.status === 'queued').length} queued · {items.filter(i => i.status === 'published').length} published
+          <div className='text-sm text-muted-foreground'>
+            {items.filter((i) => i.status === 'queued').length} queued ·{' '}
+            {items.filter((i) => i.status === 'published').length} published
           </div>
         </div>
 
         {items.length === 0 ? (
-          <p className="text-center text-muted-foreground py-20">No captured content yet. Use the extension or /admin/ingest to add.</p>
+          <p className='text-center text-muted-foreground py-20'>
+            No captured content yet. Use the extension or /admin/ingest to add.
+          </p>
         ) : (
-          <div className="space-y-3">
-            {items.map(item => (
-              <div key={item.id} className="rounded-xl border border-border bg-card overflow-hidden">
-                <div className="p-4 flex items-center gap-4">
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 mb-1">
-                    <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${statusColor[item.status] || ''}`}>
-                      {item.status}
-                    </span>
-                    {item.quality_score && (
-                      <span className="text-xs text-muted-foreground">⭐ {item.quality_score}/10</span>
-                    )}
-                    {item.company && (
-                      <span className="text-xs text-muted-foreground">🏢 {item.company}</span>
-                    )}
-                    <span className="text-xs text-muted-foreground">via {item.source}</span>
-                  </div>
-                  <p className="font-medium truncate">{item.title}</p>
-                  <a href={item.original_url} target="_blank" rel="noopener noreferrer" className="text-xs text-primary truncate block">{item.original_url}</a>
-                </div>
-
-                <div className="flex gap-2 shrink-0">
-                  {(item.status === 'queued' || item.status === 'rejected') && (
-                    <button
-                      type="button"
-                      onClick={() => handleAction(item.id, 'process')}
-                      disabled={actionLoading === item.id}
-                      className="px-3 py-1.5 text-xs font-medium rounded-lg bg-blue-500 text-white hover:bg-blue-600 disabled:opacity-50"
+          <div className='space-y-3'>
+            {items.map((item) => (
+              <div
+                key={item.id}
+                className='rounded-xl border border-border bg-card overflow-hidden'
+              >
+                <div className='p-4 flex items-center gap-4'>
+                  <div className='flex-1 min-w-0'>
+                    <div className='flex items-center gap-2 mb-1'>
+                      <span
+                        className={`text-xs px-2 py-0.5 rounded-full font-medium ${statusColor[item.status] || ''}`}
+                      >
+                        {item.status}
+                      </span>
+                      {item.quality_score && (
+                        <span className='text-xs text-muted-foreground'>
+                          ⭐ {item.quality_score}/10
+                        </span>
+                      )}
+                      {item.company && (
+                        <span className='text-xs text-muted-foreground'>
+                          🏢 {item.company}
+                        </span>
+                      )}
+                      <span className='text-xs text-muted-foreground'>
+                        via {item.source}
+                      </span>
+                    </div>
+                    <p className='font-medium truncate'>{item.title}</p>
+                    <a
+                      href={item.original_url}
+                      target='_blank'
+                      rel='noopener noreferrer'
+                      className='text-xs text-primary truncate block'
                     >
-                      {actionLoading === item.id ? 'AI Processing...' : '🤖 Process'}
-                    </button>
-                  )}
-                  {item.status === 'review' && (
-                    <button
-                      type="button"
-                      onClick={() => handleAction(item.id, 'publish')}
-                      disabled={actionLoading === item.id}
-                      className="px-3 py-1.5 text-xs font-medium rounded-lg bg-green-500 text-white hover:bg-green-600 disabled:opacity-50"
-                    >
-                      ✅ Publish
-                    </button>
-                  )}
-                  {item.status !== 'rejected' && item.status !== 'published' && (
-                    <button
-                      type="button"
-                      onClick={() => handleAction(item.id, 'reject')}
-                      disabled={actionLoading === item.id}
-                      className="px-3 py-1.5 text-xs font-medium rounded-lg bg-red-500/20 text-red-500 hover:bg-red-500/30 disabled:opacity-50"
-                    >
-                      ✕
-                    </button>
-                  )}
-                </div>
-              </div>
-              {actionMsg?.id === item.id && (
-                <div className={`px-4 py-2 text-xs border-t border-border flex items-center gap-2 ${actionMsg.ok ? 'text-green-500 bg-green-500/5' : 'text-red-500 bg-red-500/5'}`}>
-                  <span>{actionMsg.msg}</span>
-                  {actionMsg.link && (
-                    <a href={actionMsg.link} target="_blank" rel="noopener noreferrer" className="underline font-medium hover:opacity-80">
-                      View post →
+                      {item.original_url}
                     </a>
-                  )}
+                  </div>
+
+                  <div className='flex gap-2 shrink-0'>
+                    {(item.status === 'queued' ||
+                      item.status === 'rejected') && (
+                      <button
+                        type='button'
+                        onClick={() => handleAction(item.id, 'process')}
+                        disabled={actionLoading === item.id}
+                        className='px-3 py-1.5 text-xs font-medium rounded-lg bg-blue-500 text-white hover:bg-blue-600 disabled:opacity-50'
+                      >
+                        {actionLoading === item.id
+                          ? 'AI Processing...'
+                          : '🤖 Process'}
+                      </button>
+                    )}
+                    {item.status === 'published' && (
+                      <button
+                        type='button'
+                        onClick={() => handleAction(item.id, 'process')}
+                        disabled={actionLoading === item.id}
+                        className='px-3 py-1.5 text-xs font-medium rounded-lg bg-violet-500 text-white hover:bg-violet-600 disabled:opacity-50'
+                      >
+                        {actionLoading === item.id
+                          ? 'Rewriting...'
+                          : '✨ Reprocess'}
+                      </button>
+                    )}
+                    {item.status === 'review' && (
+                      <button
+                        type='button'
+                        onClick={() => handleAction(item.id, 'publish')}
+                        disabled={actionLoading === item.id}
+                        className='px-3 py-1.5 text-xs font-medium rounded-lg bg-green-500 text-white hover:bg-green-600 disabled:opacity-50'
+                      >
+                        ✅ Publish
+                      </button>
+                    )}
+                    {item.status !== 'rejected' &&
+                      item.status !== 'published' && (
+                        <button
+                          type='button'
+                          onClick={() => handleAction(item.id, 'reject')}
+                          disabled={actionLoading === item.id}
+                          className='px-3 py-1.5 text-xs font-medium rounded-lg bg-red-500/20 text-red-500 hover:bg-red-500/30 disabled:opacity-50'
+                        >
+                          ✕
+                        </button>
+                      )}
+                  </div>
                 </div>
-              )}
-            </div>
-          ))}
+                {actionMsg?.id === item.id && (
+                  <div
+                    className={`px-4 py-2 text-xs border-t border-border flex items-center gap-2 ${actionMsg.ok ? 'text-green-500 bg-green-500/5' : 'text-red-500 bg-red-500/5'}`}
+                  >
+                    <span>{actionMsg.msg}</span>
+                    {actionMsg.link && (
+                      <a
+                        href={actionMsg.link}
+                        target='_blank'
+                        rel='noopener noreferrer'
+                        className='underline font-medium hover:opacity-80'
+                      >
+                        View post →
+                      </a>
+                    )}
+                  </div>
+                )}
+              </div>
+            ))}
           </div>
         )}
       </div>

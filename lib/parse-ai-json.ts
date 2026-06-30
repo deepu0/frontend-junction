@@ -42,10 +42,15 @@ export function parseAIJson(raw: string): any {
 
     // 5. Last resort: strip the content field entirely (we can re-process later)
     try {
-      const withoutContent = text.replace(/"content"\s*:\s*"[\s\S]*?(?<!\\)",?\s*/g, '"content": "",');
+      const withoutContent = text.replace(
+        /"content"\s*:\s*"[\s\S]*?(?<!\\)",?\s*/g,
+        '"content": "",'
+      );
       return JSON.parse(withoutContent);
     } catch {
-      throw new Error(`AI returned unparseable JSON. Raw (first 200 chars): ${raw.substring(0, 200)}`);
+      throw new Error(
+        `AI returned unparseable JSON. Raw (first 200 chars): ${raw.substring(0, 200)}`
+      );
     }
   }
 }

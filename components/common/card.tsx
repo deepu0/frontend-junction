@@ -359,6 +359,25 @@ const CardComponent: React.FC<CardProps> = ({
       setIsProcessing(false);
     }
   };
+  // Derive a best-effort domain from a company name when no explicit domain is available.
+  // e.g. "Google Pay" → "googlepay.com", "Tata 1mg" → "1mg.com" (falls back to "tata1mg.com")
+  const guessDomain = (name: string): string => {
+    const lower = name.toLowerCase().trim();
+    // Use known website map first
+    if (COMPANY_WEBSITES[lower]) {
+      try {
+        return new URL(COMPANY_WEBSITES[lower]).hostname.replace(/^www\./, '');
+      } catch {
+        // ignore
+      }
+    }
+    // Strip common suffixes/words that don't appear in domains
+    const cleaned = lower
+      .replace(/\s+/g, '') // "Google Pay" → "googlepay"
+      .replace(/[^a-z0-9]/g, ''); // remove special chars
+    return `${cleaned}.com`;
+  };
+
   // Helper for logo URL
   const getLogoUrl = () => {
     // 1. Check Local Mapping first (Highest Priority for curated logos)
@@ -367,7 +386,7 @@ const CardComponent: React.FC<CardProps> = ({
       if (LOCAL_LOGOS[lowerCompany]) return LOCAL_LOGOS[lowerCompany];
     }
 
-    // 2. Use Logo.dev if domain exists (User preferred service)
+    // 2. Use Logo.dev if explicit domain exists
     if (companyDomain) {
       return `https://img.logo.dev/${companyDomain}?token=${LOGO_DEV_PUBLIC_KEY}`;
     }
@@ -375,16 +394,20 @@ const CardComponent: React.FC<CardProps> = ({
     // 3. Use Image Source if provided (Legacy)
     if (imageSrc) return imageSrc;
 
-    // 4. Fallback based on company name (Clearbit as secondary fallback if logo.dev domain not confirmed)
-    if (company && !company.includes(' ')) {
-      const domain = `${company.toLowerCase().trim()}.com`;
-      return `https://img.logo.dev/${domain}?token=${LOGO_DEV_PUBLIC_KEY}`;
+    // 4. Guess domain from company name and try logo.dev (covers multi-word names too)
+    if (company) {
+      const guessed = guessDomain(company);
+      return `https://img.logo.dev/${guessed}?token=${LOGO_DEV_PUBLIC_KEY}`;
     }
 
     return null;
   };
 
-  const logoUrl = getLogoUrl();
+  const [logoError, setLogoError] = React.useState(false);
+  React.useEffect(() => {
+    setLogoError(false);
+  }, [company, companyDomain]);
+  const logoUrl = !logoError ? getLogoUrl() : null;
 
   return (
     <div
@@ -415,6 +438,7 @@ const CardComponent: React.FC<CardProps> = ({
                   loading='eager'
                   className='object-contain p-0.5'
                   unoptimized={logoUrl.includes('logo.dev')}
+                  onError={() => setLogoError(true)}
                 />
               </div>
             </a>
@@ -509,7 +533,7 @@ const CardComponent: React.FC<CardProps> = ({
 
       <div className='relative p-6 pt-2 flex-grow flex flex-col'>
         <h3
-          className='text-lg font-bold text-foreground mb-2 group-hover:text-primary transition-colors line-clamp-2'
+          className='text-base font-semibold text-foreground mb-2 group-hover:text-primary transition-colors line-clamp-2 leading-snug'
           suppressHydrationWarning
         >
           {title}

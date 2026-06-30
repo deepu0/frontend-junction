@@ -43,6 +43,7 @@ Extension → POST /api/pipeline/ingest → captured_content table (status: queu
 ## Configuration
 
 Edit `popup.js` to change API URLs:
+
 - First URL = production
 - Second URL = local dev (fallback)
 

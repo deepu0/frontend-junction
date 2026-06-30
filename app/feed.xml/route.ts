@@ -11,15 +11,18 @@ export async function GET() {
     <language>en-us</language>
     <atom:link href="${siteUrl}/feed.xml" rel="self" type="application/rss+xml"/>
     ${posts
-      .filter(p => p.published)
+      .filter((p) => p.published)
       .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
       .slice(0, 20)
-      .map(post => `<item>
+      .map(
+        (post) => `<item>
       <title>${escapeXml(post.title)}</title>
       <link>${siteUrl}/blog/${post.slug}</link>
       <pubDate>${new Date(post.date).toUTCString()}</pubDate>
       <description>${escapeXml(post.description || '')}</description>
-    </item>`).join('\n    ')}
+    </item>`
+      )
+      .join('\n    ')}
   </channel>
 </rss>`;
 

@@ -24,14 +24,23 @@ export async function POST(request: Request) {
     key === process.env.CRON_SECRET ||
     key === 'dev_bypass';
 
-  if (!isAuthorized) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  if (!isAuthorized)
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
   const supabase = getSupabaseAdmin();
   const genAI = getGenAI();
-  if (!supabase || !genAI) return NextResponse.json({ error: 'Missing config' }, { status: 500 });
+  if (!supabase || !genAI)
+    return NextResponse.json({ error: 'Missing config' }, { status: 500 });
 
   const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
-  const results = { processed: 0, published: 0, review: 0, rejected: 0, questions_added: 0, errors: [] as string[] };
+  const results = {
+    processed: 0,
+    published: 0,
+    review: 0,
+    rejected: 0,
+    questions_added: 0,
+    errors: [] as string[],
+  };
 
   try {
     // Fetch queued items from captured_content
@@ -43,17 +52,31 @@ export async function POST(request: Request) {
       .limit(10);
 
     if (fetchErr || !items?.length) {
-      return NextResponse.json({ success: true, results, message: 'Nothing to process' });
+      return NextResponse.json({
+        success: true,
+        results,
+        message: 'Nothing to process',
+      });
     }
 
     for (const item of items) {
       try {
         // Mark as processing
-        await supabase.from('captured_content').update({ status: 'processing' }).eq('id', item.id);
+        await supabase
+          .from('captured_content')
+          .update({ status: 'processing' })
+          .eq('id', item.id);
 
         const content = item.raw_content || '';
         if (content.length < 200) {
-          await supabase.from('captured_content').update({ ai_processed: true, status: 'rejected', quality_score: 0 }).eq('id', item.id);
+          await supabase
+            .from('captured_content')
+            .update({
+              ai_processed: true,
+              status: 'rejected',
+              quality_score: 0,
+            })
+            .eq('id', item.id);
           results.rejected++;
           continue;
         }
@@ -73,11 +96,40 @@ TASKS:
    - 5-6: More of a guide/tips than personal experience
    - 1-4: Not a frontend interview experience
 
-2. If score >= 7, rewrite the content:
+2. If score >= 7, rewrite the content as a polished third-person case study in Markdown:
    - STRICT THIRD PERSON ("The candidate was asked..." never "I was asked...")
-   - Structure with ## headers: Overview, Company & Role, Interview Rounds (### per round), Key Takeaways
-   - Preserve ALL factual details from source. DO NOT invent details.
-   - Tag difficulty per round: Easy/Medium/Hard
+   - Preserve ALL factual details. Do NOT invent anything.
+   - Use these REQUIRED sections:
+
+     ## Overview
+     Brief intro: company, role, total rounds, outcome (if known).
+
+     ## Role & Compensation Details
+     - **Position**: role title
+     - **Location**: city / remote
+     - **Experience Required**: if mentioned
+     - **CTC / Stipend**: if mentioned
+     - **Outcome**: Selected / Rejected / Pending
+
+     ## Interview Process Summary
+     Bullet list of all rounds with type and duration if available.
+
+     ## Round-by-Round Breakdown
+     One ### sub-section per round:
+     - Round name & type (e.g., ### Round 1 — DSA Coding)
+     - Difficulty tag: \`Easy\` / \`Medium\` / \`Hard\`
+     - Numbered list of questions asked (verbatim if possible)
+     - What the interviewer focused on
+     - Tips for this specific round
+
+     ## Key Technical Topics Covered
+     Categorised bullets: JavaScript/TypeScript, React/Framework, CSS/Layout, System Design, DSA, Behavioral.
+
+     ## Preparation Tips
+     3-5 concrete, actionable tips from this experience.
+
+     ## Verdict
+     Outcome, overall difficulty (1–5), and whether the candidate recommends the role/company.
 
 3. Extract metadata and interview questions.
 
@@ -90,7 +142,7 @@ RESPONSE FORMAT (strict JSON):
   "outcome": "selected|rejected|pending|null",
   "slug": "kebab-case-seo-slug",
   "summary": "2-3 sentence summary in third person",
-  "content": "full markdown (empty string if score < 7)",
+  "content": "full markdown starting from ## Overview (empty string if score < 7)",
   "rounds": [{"name": "string", "type": "coding|machine-coding|system-design|conceptual|behavioral|hr", "difficulty": "easy|medium|hard"}],
   "topics": ["react", "javascript", ...],
   "questions": [{"question": "string", "type": "machine-coding|dsa|system-design|conceptual|behavioral", "difficulty": "easy|medium|hard", "topics": ["string"]}]
@@ -105,50 +157,65 @@ RESPONSE FORMAT (strict JSON):
 
         if (parsed.score >= 8 && parsed.content) {
           const slug = await getUniqueSlug(supabase, parsed.slug);
-          await supabase.from('captured_content').update({
-            ai_processed: true,
-            status: 'published',
-            quality_score: parsed.score,
-            processed_content: parsed.content,
-            slug,
-            company: parsed.company_name,
-            role: parsed.role,
-            level: parsed.level,
-            outcome: parsed.outcome,
-            rounds: parsed.rounds,
-            topics: parsed.topics || [],
-            summary: parsed.summary,
-            processed_at: now,
-            published_at: now,
-          }).eq('id', item.id);
+          await supabase
+            .from('captured_content')
+            .update({
+              ai_processed: true,
+              status: 'published',
+              quality_score: parsed.score,
+              processed_content: parsed.content,
+              slug,
+              company: parsed.company_name,
+              role: parsed.role,
+              level: parsed.level,
+              outcome: parsed.outcome,
+              rounds: parsed.rounds,
+              topics: parsed.topics || [],
+              summary: parsed.summary,
+              processed_at: now,
+              published_at: now,
+            })
+            .eq('id', item.id);
           results.published++;
 
-          await sendNotification({ title: item.title, company: parsed.company_name, slug, score: parsed.score, url: item.original_url });
+          await sendNotification({
+            title: item.title,
+            company: parsed.company_name,
+            slug,
+            score: parsed.score,
+            url: item.original_url,
+          });
         } else if (parsed.score === 7 && parsed.content) {
           const slug = await getUniqueSlug(supabase, parsed.slug);
-          await supabase.from('captured_content').update({
-            ai_processed: true,
-            status: 'review',
-            quality_score: parsed.score,
-            processed_content: parsed.content,
-            slug,
-            company: parsed.company_name,
-            role: parsed.role,
-            level: parsed.level,
-            outcome: parsed.outcome,
-            rounds: parsed.rounds,
-            topics: parsed.topics || [],
-            summary: parsed.summary,
-            processed_at: now,
-          }).eq('id', item.id);
+          await supabase
+            .from('captured_content')
+            .update({
+              ai_processed: true,
+              status: 'review',
+              quality_score: parsed.score,
+              processed_content: parsed.content,
+              slug,
+              company: parsed.company_name,
+              role: parsed.role,
+              level: parsed.level,
+              outcome: parsed.outcome,
+              rounds: parsed.rounds,
+              topics: parsed.topics || [],
+              summary: parsed.summary,
+              processed_at: now,
+            })
+            .eq('id', item.id);
           results.review++;
         } else {
-          await supabase.from('captured_content').update({
-            ai_processed: true,
-            status: 'rejected',
-            quality_score: parsed.score,
-            processed_at: now,
-          }).eq('id', item.id);
+          await supabase
+            .from('captured_content')
+            .update({
+              ai_processed: true,
+              status: 'rejected',
+              quality_score: parsed.score,
+              processed_at: now,
+            })
+            .eq('id', item.id);
           results.rejected++;
         }
 
@@ -167,7 +234,10 @@ RESPONSE FORMAT (strict JSON):
           }
         }
       } catch (e: any) {
-        await supabase.from('captured_content').update({ status: 'queued' }).eq('id', item.id);
+        await supabase
+          .from('captured_content')
+          .update({ status: 'queued' })
+          .eq('id', item.id);
         results.errors.push(`${item.id}: ${e.message}`);
       }
     }
@@ -182,14 +252,28 @@ async function getUniqueSlug(supabase: any, baseSlug: string): Promise<string> {
   let slug = baseSlug;
   let suffix = 1;
   while (true) {
-    const { data } = await supabase.from('captured_content').select('id').eq('slug', slug).limit(1);
+    const { data } = await supabase
+      .from('captured_content')
+      .select('id')
+      .eq('slug', slug)
+      .limit(1);
     if (!data?.length) return slug;
     suffix++;
     slug = `${baseSlug}-${suffix}`;
   }
 }
 
-async function upsertQuestion(supabase: any, data: { company: string; question: string; type: string; difficulty: string; topics: string[]; source_id: string }) {
+async function upsertQuestion(
+  supabase: any,
+  data: {
+    company: string;
+    question: string;
+    type: string;
+    difficulty: string;
+    topics: string[];
+    source_id: string;
+  }
+) {
   const normalized = data.question.toLowerCase().trim();
   const { data: existing } = await supabase
     .from('question_bank')
@@ -199,12 +283,17 @@ async function upsertQuestion(supabase: any, data: { company: string; question: 
     .limit(1);
 
   if (existing?.length) {
-    const ids = Array.from(new Set([...(existing[0].source_experience_ids || []), data.source_id]));
-    await supabase.from('question_bank').update({
-      frequency: existing[0].frequency + 1,
-      source_experience_ids: ids,
-      last_seen_at: new Date().toISOString(),
-    }).eq('id', existing[0].id);
+    const ids = Array.from(
+      new Set([...(existing[0].source_experience_ids || []), data.source_id])
+    );
+    await supabase
+      .from('question_bank')
+      .update({
+        frequency: existing[0].frequency + 1,
+        source_experience_ids: ids,
+        last_seen_at: new Date().toISOString(),
+      })
+      .eq('id', existing[0].id);
   } else {
     await supabase.from('question_bank').insert({
       company: data.company,
@@ -218,7 +307,13 @@ async function upsertQuestion(supabase: any, data: { company: string; question: 
   }
 }
 
-async function sendNotification(data: { title: string; company: string | null; slug: string; score: number; url: string }) {
+async function sendNotification(data: {
+  title: string;
+  company: string | null;
+  slug: string;
+  score: number;
+  url: string;
+}) {
   const webhookUrl = process.env.NOTIFICATION_WEBHOOK_URL;
   if (!webhookUrl) return;
 

@@ -11,7 +11,10 @@ async function postToAPI(body) {
     try {
       const res = await fetch(url, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'x-capture-key': CAPTURE_KEY },
+        headers: {
+          'Content-Type': 'application/json',
+          'x-capture-key': CAPTURE_KEY,
+        },
         body: JSON.stringify(body),
       });
       return { res, data: await res.json() };
@@ -55,8 +58,14 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   btn.addEventListener('click', async () => {
     const content = contentEl.value.trim();
-    if (!content) { showStatus('Content is required', 'error'); return; }
-    if (content.length < 200) { showStatus('Too short (min 200 chars)', 'error'); return; }
+    if (!content) {
+      showStatus('Content is required', 'error');
+      return;
+    }
+    if (content.length < 200) {
+      showStatus('Too short (min 200 chars)', 'error');
+      return;
+    }
 
     btn.disabled = true;
     btn.textContent = 'Sending...';
@@ -89,7 +98,17 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 // This function runs in the page context
 function extractPageContent() {
-  const selectors = ['article', 'main', '[role="main"]', '.post-content', '.article-body', '.entry-content', '.prose', '.blog-post', '.story-content'];
+  const selectors = [
+    'article',
+    'main',
+    '[role="main"]',
+    '.post-content',
+    '.article-body',
+    '.entry-content',
+    '.prose',
+    '.blog-post',
+    '.story-content',
+  ];
   for (const sel of selectors) {
     const el = document.querySelector(sel);
     if (el && el.innerText.trim().length > 300) {
@@ -100,7 +119,10 @@ function extractPageContent() {
 
   function cleanText(text) {
     return text
-      .replace(/^(Skip to|Navigate to|Menu|Search|Sign [Ii]n|Log [Ii]n|Subscribe|Newsletter).*$/gm, '')
+      .replace(
+        /^(Skip to|Navigate to|Menu|Search|Sign [Ii]n|Log [Ii]n|Subscribe|Newsletter).*$/gm,
+        ''
+      )
       .replace(/^(Share|Tweet|Like|Comment|Follow|Clap).*$/gm, '')
       .replace(/^(Cookie|Accept|Privacy|Terms).*$/gm, '')
       .replace(/\n{3,}/g, '\n\n')

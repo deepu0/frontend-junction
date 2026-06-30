@@ -235,39 +235,71 @@ async function processItem(
   content: string,
   context?: string
 ) {
-  const prompt = `
-    You are an expert technical editor for a frontend engineering blog.
-    
-    Context:
-    Title: ${title}
-    Company/Context: ${context || 'General'}
-    Raw Content: "${content.substring(0, 20000)}"
+  const prompt = `You are a senior technical editor for Frontend Junction, a frontend engineering interview blog.
 
-    Task: 
-    1. Analyze the content to identify the Company Name and their Website Domain (e.g., "Google" -> "google.com").
-    2. Rewrite the interview experience into structured, professional Markdown.
-    3. Generate a strict JSON response.
+Context:
+Title: ${title}
+Company/Context: ${context || 'General'}
+Raw Content: "${content.substring(0, 20000)}"
 
-    Requirements:
-    - **Perspective**: **STRICT THIRD-PERSON ONLY**. 
-      - INCORRECT: "I was asked about closures."
-      - CORRECT: "The candidate was questioned on JavaScript closures."
-      - INCORRECT: "My journey started with..."
-      - CORRECT: "The process initiated with..."
-    - **Tone**: Objective, educational, and high-quality.
-    - **Structure**: Use ## headers. Include sections for "Overview", "Interview Rounds", and "Key Takeaways".
-    - **Logo Data**: Infer the best company domain for a logo API.
-    - **Consistency**: Ensure the generated content feels like a case study, not a personal diary.
+TASKS:
+1. Identify the Company Name and their website domain (e.g., "Google" → "google.com").
+2. Rewrite the content as a polished, third-person interview case study in Markdown.
+3. Return a strict JSON response — no markdown fences around the JSON.
 
-    Response Format (Strict JSON):
-    {
-        "slug": "kebab-case-seo-slug",
-        "company_name": "String",
-        "company_domain": "String or null",
-        "summary": "A 2-3 sentence professional executive summary in third person.",
-        "content": "Markdown content starting with ## headers"
-    }
-    `;
+WRITING RULES:
+- STRICT THIRD PERSON. Never use "I", "my", "me", "we".
+  ✗ "I was asked about closures."
+  ✓ "The candidate was asked to explain JavaScript closures."
+- Tone: objective, educational, and professional — like a case study, not a diary.
+- Preserve ALL factual details from the source. Do NOT invent anything.
+
+REQUIRED MARKDOWN SECTIONS (use ## for top-level, ### for sub-sections):
+
+## Overview
+Brief 2-3 sentence intro: company, role, total rounds, and outcome (if known).
+
+## Role & Compensation Details
+- **Position**: e.g. SDE-2, Frontend Engineer
+- **Location**: city / remote
+- **Experience Required**: years
+- **CTC / Stipend**: if mentioned, else omit this bullet
+- **Outcome**: Selected / Rejected / Pending
+
+## Interview Process Summary
+A short table or bullet list of all rounds with their type and duration (if available).
+
+## Round-by-Round Breakdown
+One ### sub-section per round. Each must include:
+- Round name and type (e.g., ### Round 1 — DSA Coding)
+- Difficulty tag: \`Easy\` / \`Medium\` / \`Hard\`
+- Questions asked (as a numbered list, verbatim if possible)
+- What the interviewer focused on
+- Tips for this specific round
+
+## Key Technical Topics Covered
+A categorised bullet list:
+- **JavaScript / TypeScript**: topics...
+- **React / Framework**: topics...
+- **CSS / Layout**: topics...
+- **System Design**: topics...
+- **DSA**: topics...
+- **Behavioral**: topics...
+
+## Preparation Tips
+3-5 concrete, actionable tips derived from this specific experience.
+
+## Verdict
+One short paragraph: outcome, overall difficulty rating (1–5), and whether the candidate would recommend the role/company.
+
+RESPONSE FORMAT (strict JSON, no markdown fences):
+{
+  "slug": "kebab-case-seo-slug",
+  "company_name": "String",
+  "company_domain": "String or null",
+  "summary": "2-3 sentence professional executive summary in third person.",
+  "content": "Full Markdown starting from ## Overview"
+}`;
 
   const result = await model.generateContent(prompt);
   const response = await result.response;

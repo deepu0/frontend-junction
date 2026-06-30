@@ -1,6 +1,30 @@
 import { createClient } from '@supabase/supabase-js';
 import { getExperienceById } from './getExperienceById';
 
+// Derive a human-readable source name from a URL.
+function sourceFromUrl(url: string | null, fallback = 'Web'): string {
+  if (!url) return fallback;
+  try {
+    const host = new URL(url).hostname.replace(/^www\./, '');
+    const MAP: Record<string, string> = {
+      'medium.com': 'Medium',
+      'dev.to': 'DEV Community',
+      'hashnode.com': 'Hashnode',
+      'substack.com': 'Substack',
+      'linkedin.com': 'LinkedIn',
+      'github.com': 'GitHub',
+      'leetcode.com': 'LeetCode',
+      'geeksforgeeks.org': 'GeeksForGeeks',
+    };
+    for (const [key, label] of Object.entries(MAP)) {
+      if (host === key || host.endsWith('.' + key)) return label;
+    }
+    return host.split('.')[0].replace(/^./, (c) => c.toUpperCase());
+  } catch {
+    return fallback;
+  }
+}
+
 export async function getExperienceBySlug(identifierEncoded: string) {
   const identifier = decodeURIComponent(identifierEncoded);
   console.log(`[getExperienceBySlug] Lookup: "${identifier}"`);
@@ -30,7 +54,41 @@ export async function getExperienceBySlug(identifierEncoded: string) {
     return getExperienceById(identifier);
   }
 
-  // 2. Try scraped_experiences (SEO Content)
+  // 2. Try captured_content (Extension captures — highest quality, checked first)
+  const { data: capturedData, error: capturedError } = await supabaseAdmin
+    .from('captured_content')
+    .select('*')
+    .eq('slug', identifier)
+    .eq('status', 'published')
+    .single();
+
+  if (capturedError && capturedError.code !== 'PGRST116') {
+    console.error(`[getExperienceBySlug] Captured Error:`, capturedError);
+  }
+
+  if (capturedData) {
+    console.log(
+      `[getExperienceBySlug] Found in captured_content: ${capturedData.title}`
+    );
+    return {
+      id: capturedData.id,
+      title: capturedData.title,
+      summary: capturedData.summary,
+      content: capturedData.processed_content || capturedData.raw_content,
+      author: 'Community Member',
+      source: sourceFromUrl(
+        capturedData.original_url,
+        capturedData.source || 'Web'
+      ),
+      original_link: capturedData.original_url,
+      date: capturedData.published_at || capturedData.captured_at,
+      tags: capturedData.topics || [],
+      company: capturedData.company,
+      type: 'captured',
+    };
+  }
+
+  // 3. Try scraped_experiences (SEO Content)
   let { data: scrapedData, error: scrapedError } = await supabaseAdmin
     .from('scraped_experiences')
     .select('*')
@@ -62,7 +120,7 @@ export async function getExperienceBySlug(identifierEncoded: string) {
     };
   }
 
-  // 3. Try new_interview (User Submissions)
+  // 4. Try new_interview (User Submissions)
   const { data: userData, error: userError } = await supabaseAdmin
     .from('new_interview')
     .select('*')
@@ -88,7 +146,7 @@ export async function getExperienceBySlug(identifierEncoded: string) {
     };
   }
 
-  // 4. Try experiences (Legacy)
+  // 5. Try experiences (Legacy)
   const { data: legacyData, error: legacyError } = await supabaseAdmin
     .from('experiences')
     .select('*')
