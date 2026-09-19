@@ -236,8 +236,9 @@ import { deleteExperience, approveExperience } from '@/actions/admin';
 import { toast } from '../ui/use-toast';
 import { Loader2, Wand2, CheckCircle2, Trash2 } from 'lucide-react';
 
-const LOGO_DEV_PUBLIC_KEY =
-  process.env.NEXT_PUBLIC_LOGO_DEV_KEY || 'pk_eMJii9ItQ0uGS-ofYW9kQQ';
+// No bundled fallback key: self-hosters must set NEXT_PUBLIC_LOGO_DEV_KEY.
+// When unset, logo.dev URLs are skipped and cards fall back to local/initial avatars.
+const LOGO_DEV_PUBLIC_KEY = process.env.NEXT_PUBLIC_LOGO_DEV_KEY || '';
 
 const CardComponent: React.FC<CardProps> = ({
   id,
@@ -387,7 +388,7 @@ const CardComponent: React.FC<CardProps> = ({
     }
 
     // 2. Use Logo.dev if explicit domain exists
-    if (companyDomain) {
+    if (LOGO_DEV_PUBLIC_KEY && companyDomain) {
       return `https://img.logo.dev/${companyDomain}?token=${LOGO_DEV_PUBLIC_KEY}`;
     }
 
@@ -395,7 +396,7 @@ const CardComponent: React.FC<CardProps> = ({
     if (imageSrc) return imageSrc;
 
     // 4. Guess domain from company name and try logo.dev (covers multi-word names too)
-    if (company) {
+    if (LOGO_DEV_PUBLIC_KEY && company) {
       const guessed = guessDomain(company);
       return `https://img.logo.dev/${guessed}?token=${LOGO_DEV_PUBLIC_KEY}`;
     }

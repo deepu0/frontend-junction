@@ -9,6 +9,10 @@
 </p>
 
 <p align="center">
+  <img src="docs/screenshot-home.png" alt="Frontend Junction homepage" width="800" />
+</p>
+
+<p align="center">
   <a href="https://www.frontend-junction.com">🌐 Live Site</a> •
   <a href="#features">✨ Features</a> •
   <a href="#tech-stack">🛠 Tech Stack</a> •
@@ -116,7 +120,7 @@ Admin role is read from Supabase `app_metadata` — there are no hardcoded admin
 | `NEXT_PUBLIC_TURNSTILE_SITE_KEY` | Optional public Cloudflare Turnstile site key used by bot-protected forms                             |
 | `TURNSTILE_SECRET_KEY`           | Optional server-only Cloudflare Turnstile secret used to verify bot-protected form submissions        |
 | `NEXT_PUBLIC_IS_DEV`             | Optional non-production flag that relaxes cron protection for local pipeline testing                  |
-| `NEXT_PUBLIC_LOGO_DEV_KEY`       | Optional public Logo.dev token for company logos; the app falls back to a bundled demo key when unset |
+| `NEXT_PUBLIC_LOGO_DEV_KEY`       | Optional public Logo.dev token for company logos. When unset, logo.dev is skipped and cards fall back to local curated logos / initial avatars — no bundled key is used |
 
 ### Scripts
 
@@ -149,6 +153,12 @@ frontend-junction/
 ├── public/companies/       # 103 company logos
 └── .github/workflows/      # CI/CD pipeline
 ```
+
+## Architecture Decisions
+
+1. **Next.js App Router + ISR for content, dynamic for accounts** — interview experiences, company profiles, and blog posts are statically generated and revalidated because SEO and crawl speed drive discovery; auth, submissions, and the admin dashboard stay dynamic. *Tradeoff:* content can be stale until revalidation, in exchange for near-instant public pages.
+2. **Supabase as the entire backend** — Postgres, Auth, Storage, and row-level security from one managed service instead of a custom API layer. *Tradeoff:* vendor lock-in and RLS-policy complexity, in exchange for shipping speed and zero servers to operate.
+3. **AI-assisted ingestion, human-gated publishing** — the Gemini pipeline drafts and summarizes experiences from public sources, but nothing goes live without admin approval. *Tradeoff:* slower throughput than full automation, in exchange for keeping fabricated or low-quality content off the site.
 
 ## Contributing
 
